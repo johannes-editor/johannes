@@ -221,6 +221,8 @@ export class QuickMenu extends BaseUIComponent implements IQuickMenu {
             this.htmlElement.style.left = `${leftPosition}px`;
             this.htmlElement.style.top = `${topPosition}px`;
 
+            this.quickMenuEmpty.hide();
+
             super.show();
 
             this.focusOnTheFirstVisibleItem();
