@@ -254,7 +254,7 @@ p.johannes-content-element {
 }
 
 .block>*:not(.editor-only) {
-    padding-left: 1.25rem !important;
+    padding-left: 1.25rem;
 }
 
 .block:hover .drag-handler {
@@ -799,26 +799,23 @@ mark {
 
 
 /* Para telas com densidade média */
-@media only screen and (-webkit-min-device-pixel-ratio: 2),
+/* @media only screen and (-webkit-min-device-pixel-ratio: 2),
 only screen and (min--moz-device-pixel-ratio: 2),
 only screen and (min-resolution: 192dpi),
 only screen and (min-resolution: 2dppx) {
     :root {
         font-size: 18px;
-        /* Aumenta o tamanho da fonte para telas de alta densidade */
     }
 }
 
-/* Para telas com altíssima densidade */
 @media only screen and (-webkit-min-device-pixel-ratio: 3),
 only screen and (min--moz-device-pixel-ratio: 3),
 only screen and (min-resolution: 288dpi),
 only screen and (min-resolution: 3dppx) {
     :root {
         font-size: 20px;
-        /* Ainda maior para telas de densidade muito alta */
     }
-}
+} */
 
 
 
@@ -1513,5 +1510,17 @@ pre code {
 
     #johannesEditor {
         width: 100%;
+    }
+
+    .block>*:not(.editor-only) {
+        padding-left: 0;
+    }
+
+    .title h1 {
+        margin-left: 0;
+    }
+
+    .add-block {
+        margin-left: 0;
     }
 }

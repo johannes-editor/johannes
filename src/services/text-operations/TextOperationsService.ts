@@ -396,11 +396,11 @@ export class TextOperationsService implements ITextOperationsService {
     
         const highlightApplier = rangy.createClassApplier(className, {
             elementTagName: "span",
-            elementProperties: {
-                style: {
-                    backgroundColor: value
-                }
-            },
+            // elementProperties: {
+            //     style: {
+            //         backgroundColor: value
+            //     }
+            // },
             toggle: true
         });
     
@@ -416,11 +416,11 @@ export class TextOperationsService implements ITextOperationsService {
 
         const colorApplier = rangy.createClassApplier(`textColor-${value.replace(/[^a-zA-Z0-9]/g, '')}`, {
             elementTagName: "span",
-            elementProperties: {
-                style: {
-                    color: value
-                }
-            },
+            // elementProperties: {
+            //     style: {
+            //         color: value
+            //     }
+            // },
             toggle: true
         });
 

@@ -145,6 +145,12 @@ export class TextContextFloatingToolbarBuilder {
         const foreColorGrey = new DropdownMenuListItem("colorOptionGrey", colorDropdownList, Commands.toggleForeColor, Colors.ForeColorGrey, new SVGIcon("icon-material-format", Sizes.large).htmlElement, "Grey");
         foreColorGrey.addClass("foreColor");
 
+        const foreColorDark = new DropdownMenuListItem("colorOptionDark", colorDropdownList, Commands.toggleForeColor, Colors.ForeColorDark, new SVGIcon("icon-material-format", Sizes.large).htmlElement, "Dark");
+        foreColorDark.addClass("foreColor");
+
+        const foreColorLight = new DropdownMenuListItem("colorOptionDark", colorDropdownList, Commands.toggleForeColor, Colors.ForeColorLight, new SVGIcon("icon-material-format", Sizes.large).htmlElement, "Light");
+        foreColorLight.addClass("foreColor");
+
         // const foreColorNone = new DropdownMenuListItem("colorOptionNone", colorDropdownList, Commands.toggleForeColor, Colors.ForeColorInitial, new SVGIcon("icon-material-format", Sizes.large).htmlElement, "None");
         // foreColorNone.addClass("foreColor");
 
@@ -152,6 +158,8 @@ export class TextContextFloatingToolbarBuilder {
         colorDropdownList.append(foreColorGreen);
         colorDropdownList.append(foreColorBlue);
         colorDropdownList.append(foreColorYellow);
+        colorDropdownList.append(foreColorDark);
+        colorDropdownList.append(foreColorLight);
         colorDropdownList.append(foreColorGrey);
         // colorDropdownList.append(foreColorNone);
 

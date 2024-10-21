@@ -19,6 +19,8 @@ export enum Colors {
     ForeColorBlue = "#337ea9",
     ForeColorYellow = "#cb912f",
     ForeColorGrey = "#787774",
+    ForeColorDark = "#242424",
+    ForeColorLight = "#d3d3d4",
     ForeColorInitial = "initial",
 
     BackgroundColorRed = "#fddede",
