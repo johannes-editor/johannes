@@ -1484,6 +1484,54 @@ pre code {
 }
 
 
+.highlight-d7f7dc7f {
+    background-color: #d7f7dc7f;
+}
+
+.highlight-faf4d17f {
+    background-color: #faf4d17f;
+}
+
+.highlight-d9edf67f {
+    background-color: #d9edf67f;
+}
+
+.highlight-fddede7f {
+    background-color: #fddede7f;
+}
+
+.highlight-e1e0e0 {
+    background-color: #e1e0e0;
+}
+
+.textColor-d44c47 {
+    color: #d44c47;
+}
+
+.textColor-448361 {
+    color: #448361;
+}
+
+.textColor-337ea9 {
+    color: #337ea9;
+}
+
+.textColor-cb912f {
+    color: #cb912f;
+}
+
+.textColor-d44c47 {
+    color: #d44c47;
+}
+
+.textColor-000000 {
+    color: #212529;
+}
+
+.textColor-ffffff {
+    color: #d3d3d4;
+}
+
 
 @media (max-width: 768px) {
     .drag-handler {
@@ -1504,7 +1552,7 @@ pre code {
         max-width: 250px;
     }
 
-    #linkBox{
+    #linkBox {
         left: 1rem !important;
     }
 
@@ -1522,5 +1570,10 @@ pre code {
 
     .add-block {
         margin-left: 0;
+    }
+
+    #turnIntoSeparator,
+    #turnIntoMenu{
+        display: none !important;
     }
 }
