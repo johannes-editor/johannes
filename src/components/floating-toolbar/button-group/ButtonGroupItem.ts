@@ -8,6 +8,7 @@ import { IUIEventDetail } from "@/commands/IUIEventDetail";
 import { ChangeColor } from "@/commands/UIActions/ChangeColor";
 import { DOMUtils } from "@/utilities/DOMUtils";
 import { DefaultJSEvents } from "@/common/DefaultJSEvents";
+import { Colors } from "@/common/Colors";
 
 export class ButtonGroupItem extends BaseUIComponent {
 
@@ -57,18 +58,6 @@ export class ButtonGroupItem extends BaseUIComponent {
             }));
         });
 
-        // document.addEventListener(CustomEvents.textFormatChanged, (event: Event) => {
-
-        //     const customEvent = event as CustomEvent<IFormatCommand>;
-        //     const states = customEvent.detail;
-
-        //     if (states[this.command as keyof IFormatCommand]) {
-        //         this.icon.changeColor(Colors.IconActiveBlue);
-        //     } else {
-        //         this.icon.changeColor(Colors.IconDefaultBlack);
-        //     }
-        // });
-
         document.addEventListener(CustomUIEvents.ColorChangeRequest, (event: Event) => {
 
             const customEvent = event as CustomEvent<IUIEventDetail>;
@@ -76,32 +65,13 @@ export class ButtonGroupItem extends BaseUIComponent {
 
             if (this.id == details.targetId) {
 
-                this.icon.changeColor((details.action as ChangeColor).color)
-
-                // if (details[this.command as keyof IFormatCommand]) {
-                //     this.icon.changeColor(Colors.IconActiveBlue);
-                // } else {
-                //     this.icon.changeColor(Colors.IconDefaultBlack);
-                // }
+                if((details.action as ChangeColor).color == Colors.IconActiveBlue){
+                    this.icon.changeColorImportant((details.action as ChangeColor).color);
+                }else{
+                    this.icon.changeColor((details.action as ChangeColor).color);
+                }
             }
         });
-
-
-        // document.addEventListener(CustomUIEvents.ColorChangeRequest, (event: Event) => {
-
-        //     const customEvent = event as CustomEvent<IUIEventDetail>;
-        //     const details = customEvent.detail;
-
-        //     if(this.id == details.targetId){
-        //         this.icon.changeColor((details.action as ChangeColor).color)
-
-        //         // if (details[this.command as keyof IFormatCommand]) {
-        //         //     this.icon.changeColor(Colors.IconActiveBlue);
-        //         // } else {
-        //         //     this.icon.changeColor(Colors.IconDefaultBlack);
-        //         // }
-        //     }
-        // });
     }
 
     static create(command: string, title: string, icon: SVGIcon): ButtonGroupItem {

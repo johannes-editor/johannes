@@ -18,12 +18,8 @@ export class SVGIcon extends BaseUIComponent {
 
         const htmlElement = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 
-        htmlElement.style.color = "red !important";
-
         let use = document.createElementNS("http://www.w3.org/2000/svg", "use");
         use.setAttributeNS("http://www.w3.org/1999/xlink", "href", `#${this.props.iconId}`);
-
-        use.style.color = "red !important";
 
         htmlElement.appendChild(use);
         htmlElement.setAttribute('width', this.props.size);

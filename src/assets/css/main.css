@@ -159,7 +159,6 @@ ul.johannes-content-element {
 
 p.johannes-content-element {
     display: inline-block;
-    line-height: 1;
     margin: 0;
     padding: 0;
 }
@@ -1365,7 +1364,7 @@ pre code {
 }
 
 .ignore-events {
-    position: relative;
+    /* position: relative; */
 }
 
 .code-block {

@@ -147,6 +147,10 @@ export abstract class BaseUIComponent<T extends HTMLElement = HTMLElement> {
         this.htmlElement.style.color = value;
     }
 
+    changeColorImportant(value: string): void {
+        this.htmlElement.style.setProperty('color', value, 'important');
+    }
+
     removeColor() {
         this.htmlElement.style.color = "inherit";
     }

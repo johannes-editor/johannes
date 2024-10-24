@@ -19,6 +19,8 @@ export enum CustomEvents {
     transformBlockRequested = "transformBlockRequested",
     duplicateBlockRequested = "duplicateBlockRequested",
 
+    documentChanged = "documentChanged",
+
     //Text edit events
     anchor = "anchor",
     bold = "bold",

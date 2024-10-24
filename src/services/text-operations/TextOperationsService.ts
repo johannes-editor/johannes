@@ -119,6 +119,8 @@ export class TextOperationsService implements ITextOperationsService {
         } catch (error) {
             console.error("Failed to read from clipboard:", error);
         }
+
+        EventEmitter.emitDocChangedEvent();
     }
 
     execInsertLink(url: string): void {
@@ -149,6 +151,8 @@ export class TextOperationsService implements ITextOperationsService {
             EventEmitter.emitChangeComponentColorEvent(ButtonIDs.Link, Colors.IconActiveBlue);
             this.normalizeAnchors();
         }, 50);
+
+        EventEmitter.emitDocChangedEvent();
     }
 
     private normalizeAnchors() {
@@ -216,6 +220,7 @@ export class TextOperationsService implements ITextOperationsService {
 
         const isBold = this.checkBoldState();
         EventEmitter.emitChangeComponentColorEvent(ButtonIDs.Bold, isBold ? Colors.IconActiveBlue : Colors.IconDefaultBlack);
+        EventEmitter.emitDocChangedEvent();
     }
 
     private checkBoldState(): boolean {
@@ -240,6 +245,8 @@ export class TextOperationsService implements ITextOperationsService {
                 EventEmitter.emitChangeComponentColorEvent(ButtonIDs.InlineCode, Colors.IconDefaultBlack);
             }
         }
+
+        EventEmitter.emitDocChangedEvent();
     }
 
     toggleInlineCode(): boolean {
@@ -312,6 +319,7 @@ export class TextOperationsService implements ITextOperationsService {
 
         const isItalic = this.checkItalicState();
         EventEmitter.emitChangeComponentColorEvent(ButtonIDs.Italic, isItalic ? Colors.IconActiveBlue : Colors.IconDefaultBlack);
+        EventEmitter.emitDocChangedEvent();
     }
 
     private checkItalicState(): boolean {
@@ -342,6 +350,7 @@ export class TextOperationsService implements ITextOperationsService {
 
         const isStrikethrough = this.checkStrikethroughState();
         EventEmitter.emitChangeComponentColorEvent(ButtonIDs.Strikethrough, isStrikethrough ? Colors.IconActiveBlue : Colors.IconDefaultBlack);
+        EventEmitter.emitDocChangedEvent();
     }
 
     private checkStrikethroughState(): boolean {
@@ -374,6 +383,8 @@ export class TextOperationsService implements ITextOperationsService {
             const isUnderlined = this.checkUnderlineState();
             EventEmitter.emitChangeComponentColorEvent(ButtonIDs.Underline, isUnderlined ? Colors.IconActiveBlue : Colors.IconDefaultBlack);
         }, 10);
+
+        EventEmitter.emitDocChangedEvent();
     }
 
     private checkUnderlineState(): boolean {
@@ -407,6 +418,7 @@ export class TextOperationsService implements ITextOperationsService {
         highlightApplier.toggleSelection();
 
         EventEmitter.emitShowHideActiveElementEvent("hiliteColor", value, "show");
+        EventEmitter.emitDocChangedEvent();
     }
 
     execForeColor(value: string): void {
@@ -427,6 +439,7 @@ export class TextOperationsService implements ITextOperationsService {
         colorApplier.toggleSelection();
 
         EventEmitter.emitShowHideActiveElementEvent("foreColor", value, "show");
+        EventEmitter.emitDocChangedEvent();
     }
 
     queryCommandState(command: string, value: string | null): boolean {

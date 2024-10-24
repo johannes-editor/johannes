@@ -64,7 +64,7 @@ export class QuickMenuBuilder {
         const embedSection = new QuickMenuSection({ quickMenuInstance: quickMenu, title: 'Embed', classList: 'embed-section' });
 
         embedSection.appendQuickMenuItems([
-            new QuickMenuItem(embedSection, 'GitHub Gist', 'Embed a GitHub Gist.', Icons.GitHub, 'github-gist', "code gist github snippet git"),
+            // new QuickMenuItem(embedSection, 'GitHub Gist', 'Embed a GitHub Gist.', Icons.GitHub, 'github-gist', "code gist github snippet git"),
             // new QuickMenuItem(embedSection, 'GitLab Snippet ', 'List items in a numbered format.', Icons.GitLab, 'gitlab-snippet', "code git gitlab snippet gist"),
             // new QuickMenuItem(embedSection, 'GitLab Snippet ', 'List items in a numbered format.', 'icon-wordpress-numbered-list', 'numbered-list', "numbered list number list sequential list ol enumerated list ordered list"),
             new QuickMenuItem(embedSection, 'CodePen', 'Embed a CodePen web demo.', Icons.CodePen, 'codepen', "code codepen"),

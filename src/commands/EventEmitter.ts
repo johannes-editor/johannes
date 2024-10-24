@@ -75,6 +75,16 @@ export class EventEmitter {
         document.dispatchEvent(customEvent);
     }
 
+    static emitDocChangedEvent() {
+
+        const docChangedEvent = new CustomEvent(CustomEvents.documentChanged, {
+            bubbles: true,
+            cancelable: true,
+            detail: { message: "A block was deleted from the document." }
+        });
+        document.dispatchEvent(docChangedEvent);
+    }
+
     static emitShowHideActiveElementEvent(targetClass: "hiliteColor" | "foreColor" | "backgroundColor", value: string, intension: "show" | "hide") {
 
         if (targetClass == "hiliteColor" && value == Colors.HiliteColorNone) {

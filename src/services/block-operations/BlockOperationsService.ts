@@ -237,11 +237,14 @@ export class BlockOperationsService implements IBlockOperationsService {
             }
     
             selection.addRange(newRange);
+
+            EventEmitter.emitDocChangedEvent();
             return true;
         } catch (error) {
             console.error("Error removing formatting:", error);
             return false;
         }
+
     }
 
     execMergeWithPreviousBlock(): void {
@@ -352,6 +355,8 @@ export class BlockOperationsService implements IBlockOperationsService {
 
         document.dispatchEvent(hideEvent);
 
+        EventEmitter.emitDocChangedEvent();
+
         return true;
     }
 
@@ -370,6 +375,7 @@ export class BlockOperationsService implements IBlockOperationsService {
         });
 
         document.dispatchEvent(hideEvent);
+        EventEmitter.emitDocChangedEvent();
 
         return true;
     }
@@ -590,6 +596,8 @@ export class BlockOperationsService implements IBlockOperationsService {
 
             document.dispatchEvent(customEvent);
         }
+
+        EventEmitter.emitDocChangedEvent();
     }
 
     createNewElement(event: Event) {
@@ -605,6 +613,8 @@ export class BlockOperationsService implements IBlockOperationsService {
         } else {
             this.createDefaultBlock(contentElement);
         }
+
+        EventEmitter.emitDocChangedEvent();
     }
 
     createListItem(element: HTMLElement): void {
@@ -623,6 +633,8 @@ export class BlockOperationsService implements IBlockOperationsService {
         } else {
             // newContentElement = createNewDraggableParagraphElement();
         }
+
+        EventEmitter.emitDocChangedEvent();
     }
 
     createNewElementAndSplitContent(): boolean {
@@ -695,6 +707,8 @@ export class BlockOperationsService implements IBlockOperationsService {
             }
         }
 
+        EventEmitter.emitDocChangedEvent();
+
         return true;
     }
 
@@ -725,6 +739,8 @@ export class BlockOperationsService implements IBlockOperationsService {
         }
 
         clonedTitle?.remove();
+
+        EventEmitter.emitDocChangedEvent();
     }
 
     createDefaultBlock(eventParagraph: Element | null): HTMLElement {
@@ -742,6 +758,8 @@ export class BlockOperationsService implements IBlockOperationsService {
         const focusable = newBlock.querySelector('.johannes-content-element') as HTMLElement;
         focusable.focus();
         this.focusStack.push(newBlock);
+
+        EventEmitter.emitDocChangedEvent();
 
         return newBlock;
     }
@@ -768,6 +786,8 @@ export class BlockOperationsService implements IBlockOperationsService {
         this.focusOnPrevious(currentActiveElement);
         this.deleteTheCurrentElementAndTheDraggableBlockIfEmpty(currentActiveElement);
 
+        EventEmitter.emitDocChangedEvent();
+
         return true;
     }
 
@@ -783,6 +803,8 @@ export class BlockOperationsService implements IBlockOperationsService {
 
         this.focusOnNext(currentActiveElement);
         this.deleteTheCurrentElementAndTheDraggableBlockIfEmpty(currentActiveElement);
+
+        EventEmitter.emitDocChangedEvent();
 
         return true;
     }
@@ -1085,6 +1107,8 @@ export class BlockOperationsService implements IBlockOperationsService {
 
             EventEmitter.emitCodeBlockLanguageChangedEvent("code-block-language-menu", block.id, value);
         }
+
+        EventEmitter.emitDocChangedEvent();
     }
 
     private removeJustify(element: HTMLElement) {
@@ -1097,6 +1121,8 @@ export class BlockOperationsService implements IBlockOperationsService {
                 classList.remove(className);
             }
         }
+
+        EventEmitter.emitDocChangedEvent();
     }
 
     execChangeCalloutBackground(block: HTMLElement, color: string): void {
@@ -1107,5 +1133,7 @@ export class BlockOperationsService implements IBlockOperationsService {
             DOMUtils.removeClassesWithPrefix(calloutDiv as Element, "callout-background-");
             calloutDiv.classList.add(color);
         }
+
+        EventEmitter.emitDocChangedEvent();
     }
 }
