@@ -374,6 +374,16 @@ export class DOMUtils {
         return null;
     }
 
+    static getBlockFromEvent(event: Event): HTMLElement | null {
+        const target = event.target;
+    
+        if (target && target instanceof Element) {
+            return target.closest('.block');
+        }
+    
+        return null;
+    }
+
     static isSelectedTextDescendantOf(parentSelector: string): boolean {
         const selection = document.getSelection();
 

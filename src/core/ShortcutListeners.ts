@@ -4,6 +4,8 @@ import { CustomEvents } from "@/common/CustomEvents";
 import { ElementFactoryService } from "@/services/element-factory/ElementFactoryService";
 import { IShortcutListeners } from "./IShortcutListeners";
 import { DefaultJSEvents } from "@/common/DefaultJSEvents";
+import { Utils } from "@/utilities/Utils";
+import { DOMUtils } from "@/utilities/DOMUtils";
 
 export class ShortcutListeners implements IShortcutListeners {
 
@@ -32,6 +34,10 @@ export class ShortcutListeners implements IShortcutListeners {
     private listen() {
         document.addEventListener(DefaultJSEvents.Keydown, (event) => {
 
+            if (!Utils.isEventFromContentWrapper(event)) {
+                return;
+            }
+
             const isNumPad = event.code.startsWith("Numpad");
             const numLockOn = event.getModifierState("NumLock");
 
@@ -43,7 +49,8 @@ export class ShortcutListeners implements IShortcutListeners {
                 document.dispatchEvent(new CustomEvent<ICommandEventDetail>(CustomEvents.emittedCommand, {
                     detail: {
                         command: Commands.transformBlock,
-                        targetBlockType: ElementFactoryService.ELEMENT_TYPES.PARAGRAPH
+                        value: ElementFactoryService.ELEMENT_TYPES.PARAGRAPH,
+                        block: DOMUtils.getBlockFromEvent(event)
                     }
                 }));
 
@@ -55,11 +62,12 @@ export class ShortcutListeners implements IShortcutListeners {
                 document.dispatchEvent(new CustomEvent<ICommandEventDetail>(CustomEvents.emittedCommand, {
                     detail: {
                         command: Commands.transformBlock,
-                        targetBlockType: ElementFactoryService.ELEMENT_TYPES.CHECK_LIST
+                        value: ElementFactoryService.ELEMENT_TYPES.CHECK_LIST,
+                        block: DOMUtils.getBlockFromEvent(event)
                     }
                 }));
 
-            } else if ((event.ctrlKey || event.metaKey) && !event.shiftKey && event.key === ".") {
+            } else if (event.ctrlKey && event.key === '.') {
                 // Converts to bulleted list when pressing  Ctrl+Shift+.
                 event.preventDefault();
                 event.stopPropagation();
@@ -67,7 +75,8 @@ export class ShortcutListeners implements IShortcutListeners {
                 document.dispatchEvent(new CustomEvent<ICommandEventDetail>(CustomEvents.emittedCommand, {
                     detail: {
                         command: Commands.transformBlock,
-                        targetBlockType: ElementFactoryService.ELEMENT_TYPES.BULLETED_LIST
+                        value: ElementFactoryService.ELEMENT_TYPES.BULLETED_LIST,
+                        block: DOMUtils.getBlockFromEvent(event)
                     }
                 }));
             } else if ((event.ctrlKey || event.metaKey) && !event.shiftKey && (event.key === "/")) {
@@ -78,7 +87,8 @@ export class ShortcutListeners implements IShortcutListeners {
                 document.dispatchEvent(new CustomEvent<ICommandEventDetail>(CustomEvents.emittedCommand, {
                     detail: {
                         command: Commands.transformBlock,
-                        targetBlockType: ElementFactoryService.ELEMENT_TYPES.NUMBERED_LIST
+                        value: ElementFactoryService.ELEMENT_TYPES.NUMBERED_LIST,
+                        block: DOMUtils.getBlockFromEvent(event)
                     }
                 }));
             } else if ((event.ctrlKey && event.altKey && ((event.code === "Digit1") || (isNumPad && numLockOn && event.code === "Numpad1")))) {
@@ -89,7 +99,8 @@ export class ShortcutListeners implements IShortcutListeners {
                 document.dispatchEvent(new CustomEvent<ICommandEventDetail>(CustomEvents.emittedCommand, {
                     detail: {
                         command: Commands.transformBlock,
-                        targetBlockType: ElementFactoryService.ELEMENT_TYPES.HEADER_1
+                        value: ElementFactoryService.ELEMENT_TYPES.HEADER_1,
+                        block: DOMUtils.getBlockFromEvent(event)
                     }
                 }));
             } else if ((event.ctrlKey && event.altKey && ((event.code === "Digit2") || (isNumPad && numLockOn && event.code === "Numpad2")))) {
@@ -100,7 +111,8 @@ export class ShortcutListeners implements IShortcutListeners {
                 document.dispatchEvent(new CustomEvent<ICommandEventDetail>(CustomEvents.emittedCommand, {
                     detail: {
                         command: Commands.transformBlock,
-                        targetBlockType: ElementFactoryService.ELEMENT_TYPES.HEADER_2
+                        value: ElementFactoryService.ELEMENT_TYPES.HEADER_2,
+                        block: DOMUtils.getBlockFromEvent(event)
                     }
                 }));
             } else if ((event.ctrlKey && event.altKey && ((event.code === "Digit3") || (isNumPad && numLockOn && event.code === "Numpad3")))) {
@@ -111,7 +123,8 @@ export class ShortcutListeners implements IShortcutListeners {
                 document.dispatchEvent(new CustomEvent<ICommandEventDetail>(CustomEvents.emittedCommand, {
                     detail: {
                         command: Commands.transformBlock,
-                        targetBlockType: ElementFactoryService.ELEMENT_TYPES.HEADER_3
+                        value: ElementFactoryService.ELEMENT_TYPES.HEADER_3,
+                        block: DOMUtils.getBlockFromEvent(event)
                     }
                 }));
             } else if ((event.ctrlKey && event.altKey && ((event.code === "Digit4") || (isNumPad && numLockOn && event.code === "Numpad4")))) {
@@ -122,7 +135,8 @@ export class ShortcutListeners implements IShortcutListeners {
                 document.dispatchEvent(new CustomEvent<ICommandEventDetail>(CustomEvents.emittedCommand, {
                     detail: {
                         command: Commands.transformBlock,
-                        targetBlockType: ElementFactoryService.ELEMENT_TYPES.HEADER_4
+                        value: ElementFactoryService.ELEMENT_TYPES.HEADER_4,
+                        block: DOMUtils.getBlockFromEvent(event)
                     }
                 }));
             } else if ((event.ctrlKey && event.altKey && ((event.code === "Digit5") || (isNumPad && numLockOn && event.code === "Numpad5")))) {
@@ -133,7 +147,8 @@ export class ShortcutListeners implements IShortcutListeners {
                 document.dispatchEvent(new CustomEvent<ICommandEventDetail>(CustomEvents.emittedCommand, {
                     detail: {
                         command: Commands.transformBlock,
-                        targetBlockType: ElementFactoryService.ELEMENT_TYPES.HEADER_5
+                        value: ElementFactoryService.ELEMENT_TYPES.HEADER_5,
+                        block: DOMUtils.getBlockFromEvent(event)
                     }
                 }));
             } else if ((event.ctrlKey && event.altKey && ((event.code === "Digit6") || (isNumPad && numLockOn && event.code === "Numpad6")))) {
@@ -144,7 +159,8 @@ export class ShortcutListeners implements IShortcutListeners {
                 document.dispatchEvent(new CustomEvent<ICommandEventDetail>(CustomEvents.emittedCommand, {
                     detail: {
                         command: Commands.transformBlock,
-                        targetBlockType: ElementFactoryService.ELEMENT_TYPES.HEADER_6
+                        value: ElementFactoryService.ELEMENT_TYPES.HEADER_6,
+                        block: DOMUtils.getBlockFromEvent(event)
                     }
                 }));
             } else if ((event.key === "D" || event.key === "d") && event.ctrlKey) {
