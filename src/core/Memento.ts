@@ -3,6 +3,7 @@ import { IMemento } from "./IMemento";
 import { DOMUtils } from "@/utilities/DOMUtils";
 import { DefaultJSEvents } from "@/common/DefaultJSEvents";
 import { KeyboardKeys } from "@/common/KeyboardKeys";
+import { Utils } from "@/utilities/Utils";
 
 export class Memento implements IMemento {
 
@@ -58,8 +59,25 @@ export class Memento implements IMemento {
     }
   }
 
+  debounce(fn: () => void, delay: number) {
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    return () => {
+      if (timeoutId !== undefined) clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        fn();
+      }, delay);
+    };
+  }
+
+  debouncedSaveState = this.debounce(() => this.saveState(), 300);
+
   attachEvents() {
     document.addEventListener(DefaultJSEvents.Keydown, (event) => {
+
+      if (!Utils.isEventFromContentWrapper(event)) {
+        return;
+      }
+
       if (event.ctrlKey && event.key === 'z') {
         this.undo();
         event.preventDefault();
@@ -72,11 +90,15 @@ export class Memento implements IMemento {
     document.addEventListener(DefaultJSEvents.Keyup, (event: KeyboardEvent) => {
       if (event.key == KeyboardKeys.Space || event.key == KeyboardKeys.Backspace || event.key == KeyboardKeys.Delete) {
 
+        if (!Utils.isEventFromContentWrapper(event)) {
+          return;
+        }
+
         if (DOMUtils.isEventTargetDescendantOf(event, `.${CommonClasses.EditorOnly}`)) {
           return;
         }
 
-        this.saveState();
+        this.debouncedSaveState();
       }
     });
   }
