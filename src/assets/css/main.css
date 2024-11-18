@@ -245,7 +245,7 @@ p.johannes-content-element {
 }
 
 .block {
-    display: flex;
+    display: flex !important;
     flex-direction: row;
     margin-bottom: 1rem;
     position: relative;
