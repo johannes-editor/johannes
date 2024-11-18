@@ -8,6 +8,7 @@ import { DependencyContainer } from "@/core/DependencyContainer";
 import { Colors } from "@/common/Colors";
 import { ButtonIDs } from "@/core/ButtonIDs";
 import { KeyboardKeys } from "@/common/KeyboardKeys";
+import { Utils } from "@/utilities/Utils";
 
 export class TextContextFloatingToolbar extends FloatingToolbar {
 
@@ -122,12 +123,22 @@ export class TextContextFloatingToolbar extends FloatingToolbar {
         document.addEventListener(DefaultJSEvents.SelectionChange, debouncedProcessAfterChange);
 
         document.addEventListener(DefaultJSEvents.Keydown, (event) => {
+
+            if (!Utils.isEventFromContentWrapper(event)) {
+                return;
+            }
+
             if (event.shiftKey) {
                 isSelecting = true;
             }
         });
 
         document.addEventListener(DefaultJSEvents.Keyup, (event) => {
+
+            if (!Utils.isEventFromContentWrapper(event)) {
+                return;
+            }
+
             if (event.key === KeyboardKeys.Shift) {
                 isSelecting = false;
                 this.showHide(event, isSelecting);
@@ -150,12 +161,21 @@ export class TextContextFloatingToolbar extends FloatingToolbar {
         });
 
         document.addEventListener(DefaultJSEvents.SelectionChange, (event) => {
+
+            if (!Utils.isEventFromContentWrapper(event)) {
+                return;
+            }
+
             this.showHide(event, isSelecting);
         });
 
 
         document.addEventListener(DefaultJSEvents.Keydown, (event) => {
             if (event.key !== KeyboardKeys.Escape) return;
+
+            if (!Utils.isEventFromContentWrapper(event)) {
+                return;
+            }
 
             setTimeout(() => {
                 if (this.canHide && (event.key === KeyboardKeys.Escape) && !this.lockedHide) {

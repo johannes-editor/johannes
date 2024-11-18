@@ -14,6 +14,7 @@ import { DOMUtils } from '@/utilities/DOMUtils';
 import { ZIndex } from '@/common/ZIndex';
 import { DefaultJSEvents } from '@/common/DefaultJSEvents';
 import { KeyboardKeys } from '@/common/KeyboardKeys';
+import { Utils } from '@/utilities/Utils';
 
 export class QuickMenu extends BaseUIComponent implements IQuickMenu {
 
@@ -267,6 +268,10 @@ export class QuickMenu extends BaseUIComponent implements IQuickMenu {
                 return;
             }
 
+            if (!Utils.isEventFromContentWrapper(event)) {
+                return;
+            }
+
             let value = '';
 
             if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) {
@@ -316,6 +321,10 @@ export class QuickMenu extends BaseUIComponent implements IQuickMenu {
                 return;
             }
 
+            if (!Utils.isEventFromContentWrapper(event)) {
+                return;
+            }
+
             const block = DOMUtils.findClosestAncestorOfActiveElementByClass("block");
 
             if (this.isVisible && event.key === KeyboardKeys.ArrowLeft && !event.ctrlKey && !event.shiftKey && !event.altKey) {
@@ -345,6 +354,10 @@ export class QuickMenu extends BaseUIComponent implements IQuickMenu {
         document.addEventListener(DefaultJSEvents.Keydown, (event) => {
 
             if (this.isVisible && event.key === KeyboardKeys.Enter && !event.ctrlKey && !event.shiftKey && !event.altKey) {
+
+                if (!Utils.isEventFromContentWrapper(event)) {
+                    return;
+                }
 
                 event.preventDefault();
                 event.stopPropagation();

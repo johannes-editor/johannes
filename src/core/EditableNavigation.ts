@@ -6,6 +6,7 @@ import { TableUtils } from "@/utilities/TableUtils";
 import { IQuickMenu } from "@/components/quick-menu/IQuickMenu";
 import { DependencyContainer } from "./DependencyContainer";
 import { DefaultJSEvents } from "@/common/DefaultJSEvents";
+import { Utils } from "@/utilities/Utils";
 
 export class EditableNavigation implements IEditableNavigation {
 
@@ -37,6 +38,10 @@ export class EditableNavigation implements IEditableNavigation {
     private handleArrowKeys(event: KeyboardEvent) {
 
         if(!event.key.startsWith('Arrow')){
+            return;
+        }
+
+        if(!Utils.isEventFromContentWrapper(event)){
             return;
         }
 

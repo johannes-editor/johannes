@@ -70,6 +70,10 @@ export class DropdownMenuList extends BaseUIComponent {
 
             if (event.key !== KeyboardKeys.Enter) return;
 
+            if (!Utils.isEventFromContentWrapper(event)) {
+                return;
+            }
+
             if (this.isVisible && this.currentFocusedMenuItem && event.key === KeyboardKeys.Enter) {
                 event.stopImmediatePropagation();
                 event.preventDefault();
@@ -90,6 +94,10 @@ export class DropdownMenuList extends BaseUIComponent {
                 event.key !== KeyboardKeys.ArrowDown &&
                 event.key !== KeyboardKeys.ArrowUp &&
                 event.key !== KeyboardKeys.Escape) {
+                return;
+            }
+
+            if(!Utils.isEventFromContentWrapper(event)){
                 return;
             }
 

@@ -15,6 +15,21 @@ export class Utils {
         }).join("");
     }
 
+    static isEventFromContentWrapper(event: Event): boolean {
+        const target = event.target;
+        const contentWrapper = document.querySelector('#johannesEditor .content-wrapper');
+
+        if (!contentWrapper || !target) {
+            return false;
+        }
+
+        if (!(target instanceof Node)) {
+            return false;
+        }
+
+        return contentWrapper.contains(target);
+    }
+
     static isValidUrl(url: string): boolean {
         const pattern = new RegExp(
             '^(https?:\\/\\/)' +
@@ -27,11 +42,11 @@ export class Utils {
             '(#[-a-zA-Z\\d_]*)?$',
             'i'
         );
-    
+
         if (url.includes('../') || url.toLowerCase().includes('%2e%2e') || url.toLowerCase().includes('%00')) {
             return false;
         }
-    
+
         return pattern.test(url);
     }
 }

@@ -330,6 +330,11 @@ export class MediaInputter extends BaseUIComponent {
 
     handlerKeydownEvents(event: KeyboardEvent) {
         if (event.key == KeyboardKeys.Escape) {
+
+            if(!Utils.isEventFromContentWrapper(event)){
+                return;
+            }
+            
             if (this.canHide) {
                 this.hide();
             }

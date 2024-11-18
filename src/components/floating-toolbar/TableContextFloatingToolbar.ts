@@ -16,6 +16,7 @@ import { EventEmitter } from "@/commands/EventEmitter";
 import { ITableOperationsService } from "@/services/table-operations/ITableOperationsService";
 import { CustomUIEvents } from "@/common/CustomUIEvents";
 import { IUIEventDetail } from "@/commands/IUIEventDetail";
+import { Utils } from "@/utilities/Utils";
 
 export class TableContextFloatingToolbar extends FloatingToolbar implements ITableContextFloatingToolbar {
 
@@ -112,6 +113,11 @@ export class TableContextFloatingToolbar extends FloatingToolbar implements ITab
 
     private handleMouseUp(event: MouseEvent) {
         if (this.selectedCells.length > 0 && this.selectionFlag) {
+
+            if (!Utils.isEventFromContentWrapper(event)) {
+                return;
+            }
+
             this.resetSelectionState();
             this.show();
         }
@@ -119,7 +125,11 @@ export class TableContextFloatingToolbar extends FloatingToolbar implements ITab
 
     private handleKeyDown(event: KeyboardEvent) {
 
-        if(event.key !== KeyboardKeys.Enter && event.key !== KeyboardKeys.Escape){
+        if (event.key !== KeyboardKeys.Enter && event.key !== KeyboardKeys.Escape) {
+            return;
+        }
+
+        if(!Utils.isEventFromContentWrapper(event)){
             return;
         }
 
@@ -150,6 +160,10 @@ export class TableContextFloatingToolbar extends FloatingToolbar implements ITab
             return;
         }
 
+        if (!Utils.isEventFromContentWrapper(event)) {
+            return;
+        }
+
         const target = event.target as HTMLElement;
         const currentCell = target.closest(DOMElements.TD) as HTMLTableCellElement;
 
@@ -170,6 +184,10 @@ export class TableContextFloatingToolbar extends FloatingToolbar implements ITab
     private handleCellSelectionContinuationOnKeyDown(event: KeyboardEvent) {
 
         if (!event.shiftKey && !event.key.startsWith('Arrow')) {
+            return;
+        }
+
+        if (!Utils.isEventFromContentWrapper(event)) {
             return;
         }
 
@@ -254,7 +272,11 @@ export class TableContextFloatingToolbar extends FloatingToolbar implements ITab
 
     private handleKeyUp(event: KeyboardEvent) {
 
-        if(event.key !== KeyboardKeys.Shift){
+        if (event.key !== KeyboardKeys.Shift) {
+            return;
+        }
+
+        if(!Utils.isEventFromContentWrapper(event)){
             return;
         }
 

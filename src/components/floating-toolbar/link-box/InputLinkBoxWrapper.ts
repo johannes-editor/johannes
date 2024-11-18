@@ -74,6 +74,10 @@ export class InputLinkBoxWrapper extends BaseUIComponent {
                 return;
             }
 
+            if(!Utils.isEventFromContentWrapper(event)){
+                return;
+            }
+
             if (this.canHide && (event.key === KeyboardKeys.Escape)) {
                 event.stopImmediatePropagation();
                 this.hide();

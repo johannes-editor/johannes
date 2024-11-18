@@ -1,6 +1,7 @@
 import { CommonClasses } from "@/common/CommonClasses";
 import { IImageAlt } from "./IImageAlt";
 import { DefaultJSEvents } from "@/common/DefaultJSEvents";
+import { Utils } from "@/utilities/Utils";
 
 export class ImageAlt implements IImageAlt {
   private static instance: ImageAlt | null = null;
@@ -66,7 +67,7 @@ export class ImageAlt implements IImageAlt {
 
         this.inputElement = document.createElement("input");
         this.inputElement.classList.add(
-          
+
         );
         this.inputElement.type = "text";
         this.inputElement.placeholder = "Alt text";
@@ -128,6 +129,11 @@ export class ImageAlt implements IImageAlt {
     });
 
     document.addEventListener(DefaultJSEvents.Keydown, (event) => {
+
+      if (!Utils.isEventFromContentWrapper(event)) {
+        return;
+      }
+
       if (event.key === "Escape") {
         if (this.currentImage && this.inputElement) {
           this.currentImage.alt = this.inputElement.value;

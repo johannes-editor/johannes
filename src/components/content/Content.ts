@@ -12,6 +12,7 @@ import { DOMUtils } from "@/utilities/DOMUtils";
 import { TableUtils } from "@/utilities/TableUtils";
 import { DefaultJSEvents } from "@/common/DefaultJSEvents";
 import { KeyboardKeys } from "@/common/KeyboardKeys";
+import { Utils } from "@/utilities/Utils";
 
 export class Content extends BaseUIComponent {
 
@@ -341,6 +342,10 @@ export class Content extends BaseUIComponent {
         document.addEventListener(DefaultJSEvents.Input, function (event: Event) {
             if (event.target instanceof HTMLElement) {
                 const editableElement = event.target;
+
+                if(!Utils.isEventFromContentWrapper(event)){
+                    return;
+                }
 
                 if (editableElement.isContentEditable) {
                     if (editableElement.hasAttribute('data-placeholder')) {
