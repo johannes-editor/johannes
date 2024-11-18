@@ -145,6 +145,28 @@ export class DOMUtils {
         return null;
     }
 
+    static trimEmptyTextAndBrElements(element: Node): void {
+        if (!element) return;
+
+        const isEmptyTextOrBr = (node: Node): boolean => {
+            if (node.nodeType === Node.TEXT_NODE) {
+                return !node.textContent?.trim();
+            }
+            if (node.nodeType === Node.ELEMENT_NODE) {
+                return (node as HTMLElement).tagName.toLowerCase() === 'br';
+            }
+            return false;
+        };
+
+        while (element.firstChild && isEmptyTextOrBr(element.firstChild)) {
+            element.removeChild(element.firstChild);
+        }
+
+        while (element.lastChild && isEmptyTextOrBr(element.lastChild)) {
+            element.removeChild(element.lastChild);
+        }
+    }
+
     static rearrangeContentAfterSplit(currentNode: Node, newNode: Node): void {
         const selection = window.getSelection();
         if (!selection || selection.rangeCount === 0) {
@@ -376,11 +398,11 @@ export class DOMUtils {
 
     static getBlockFromEvent(event: Event): HTMLElement | null {
         const target = event.target;
-    
+
         if (target && target instanceof Element) {
             return target.closest('.block');
         }
-    
+
         return null;
     }
 

@@ -12,6 +12,7 @@ import { IMemento } from "@/core/IMemento";
 import { DependencyContainer } from "@/core/DependencyContainer";
 import { MediaInputter } from "../media-inputter/MediaInputter";
 import { InputLinkBoxWrapper } from "../floating-toolbar/link-box/InputLinkBoxWrapper";
+import { Commands } from "@/commands/Commands";
 
 export class Editor extends BaseUIComponent {
 
@@ -28,6 +29,7 @@ export class Editor extends BaseUIComponent {
     private tableContextToolbar: TableContextFloatingToolbar;
     private mediaInputter: MediaInputter;
     private inputLinkBoxWrapper: InputLinkBoxWrapper;
+    private blockOperationsService: IBlockOperationsService;
 
     private constructor(
         elementFactoryService: IElementFactoryService,
@@ -62,6 +64,7 @@ export class Editor extends BaseUIComponent {
 
         this.inputLinkBoxWrapper = inputLinkBoxWrapper;
         this.elementFactoryService = elementFactoryService;
+        this.blockOperationsService = blockOperationsService;
         this.memento = memento;
         this.addBlock = addBlock;
         this.textFloatingToolbar = floatingToolbar;
@@ -178,16 +181,24 @@ export class Editor extends BaseUIComponent {
             }
         }
 
-        document.addEventListener('paste', function (event: ClipboardEvent) {
+        document.addEventListener('paste', (event: ClipboardEvent) => {
             const target = event.target as HTMLElement;
+
             if (target.getAttribute('contenteditable') === 'true') {
                 event.preventDefault();
 
                 const clipboardData = event.clipboardData;
                 if (clipboardData) {
                     const text = clipboardData.getData('text/plain');
+                    const paragraphs = text.split('\n\n').filter(line => line.trim() !== '');
 
-                    Editor.insertTextAtCursor(text);
+                    if (paragraphs.length > 0) {
+                        Editor.insertTextAtCursor(paragraphs[0]);
+
+                        paragraphs.slice(1).forEach(p => {
+                            this.blockOperationsService.createDefaultBlock(null, p);
+                        });
+                    }
                 }
             }
         }, true);

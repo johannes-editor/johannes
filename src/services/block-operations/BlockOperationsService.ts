@@ -135,7 +135,7 @@ export class BlockOperationsService implements IBlockOperationsService {
         if (command == Commands.createDefaultBlock) {
             const element = document.activeElement || null;
 
-            this.createDefaultBlock(element);
+            this.createDefaultBlock(element, value);
             return true;
         }
 
@@ -611,7 +611,7 @@ export class BlockOperationsService implements IBlockOperationsService {
         if (contentElement && contentElement.classList.contains('list')) {
             this.createListItem(contentElement);
         } else {
-            this.createDefaultBlock(contentElement);
+            this.createDefaultBlock(contentElement, "");
         }
 
         EventEmitter.emitDocChangedEvent();
@@ -646,7 +646,7 @@ export class BlockOperationsService implements IBlockOperationsService {
         if (contentType == ContentTypes.Image) {
 
             const block = DOMUtils.findClosestAncestorOfActiveElementByClass("block");
-            this.createDefaultBlock(block);
+            this.createDefaultBlock(block, "");
             return false;
         } else if (contentType == ContentTypes.Table) {
             // TODO Jump to the next line if exists
@@ -663,7 +663,10 @@ export class BlockOperationsService implements IBlockOperationsService {
                 if (clone) {
                     const contentCurrent = currentItem.querySelector(".focusable") as Node;
                     const contentClone = clone.querySelector(".focusable") as Node;
+                    
+                    DOMUtils.trimEmptyTextAndBrElements(contentClone);
                     DOMUtils.rearrangeContentAfterSplit(contentCurrent, contentClone);
+                
                 }
             } else if (currentItem) {
 
@@ -696,7 +699,7 @@ export class BlockOperationsService implements IBlockOperationsService {
                     const contentClone = clonedBlock.querySelector(".focusable") as Node;
                     DOMUtils.rearrangeContentAfterSplit(contentCurrent, contentClone);
 
-
+                    DOMUtils.trimEmptyTextAndBrElements(contentClone);
                     this.transformBlock(ContentTypes.Paragraph, clonedBlock);
 
                 }
@@ -743,10 +746,10 @@ export class BlockOperationsService implements IBlockOperationsService {
         EventEmitter.emitDocChangedEvent();
     }
 
-    createDefaultBlock(eventParagraph: Element | null): HTMLElement {
+    createDefaultBlock(eventParagraph: Element | null, text: string | null): HTMLElement {
 
         this.memento.saveState();
-        const newBlock = this.elementFactoryService.create(ElementFactoryService.ELEMENT_TYPES.BLOCK_PARAGRAPH, "");
+        const newBlock = this.elementFactoryService.create(ElementFactoryService.ELEMENT_TYPES.BLOCK_PARAGRAPH, text || "");
 
         if (eventParagraph && eventParagraph.closest('.block')) {
             const sibling = eventParagraph.closest('.block')!;
