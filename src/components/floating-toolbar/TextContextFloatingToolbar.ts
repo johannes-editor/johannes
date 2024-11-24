@@ -162,10 +162,6 @@ export class TextContextFloatingToolbar extends FloatingToolbar {
 
         document.addEventListener(DefaultJSEvents.SelectionChange, (event) => {
 
-            if (!Utils.isEventFromContentWrapper(event)) {
-                return;
-            }
-
             this.showHide(event, isSelecting);
         });
 
