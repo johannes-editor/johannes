@@ -38,6 +38,30 @@ export class BlockOperationsService implements IBlockOperationsService {
         BlockOperationsService.instance = this;
     }
 
+    insertBlock(type: string, content: string, previousBlock: HTMLElement): HTMLElement {
+
+        const block = this.elementFactoryService.create(type, content);
+
+        if (previousBlock) {
+            previousBlock.insertAdjacentElement('afterend', block);
+        } else {
+            document.querySelector("#johannesEditor .content")!.appendChild(block);
+        }
+
+        return block;
+    }
+
+    insertLiIntoListBlock(content: string, block: HTMLElement): HTMLElement {
+
+        const li = this.elementFactoryService.create(ElementFactoryService.ELEMENT_TYPES.LIST_ITEM, content);
+
+        const list = block.querySelector("ul, ol");
+
+        list!.appendChild(li);
+
+        return li;
+    }
+
     execCommand(command: string, showUI: boolean, value: string | null = null): boolean {
 
         if (command == Commands.copySelected) {
@@ -214,28 +238,28 @@ export class BlockOperationsService implements IBlockOperationsService {
         if (!selection || selection.rangeCount === 0) {
             return false;
         }
-    
+
         const range = selection.getRangeAt(0);
         const fragment = range.cloneContents();
-    
+
         const tempDiv = document.createElement('div');
         tempDiv.appendChild(fragment);
-    
+
         const textContent = tempDiv.textContent || '';
-    
+
         try {
             range.deleteContents();
             const textNode = document.createTextNode(textContent);
             range.insertNode(textNode);
-    
+
             selection.removeAllRanges();
             const newRange = document.createRange();
-    
+
             if (textNode.parentNode) {
                 newRange.setStart(textNode, 0);
                 newRange.setEnd(textNode, textContent.length);
             }
-    
+
             selection.addRange(newRange);
 
             EventEmitter.emitDocChangedEvent();
@@ -663,10 +687,10 @@ export class BlockOperationsService implements IBlockOperationsService {
                 if (clone) {
                     const contentCurrent = currentItem.querySelector(".focusable") as Node;
                     const contentClone = clone.querySelector(".focusable") as Node;
-                    
+
                     DOMUtils.trimEmptyTextAndBrElements(contentClone);
                     DOMUtils.rearrangeContentAfterSplit(contentCurrent, contentClone);
-                
+
                 }
             } else if (currentItem) {
 

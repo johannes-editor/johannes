@@ -16,5 +16,6 @@ export enum DefaultJSEvents {
     Focusout = "focusout",
     DOMContentLoaded = "DOMContentLoaded",
     Input = "input",
-    BblClick = "dblclick"
+    BblClick = "dblclick",
+    Paste = "paste"
 }

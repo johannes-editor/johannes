@@ -19,6 +19,7 @@ export class Content extends BaseUIComponent {
 
     quickMenu: IQuickMenu;
     tableToolbar: ITableContextFloatingToolbar;
+    contentWrapper: HTMLElement | null = null;
 
     constructor() {
 
@@ -63,6 +64,37 @@ export class Content extends BaseUIComponent {
         });
     }
 
+    // Allow multi-block selection 
+    handleSelectionChange = () => {
+        if (!this.contentWrapper) {
+            this.contentWrapper = document.querySelector("#johannesEditor .content-wrapper");
+        }
+
+        const selection = document.getSelection();
+
+        if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
+            if (this.contentWrapper && this.contentWrapper.getAttribute("contenteditable") !== "true") {
+                const anchorNode = selection.anchorNode;
+                const anchorOffset = selection.anchorOffset;
+                const focusNode = selection.focusNode;
+                const focusOffset = selection.focusOffset;
+
+                this.contentWrapper.setAttribute("contenteditable", "true");
+
+                setTimeout(() => {
+                    const newSelection = document.getSelection();
+                    if (newSelection) {
+                        newSelection.removeAllRanges();
+                        newSelection.setBaseAndExtent(anchorNode!, anchorOffset, focusNode!, focusOffset);
+                    }
+                }, 0);
+            }
+        } else {
+            if (this.contentWrapper && this.contentWrapper.getAttribute("contenteditable") === "true") {
+                this.contentWrapper.removeAttribute("contenteditable");
+            }
+        }
+    };
 
     attachEvent(): void {
 
@@ -85,6 +117,8 @@ export class Content extends BaseUIComponent {
                 }
             }
         });
+
+        document.addEventListener(DefaultJSEvents.SelectionChange, this.handleSelectionChange, true);
 
         document.addEventListener(DefaultJSEvents.Click, (event: MouseEvent) => {
             const previousSelected = document.querySelectorAll('.separator-selected');
@@ -343,7 +377,7 @@ export class Content extends BaseUIComponent {
             if (event.target instanceof HTMLElement) {
                 const editableElement = event.target;
 
-                if(!Utils.isEventFromContentWrapper(event)){
+                if (!Utils.isEventFromContentWrapper(event)) {
                     return;
                 }
 

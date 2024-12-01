@@ -450,6 +450,7 @@ p {
         2px 0 4px rgba(0, 0, 0, 0.02);
 
     border: 1px solid #d0d0d0;
+    border-radius: 4px;
 }
 
 /** and soft-box-shadow */
@@ -649,6 +650,7 @@ mark {
     width: fit-content;
     max-height: 19rem;
     overflow-y: auto;
+    border-radius: 4px;
 }
 
 .block-options {
@@ -1572,7 +1574,7 @@ pre code {
     }
 
     #turnIntoSeparator,
-    #turnIntoMenu{
+    #turnIntoMenu {
         display: none !important;
     }
 }

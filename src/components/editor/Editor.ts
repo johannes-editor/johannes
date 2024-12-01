@@ -12,7 +12,8 @@ import { IMemento } from "@/core/IMemento";
 import { DependencyContainer } from "@/core/DependencyContainer";
 import { MediaInputter } from "../media-inputter/MediaInputter";
 import { InputLinkBoxWrapper } from "../floating-toolbar/link-box/InputLinkBoxWrapper";
-import { Commands } from "@/commands/Commands";
+import { DefaultJSEvents } from '@/common/DefaultJSEvents';
+import { Utils } from "@/utilities/Utils";
 
 export class Editor extends BaseUIComponent {
 
@@ -87,6 +88,7 @@ export class Editor extends BaseUIComponent {
 
         const contentWrapper = document.createElement("div");
         contentWrapper.classList.add("content-wrapper");
+        // contentWrapper.setAttribute("contenteditable", "true");
 
         if (window.editorConfig?.enableTitle || true) {
             contentWrapper.appendChild(this.props.title.htmlElement);
@@ -181,31 +183,69 @@ export class Editor extends BaseUIComponent {
             }
         }
 
-        document.addEventListener('paste', (event: ClipboardEvent) => {
-            const target = event.target as HTMLElement;
+        document.addEventListener(DefaultJSEvents.Paste, (event: ClipboardEvent) => {
+            const target = event.target as HTMLElement | null;
 
-            if (target.getAttribute('contenteditable') === 'true') {
+            if (target?.getAttribute('contenteditable') === 'true') {
+
+                if (!Utils.isEventFromContentWrapper(event)) {
+                    return;
+                }
+
                 event.preventDefault();
+                event.stopImmediatePropagation();
 
                 const clipboardData = event.clipboardData;
                 if (clipboardData) {
                     const text = clipboardData.getData('text/plain');
-                    const paragraphs = text.split('\n\n').filter(line => line.trim() !== '');
+                    const textHtml = clipboardData.getData('text/html');
+
+                    if (textHtml !== "") {
+                        const blocks = Editor.extractClipboardContent(textHtml);
+
+                        if (blocks.length > 0) {
+
+                            if (blocks[0].text) {
+                                Editor.insertTextAtCursor(blocks[0].text);
+                            }
+
+                            blocks.slice(1).forEach(block => {
+
+                                if (block.type == "ul" || block.type == "ol") {
+
+                                    const first = block.items?.[0]?.text;
+                                    const newBlock = this.blockOperationsService.insertBlock("block-" + block.type, first || "", null);
+
+                                    block.items?.slice(1).forEach(item => {
+                                        this.blockOperationsService.insertLiIntoListBlock(item.text || "", newBlock)
+                                    });
+
+                                } else {
+                                    this.blockOperationsService.insertBlock("block-" + block.type, block.text || "", null);
+                                }
+
+                            });
+                        }
+
+                        return;
+                    }
+
+                    const paragraphs = text.split('\n\r')
+                        .map(item => item = item.replace("\n", ""))
+                        .filter(line => line.trim() !== '');
 
                     if (paragraphs.length > 0) {
                         Editor.insertTextAtCursor(paragraphs[0]);
 
-                        paragraphs.slice(1).forEach(p => {
-                            this.blockOperationsService.createDefaultBlock(null, p);
+                        paragraphs.slice(1).forEach(textContent => {
+                            this.blockOperationsService.createDefaultBlock(null, textContent);
                         });
                     }
                 }
             }
         }, true);
 
-
         this.attachDragHandler();
-
     }
 
     static insertTextAtCursor(text: string): void {
@@ -267,8 +307,6 @@ export class Editor extends BaseUIComponent {
         throw new Error("Not implemented Exception");
     }
 
-
-
     attachDragHandler() {
         let draggedItem: any = null;
 
@@ -328,4 +366,162 @@ export class Editor extends BaseUIComponent {
             }
         });
     }
+
+    // static extractClipboardContent(htmlContent: string) {
+    //     const parser = new DOMParser();
+    //     const doc = parser.parseFromString(htmlContent, 'text/html');
+
+    //     interface Block {
+    //         type: string;
+    //         text?: string;
+    //         items?: Block[];
+    //     }
+
+    //     const blocks: Block[] = [];
+
+    //     function processNode(node: Node): Block | null {
+    //         if (node.nodeType === Node.ELEMENT_NODE) {
+    //             const element = node as HTMLElement;
+    //             const type = element.tagName.toLowerCase();
+
+    //             // Handle different block elements
+    //             if (type === 'h1' || type === 'h2' || type === 'h3' ||
+    //                 type === 'h4' || type === 'h5' || type === 'h6' ||
+    //                 type === 'p' || type === 'pre' || type === 'code' ||
+    //                 type === 'blockquote') {
+
+    //                 const text = element.innerText.trim();
+    //                 return { type, text };
+
+    //             } else if (type === 'ul' || type === 'ol') {
+    //                 // Handle lists
+    //                 const items: Block[] = [];
+    //                 element.querySelectorAll('li').forEach(li => {
+    //                     const text = li.innerText.trim();
+    //                     items.push({ type: 'li', text });
+    //                 });
+    //                 return { type, items };
+
+    //             } else if (type === 'li') {
+    //                 const text = element.innerText.trim();
+    //                 return { type: 'li', text };
+
+    //             } else if (type === 'div' || type === 'span') {
+    //                 // Process child nodes
+    //                 const childBlocks: Block[] = [];
+    //                 element.childNodes.forEach(child => {
+    //                     const block = processNode(child);
+    //                     if (block) {
+    //                         childBlocks.push(block);
+    //                     }
+    //                 });
+    //                 // Flatten if only one child
+    //                 if (childBlocks.length === 1) {
+    //                     return childBlocks[0];
+    //                 } else if (childBlocks.length > 1) {
+    //                     return { type: 'group', items: childBlocks };
+    //                 } else {
+    //                     return null;
+    //                 }
+
+    //             } else {
+    //                 // For other elements, process child nodes
+    //                 const text = element.innerText.trim();
+    //                 if (text) {
+    //                     return { type: element.tagName.toLowerCase(), text };
+    //                 } else {
+    //                     return null;
+    //                 }
+    //             }
+    //         } else if (node.nodeType === Node.TEXT_NODE) {
+    //             const text = node.textContent?.trim();
+    //             if (text) {
+    //                 return { type: 'text', text };
+    //             }
+    //         }
+    //         return null;
+    //     }
+
+    //     doc.body.childNodes.forEach(node => {
+    //         const block = processNode(node);
+    //         if (block) {
+    //             blocks.push(block);
+    //         }
+    //     });
+
+    //     return blocks;
+    // }
+
+    static extractClipboardContent(htmlContent: string) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlContent, 'text/html');
+
+        interface Block {
+            type: string;
+            text?: string;
+            items?: Block[];
+        }
+
+        const blocks: Block[] = [];
+
+        function processNode(node: Node): Block[] {
+            let blocks: Block[] = [];
+
+            if (node.nodeType === Node.ELEMENT_NODE) {
+                const element = node as HTMLElement;
+                const type = element.tagName.toLowerCase();
+
+                if (['style', 'script'].includes(type)) {
+                    return blocks;
+                }
+
+                if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'pre', 'code', 'blockquote'].includes(type)) {
+                    const text = element.innerText.trim();
+                    if (text) {
+                        blocks.push({ type, text });
+                    }
+                } else if (type === 'ul' || type === 'ol') {
+                    const items: Block[] = [];
+                    element.querySelectorAll(':scope > li').forEach(li => {
+                        const text = (li as HTMLElement).innerText.trim();
+                        if (text) {
+                            items.push({ type: 'li', text });
+                        }
+                    });
+                    if (items.length > 0) {
+                        blocks.push({ type, items });
+                    }
+                } else if (type === 'li') {
+                    const text = element.innerText.trim();
+                    if (text) {
+                        blocks.push({ type: 'li', text });
+                    }
+                } else {
+                    element.childNodes.forEach(child => {
+                        const childBlocks = processNode(child);
+                        blocks = blocks.concat(childBlocks);
+                    });
+                }
+            } else if (node.nodeType === Node.TEXT_NODE) {
+                const text = node.textContent?.trim();
+                if (text) {
+                    const parent = node.parentNode as HTMLElement;
+                    const parentType = parent?.tagName.toLowerCase();
+
+                    if (parentType && !['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'pre', 'code', 'blockquote', 'li'].includes(parentType)) {
+                        blocks.push({ type: 'p', text });
+                    }
+                }
+            }
+            return blocks;
+        }
+
+        doc.body.childNodes.forEach(node => {
+            const nodeBlocks = processNode(node);
+            blocks.push(...nodeBlocks);
+        });
+
+        return blocks;
+    }
+
 }
