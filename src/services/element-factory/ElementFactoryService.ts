@@ -18,6 +18,20 @@ export class ElementFactoryService implements IElementFactoryService {
 
     static ELEMENT_TYPES = {
         BLOCK_PARAGRAPH: "block-p",
+
+        BOCK_HEADER_1: "block-h1",
+        BLOCK_HEADER_2: "block-h2",
+        BLOCK_HEADER_3: "block-h3",
+        BLOCK_HEADER_4: "block-h4",
+        BLOCK_HEADER_5: "block-h5",
+        BLOCK_HEADER_6: "block-h6",
+        BLOCK_CODE: "block-code",
+        BLOCK_PRE: "block-pre",
+        BLOCK_BLOCKQUOTE: "block-blockquote",
+
+        BLOCK_BULLETED_LIST: "block-ul",
+        BLOCK_NUMBERED_LIST: "block-ol",
+
         PARAGRAPH: "p",
         CHECKBOX_ITEM: "checkboxItem",
         LIST_ITEM: "listItem",
@@ -53,6 +67,17 @@ export class ElementFactoryService implements IElementFactoryService {
         this.creators = {};
 
         this.register(ElementFactoryService.ELEMENT_TYPES.BLOCK_PARAGRAPH, ElementFactoryService.blockParagraphCreator());
+        this.register(ElementFactoryService.ELEMENT_TYPES.BOCK_HEADER_1, ElementFactoryService.blockHeadingCreator(1));
+        this.register(ElementFactoryService.ELEMENT_TYPES.BLOCK_HEADER_2, ElementFactoryService.blockHeadingCreator(2));
+        this.register(ElementFactoryService.ELEMENT_TYPES.BLOCK_HEADER_3, ElementFactoryService.blockHeadingCreator(3));
+        this.register(ElementFactoryService.ELEMENT_TYPES.BLOCK_HEADER_4, ElementFactoryService.blockHeadingCreator(4));
+        this.register(ElementFactoryService.ELEMENT_TYPES.BLOCK_HEADER_5, ElementFactoryService.blockHeadingCreator(5));
+        this.register(ElementFactoryService.ELEMENT_TYPES.BLOCK_HEADER_6, ElementFactoryService.blockHeadingCreator(6));
+        this.register(ElementFactoryService.ELEMENT_TYPES.BLOCK_CODE, ElementFactoryService.blockCodeCreator());
+        this.register(ElementFactoryService.ELEMENT_TYPES.BLOCK_PRE, ElementFactoryService.blockCodeCreator());
+        this.register(ElementFactoryService.ELEMENT_TYPES.BLOCK_BLOCKQUOTE, ElementFactoryService.blockBlockquoteCreator());
+        this.register(ElementFactoryService.ELEMENT_TYPES.BLOCK_BULLETED_LIST, ElementFactoryService.blockUlCreator());
+        this.register(ElementFactoryService.ELEMENT_TYPES.BLOCK_NUMBERED_LIST, ElementFactoryService.blockOlCreator());
         this.register(ElementFactoryService.ELEMENT_TYPES.PARAGRAPH, ElementFactoryService.paragraphCreator());
         this.register(ElementFactoryService.ELEMENT_TYPES.CHECKBOX_ITEM, ElementFactoryService.checkboxItemCreator());
         this.register(ElementFactoryService.ELEMENT_TYPES.LIST_ITEM, ElementFactoryService.listItemCreator());
@@ -109,6 +134,40 @@ export class ElementFactoryService implements IElementFactoryService {
         };
     }
 
+    private static blockHeadingCreator(level: number): ElementCreator {
+        return content => {
+            return ElementFactoryService.blockHeading(level, content);
+        };
+    }
+
+    private static blockCodeCreator(): ElementCreator {
+        return content => {
+            return ElementFactoryService.blockCode(content || "");
+        };
+
+    }
+
+    private static blockBlockquoteCreator(): ElementCreator {
+        return content => {
+            return ElementFactoryService.blockBlockquote(content || "");
+        };
+
+    }
+
+    private static blockUlCreator(): ElementCreator {
+        return content => {
+            return ElementFactoryService.blockUl(content || "");
+        };
+
+    }
+
+    private static blockOlCreator(): ElementCreator {
+        return content => {
+            return ElementFactoryService.blockOl(content || "");
+        };
+
+    }
+
     private static paragraphCreator(): ElementCreator {
         return content => {
             return ElementFactoryService.paragraph(content);
@@ -143,53 +202,19 @@ export class ElementFactoryService implements IElementFactoryService {
 
     private static codeCreator(): ElementCreator {
         return content => {
-            const container = document.createElement('div');
-            container.classList.add("johannes-content-element", "ignore-events");
-
-            const codeBlock = document.createElement("div");
-            codeBlock.classList.add("code-block", "ignore-quick-menu", "ignore-text-floating-toolbar");
-
-            const pre = document.createElement('pre');
-            pre.classList.add(ToolboxOptions.IncludeBlockToolbarClass, ToolboxOptions.LanguageSelectionToolClass, ToolboxOptions.ExtraOptionsClass);
-
-            const code = document.createElement('code');
-            code.contentEditable = "true";
-            code.setAttribute("data-placeholder", "/* Code snippet */");
-            code.textContent = content || "";
-            code.classList.add('johannes-code', "focusable", "hljs", "language-plaintext", "editable");
-            code.setAttribute("spellCheck", "false");
-
-            pre.appendChild(code);
-
-            code.addEventListener("blur", () => {
-                code.removeAttribute("data-highlighted");
-                hljs.highlightElement(code);
-            });
-
-            codeBlock.appendChild(pre);
-            container.appendChild(codeBlock);
-
-            hljs.highlightElement(code);
-
-            return container;
+            return ElementFactoryService.code(content || "");
         };
     }
 
     private static quoteCreator(): ElementCreator {
         return content => {
+            return ElementFactoryService.quote(content || "");
+        };
+    }
 
-            const contentElement = document.createElement("div");
-            contentElement.classList.add("johannes-content-element", "swittable");
-
-            const blockquote = document.createElement("blockquote");
-            blockquote.classList.add("focusable", "editable");
-            blockquote.textContent = content || "";
-            blockquote.contentEditable = "true";
-            blockquote.setAttribute("data-placeholder", ElementFactoryService.getRandomQuote());
-
-            contentElement.appendChild(blockquote);
-            
-            return contentElement;
+    private static ulCreator(): ElementCreator {
+        return content => {
+            return ElementFactoryService.ul(content || "");
         };
     }
 
@@ -206,8 +231,8 @@ export class ElementFactoryService implements IElementFactoryService {
             "Make it work, make it right, make it fast. - Kent Beck",
             "Before software can be reusable it first has to be usable. - Ralph Johnson"
         ];
-    
-        const index = Math.floor(Math.random() * quotations.length);    
+
+        const index = Math.floor(Math.random() * quotations.length);
         return quotations[index];
     }
 
@@ -227,33 +252,13 @@ export class ElementFactoryService implements IElementFactoryService {
 
     private static bulletedListCreator(): ElementCreator {
         return content => {
-            const element = document.createElement('ul');
-            element.setAttribute("data-content-type", ContentTypes.BulletedList);
-            element.classList.add('johannes-content-element');
-            element.classList.add('swittable');
-            element.classList.add('list');
-
-            const initialItem = ElementFactoryService.listItem_2(content || "");
-
-            element.appendChild(initialItem);
-
-            return element;
+            return ElementFactoryService.ul(content || "");
         };
     }
 
     private static numberedListCreator(): ElementCreator {
         return content => {
-            const element = document.createElement('ol');
-            element.setAttribute("data-content-type", ContentTypes.NumberedList);
-            element.classList.add('johannes-content-element');
-            element.classList.add('swittable');
-            element.classList.add('list');
-
-            const initialItem = ElementFactoryService.listItem_2(content || "");
-
-            element.appendChild(initialItem);
-
-            return element;
+            return ElementFactoryService.ol(content || "");
         };
     }
 
@@ -340,12 +345,12 @@ export class ElementFactoryService implements IElementFactoryService {
 
             const calloutWrapper = document.createElement("div");
             calloutWrapper.classList.add("callout-background-grey", "callout-wrapper");
-            
+
             const textArea = document.createElement('p');
             textArea.setAttribute("data-placeholder", "Type something...");
             textArea.contentEditable = "true";
             textArea.classList.add("callout-text", "editable", "focusable");
-            
+
             calloutWrapper.appendChild(textArea);
             johannesCallout.appendChild(calloutWrapper);
 
@@ -365,7 +370,7 @@ export class ElementFactoryService implements IElementFactoryService {
             separator.classList.add('separator');
             wrapper.appendChild(separator);
             content.appendChild(wrapper);
-            
+
             return content;
         };
     }
@@ -394,7 +399,85 @@ export class ElementFactoryService implements IElementFactoryService {
         return h;
     }
 
-    static checkboxItem(content: string): HTMLElement {
+    private static code(content: string): HTMLElement {
+        const container = document.createElement('div');
+        container.classList.add("johannes-content-element", "ignore-events");
+
+        const codeBlock = document.createElement("div");
+        codeBlock.classList.add("code-block", "ignore-quick-menu", "ignore-text-floating-toolbar");
+
+        const pre = document.createElement('pre');
+        pre.classList.add(ToolboxOptions.IncludeBlockToolbarClass, ToolboxOptions.LanguageSelectionToolClass, ToolboxOptions.ExtraOptionsClass);
+
+        const code = document.createElement('code');
+        code.contentEditable = "true";
+        code.setAttribute("data-placeholder", "/* Code snippet */");
+        code.textContent = content || "";
+        code.classList.add('johannes-code', "focusable", "hljs", "language-plaintext", "editable");
+        code.setAttribute("spellCheck", "false");
+
+        pre.appendChild(code);
+
+        code.addEventListener("blur", () => {
+            code.removeAttribute("data-highlighted");
+            hljs.highlightElement(code);
+        });
+
+        codeBlock.appendChild(pre);
+        container.appendChild(codeBlock);
+
+        hljs.highlightElement(code);
+
+        return container;
+    }
+
+    private static quote(content: string): HTMLElement {
+
+        const contentElement = document.createElement("div");
+        contentElement.classList.add("johannes-content-element", "swittable");
+
+        const blockquote = document.createElement("blockquote");
+        blockquote.classList.add("focusable", "editable");
+        blockquote.textContent = content || "";
+        blockquote.contentEditable = "true";
+        blockquote.setAttribute("data-placeholder", ElementFactoryService.getRandomQuote());
+
+        contentElement.appendChild(blockquote);
+
+        return contentElement;
+    }
+
+    private static ul(content: string): HTMLElement {
+
+        const element = document.createElement('ul');
+        element.setAttribute("data-content-type", ContentTypes.BulletedList);
+        element.classList.add('johannes-content-element');
+        element.classList.add('swittable');
+        element.classList.add('list');
+
+        const initialItem = ElementFactoryService.listItem_2(content || "");
+
+        element.appendChild(initialItem);
+
+        return element;
+    }
+
+    private static ol(content: string): HTMLElement {
+
+        const element = document.createElement('ol');
+        element.setAttribute("data-content-type", ContentTypes.NumberedList);
+        element.classList.add('johannes-content-element');
+        element.classList.add('swittable');
+        element.classList.add('list');
+
+        const initialItem = ElementFactoryService.listItem_2(content || "");
+
+        element.appendChild(initialItem);
+
+        return element;
+    }
+
+    private static checkboxItem(content: string): HTMLElement {
 
         const id = Utils.generateUniqueId();
 
@@ -443,7 +526,67 @@ export class ElementFactoryService implements IElementFactoryService {
     static blockParagraph(content: string | null = null) {
         let newDiv = document.createElement('div');
         let newElement = ElementFactoryService.paragraph(content);
-        
+
+        newDiv.id = `b-${Utils.generateUniqueId()}`;
+        newDiv.appendChild(newElement);
+        newDiv.classList.add('block');
+        newDiv.classList.add('deletable');
+
+        return newDiv;
+    }
+
+    static blockHeading(level: number, content: string | null = null) {
+        let newDiv = document.createElement('div');
+        let newElement = ElementFactoryService.heading(level, content);
+
+        newDiv.id = `b-${Utils.generateUniqueId()}`;
+        newDiv.appendChild(newElement);
+        newDiv.classList.add('block');
+        newDiv.classList.add('deletable');
+
+        return newDiv;
+    }
+
+    static blockCode(content: string) {
+        let newDiv = document.createElement('div');
+        let newElement = ElementFactoryService.code(content);
+
+        newDiv.id = `b-${Utils.generateUniqueId()}`;
+        newDiv.appendChild(newElement);
+        newDiv.classList.add('block');
+        newDiv.classList.add('deletable');
+
+        return newDiv;
+    }
+
+    static blockBlockquote(content: string) {
+        let newDiv = document.createElement('div');
+        let newElement = ElementFactoryService.quote(content);
+
+        newDiv.id = `b-${Utils.generateUniqueId()}`;
+        newDiv.appendChild(newElement);
+        newDiv.classList.add('block');
+        newDiv.classList.add('deletable');
+
+        return newDiv;
+    }
+
+    static blockUl(content: string) {
+        let newDiv = document.createElement('div');
+        let newElement = ElementFactoryService.ul(content);
+
+        newDiv.id = `b-${Utils.generateUniqueId()}`;
+        newDiv.appendChild(newElement);
+        newDiv.classList.add('block');
+        newDiv.classList.add('deletable');
+
+        return newDiv;
+    }
+
+    static blockOl(content: string) {
+        let newDiv = document.createElement('div');
+        let newElement = ElementFactoryService.ol(content);
+
         newDiv.id = `b-${Utils.generateUniqueId()}`;
         newDiv.appendChild(newElement);
         newDiv.classList.add('block');
