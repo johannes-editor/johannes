@@ -13,3 +13,5 @@
 * `.key-trigger` - Specifies elements that trigger actions on key presses.
 * `.johannes-editor` - Designates the main container of the Johannes Editor.
 * `.johannes-content-element` - Specifies content elements within the Johannes Editor.
+
+publish
