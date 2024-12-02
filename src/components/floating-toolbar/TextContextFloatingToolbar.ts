@@ -17,6 +17,11 @@ export class TextContextFloatingToolbar extends FloatingToolbar {
     private textOperationsService: ITextOperationsService;
     private initialRect: DOMRect | null = null;
 
+    private moreTextOptions: HTMLElement | null = null;
+    private turnIntoOptions: HTMLElement | null = null;
+    private turnIntoSeparator: HTMLElement | null = null;
+    private textOperationsSeparator: HTMLElement | null = null;
+
     private lockedHide = false;
     debounceTimer: any = null;
 
@@ -47,6 +52,8 @@ export class TextContextFloatingToolbar extends FloatingToolbar {
 
     processSelectionChangeEffects() {
 
+        this.checkMultipleBlocksSelection();
+        
         EventEmitter.emitResetActiveButtonsElementEvent("hiliteColor");
         EventEmitter.emitResetActiveButtonsElementEvent("foreColor");
 
@@ -89,6 +96,54 @@ export class TextContextFloatingToolbar extends FloatingToolbar {
         this.emitChangeComponentColorEvent(isInlineCode, ButtonIDs.InlineCode);
         this.emitChangeComponentColorEvent(isUnderline, ButtonIDs.Underline);
         this.emitChangeComponentColorEvent(isStrikeThrough, ButtonIDs.Strikethrough);
+
+        // Check if selection includes more than one block
+        
+    }
+
+    private checkMultipleBlocksSelection() {
+        const selection = window.getSelection();
+
+        if (!selection) {
+            return null;
+        }
+
+        if (!selection.rangeCount) return;
+
+        const range = selection.getRangeAt(0);
+        const blockElements = range.cloneContents().querySelectorAll('.block');
+
+        if (!this.moreTextOptions) {
+            this.moreTextOptions = document.querySelector("#moreTextOptionButton");
+        }
+
+        if (!this.turnIntoOptions) {
+            this.turnIntoOptions = document.querySelector("#turnIntoButton");
+        }
+
+        if (!this.turnIntoSeparator) {
+            this.turnIntoSeparator = document.querySelector("#turnIntoSeparator");
+        }
+
+        if (!this.textOperationsSeparator) {
+            this.textOperationsSeparator = document.querySelector("#textOperationsSeparator");
+        }
+
+        if (blockElements.length > 1) {
+
+
+            this.moreTextOptions!.style.display = "none";
+            this.turnIntoOptions!.style.display = "none";
+            this.turnIntoSeparator!.style.display = "none";
+            this.textOperationsSeparator!.style.display = "none";
+
+
+        } else {
+            this.moreTextOptions!.style.display = "flex";
+            this.turnIntoOptions!.style.display = "flex";
+            this.turnIntoSeparator!.style.display = "flex";
+            this.textOperationsSeparator!.style.display = "flex";
+        }
     }
 
     private emitChangeComponentColorEvent(active: boolean, targetId: string) {
