@@ -455,35 +455,44 @@ export class Editor extends BaseUIComponent {
     static extractClipboardContent(htmlContent: string) {
         const parser = new DOMParser();
         const doc = parser.parseFromString(htmlContent, 'text/html');
-
+    
         interface Block {
             type: string;
             text?: string;
             items?: Block[];
         }
-
+    
         const blocks: Block[] = [];
-
-        function processNode(node: Node): Block[] {
+    
+        function processNode(node: Node, currentText: string = ''): { blocks: Block[], text: string } {
+            let collectedText = currentText;
             let blocks: Block[] = [];
-
+    
             if (node.nodeType === Node.ELEMENT_NODE) {
                 const element = node as HTMLElement;
                 const type = element.tagName.toLowerCase();
-
+    
                 if (['style', 'script'].includes(type)) {
-                    return blocks;
+                    return { blocks, text: collectedText };
                 }
-
+    
                 if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'pre', 'code', 'blockquote'].includes(type)) {
-                    const text = element.innerText.trim();
+                    if (collectedText.trim()) {
+                        blocks.push({ type: 'p', text: collectedText.trim() });
+                        collectedText = '';
+                    }
+                    const text = element.textContent?.trim();
                     if (text) {
                         blocks.push({ type, text });
                     }
                 } else if (type === 'ul' || type === 'ol') {
+                    if (collectedText.trim()) {
+                        blocks.push({ type: 'p', text: collectedText.trim() });
+                        collectedText = '';
+                    }
                     const items: Block[] = [];
                     element.querySelectorAll(':scope > li').forEach(li => {
-                        const text = (li as HTMLElement).innerText.trim();
+                        const text = (li as HTMLElement).textContent?.trim();
                         if (text) {
                             items.push({ type: 'li', text });
                         }
@@ -491,36 +500,31 @@ export class Editor extends BaseUIComponent {
                     if (items.length > 0) {
                         blocks.push({ type, items });
                     }
-                } else if (type === 'li') {
-                    const text = element.innerText.trim();
-                    if (text) {
-                        blocks.push({ type: 'li', text });
-                    }
                 } else {
                     element.childNodes.forEach(child => {
-                        const childBlocks = processNode(child);
-                        blocks = blocks.concat(childBlocks);
+                        const result = processNode(child, collectedText);
+                        blocks = blocks.concat(result.blocks);
+                        collectedText = result.text;
                     });
                 }
             } else if (node.nodeType === Node.TEXT_NODE) {
-                const text = node.textContent?.trim();
-                if (text) {
-                    const parent = node.parentNode as HTMLElement;
-                    const parentType = parent?.tagName.toLowerCase();
-
-                    if (parentType && !['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'pre', 'code', 'blockquote', 'li'].includes(parentType)) {
-                        blocks.push({ type: 'p', text });
-                    }
-                }
+                const text = node.textContent || '';
+                collectedText += text;
             }
-            return blocks;
+            return { blocks, text: collectedText };
         }
-
+    
+        let collectedText = '';
         doc.body.childNodes.forEach(node => {
-            const nodeBlocks = processNode(node);
-            blocks.push(...nodeBlocks);
+            const result = processNode(node, collectedText);
+            blocks.push(...result.blocks);
+            collectedText = result.text;
         });
-
+    
+        if (collectedText.trim()) {
+            blocks.push({ type: 'p', text: collectedText.trim() });
+        }
+    
         return blocks;
     }
 
