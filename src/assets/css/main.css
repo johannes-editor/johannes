@@ -232,12 +232,15 @@ p.johannes-content-element {
     align-self: start;
     padding-top: 0.33rem;
     position: absolute;
+    opacity: 0.5;
+    user-select: none;
 }
 
 .drag-handler-wrapper {
     position: relative;
     height: 0;
     width: 0;
+    user-select: none;
 }
 
 .drag-handler:active {
@@ -271,7 +274,7 @@ p.johannes-content-element {
 
 
 .title h1 {
-    margin-left: 1.3rem;
+    margin-left: 1.2rem;
     line-height: 3rem;
 }
 
