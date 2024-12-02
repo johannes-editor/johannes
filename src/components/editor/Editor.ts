@@ -90,7 +90,7 @@ export class Editor extends BaseUIComponent {
         contentWrapper.classList.add("content-wrapper");
         // contentWrapper.setAttribute("contenteditable", "true");
 
-        if (window.editorConfig?.enableTitle || true) {
+        if (window.editorConfig?.enableTitle !== false) {
             contentWrapper.appendChild(this.props.title.htmlElement);
         }
 
@@ -99,15 +99,15 @@ export class Editor extends BaseUIComponent {
 
         htmlElement.appendChild(contentWrapper);
 
-        if (window.editorConfig?.enableAddBlock || true) {
+        if (window.editorConfig?.enableAddBlock !== false) {
             htmlElement.appendChild(this.props.addBlock.htmlElement);
         }
 
-        if (window.editorConfig?.enableFloatingToolbar || true) {
+        if (window.editorConfig?.enableFloatingToolbar !== false) {
             htmlElement.appendChild(this.props.floatingToolbar.htmlElement);
         }
 
-        if (window.editorConfig?.enableQuickMenu || true) {
+        if (window.editorConfig?.enableQuickMenu != false) {
             htmlElement.appendChild(this.props.quickMenu.htmlElement);
         }
 
@@ -455,27 +455,27 @@ export class Editor extends BaseUIComponent {
     static extractClipboardContent(htmlContent: string) {
         const parser = new DOMParser();
         const doc = parser.parseFromString(htmlContent, 'text/html');
-    
+
         interface Block {
             type: string;
             text?: string;
             items?: Block[];
         }
-    
+
         const blocks: Block[] = [];
-    
+
         function processNode(node: Node, currentText: string = ''): { blocks: Block[], text: string } {
             let collectedText = currentText;
             let blocks: Block[] = [];
-    
+
             if (node.nodeType === Node.ELEMENT_NODE) {
                 const element = node as HTMLElement;
                 const type = element.tagName.toLowerCase();
-    
+
                 if (['style', 'script'].includes(type)) {
                     return { blocks, text: collectedText };
                 }
-    
+
                 if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'pre', 'code', 'blockquote'].includes(type)) {
                     if (collectedText.trim()) {
                         blocks.push({ type: 'p', text: collectedText.trim() });
@@ -513,18 +513,18 @@ export class Editor extends BaseUIComponent {
             }
             return { blocks, text: collectedText };
         }
-    
+
         let collectedText = '';
         doc.body.childNodes.forEach(node => {
             const result = processNode(node, collectedText);
             blocks.push(...result.blocks);
             collectedText = result.text;
         });
-    
+
         if (collectedText.trim()) {
             blocks.push({ type: 'p', text: collectedText.trim() });
         }
-    
+
         return blocks;
     }
 
