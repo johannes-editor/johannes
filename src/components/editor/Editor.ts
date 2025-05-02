@@ -6,12 +6,12 @@ import { Title } from "../title/Title";
 import { IBlockOperationsService } from "@/services/block-operations/IBlockOperationsService";
 import { AddBlockWrapper } from "../add-block/AddBlockWrapper";
 import { QuickMenu } from "../quick-menu/QuickMenu";
-import { TableContextFloatingToolbar } from "../floating-toolbar/TableContextFloatingToolbar";
-import { TextContextFloatingToolbar } from "../floating-toolbar/TextContextFloatingToolbar";
+import { Toolbar as TableContextFloatingToolbar } from "../floating-toolbar/table-context/Toolbar";
+import { Toolbar as TextContextFloatingToolbar } from "../floating-toolbar/text-context/Toolbar";
 import { IMemento } from "@/core/IMemento";
 import { DependencyContainer } from "@/core/DependencyContainer";
 import { MediaInputter } from "../media-inputter/MediaInputter";
-import { InputLinkBoxWrapper } from "../floating-toolbar/link-box/InputLinkBoxWrapper";
+import { InputLinkBoxWrapper } from "../floating-toolbar/base/link-box/InputLinkBoxWrapper";
 import { DefaultJSEvents } from '@/common/DefaultJSEvents';
 import { Utils } from "@/utilities/Utils";
 
@@ -197,6 +197,8 @@ export class Editor extends BaseUIComponent {
 
                 const clipboardData = event.clipboardData;
                 if (clipboardData) {
+
+                    console.log("colou");
                     const text = clipboardData.getData('text/plain');
                     const textHtml = clipboardData.getData('text/html');
 
@@ -367,129 +369,57 @@ export class Editor extends BaseUIComponent {
         });
     }
 
-    // static extractClipboardContent(htmlContent: string) {
-    //     const parser = new DOMParser();
-    //     const doc = parser.parseFromString(htmlContent, 'text/html');
-
-    //     interface Block {
-    //         type: string;
-    //         text?: string;
-    //         items?: Block[];
-    //     }
-
-    //     const blocks: Block[] = [];
-
-    //     function processNode(node: Node): Block | null {
-    //         if (node.nodeType === Node.ELEMENT_NODE) {
-    //             const element = node as HTMLElement;
-    //             const type = element.tagName.toLowerCase();
-
-    //             // Handle different block elements
-    //             if (type === 'h1' || type === 'h2' || type === 'h3' ||
-    //                 type === 'h4' || type === 'h5' || type === 'h6' ||
-    //                 type === 'p' || type === 'pre' || type === 'code' ||
-    //                 type === 'blockquote') {
-
-    //                 const text = element.innerText.trim();
-    //                 return { type, text };
-
-    //             } else if (type === 'ul' || type === 'ol') {
-    //                 // Handle lists
-    //                 const items: Block[] = [];
-    //                 element.querySelectorAll('li').forEach(li => {
-    //                     const text = li.innerText.trim();
-    //                     items.push({ type: 'li', text });
-    //                 });
-    //                 return { type, items };
-
-    //             } else if (type === 'li') {
-    //                 const text = element.innerText.trim();
-    //                 return { type: 'li', text };
-
-    //             } else if (type === 'div' || type === 'span') {
-    //                 // Process child nodes
-    //                 const childBlocks: Block[] = [];
-    //                 element.childNodes.forEach(child => {
-    //                     const block = processNode(child);
-    //                     if (block) {
-    //                         childBlocks.push(block);
-    //                     }
-    //                 });
-    //                 // Flatten if only one child
-    //                 if (childBlocks.length === 1) {
-    //                     return childBlocks[0];
-    //                 } else if (childBlocks.length > 1) {
-    //                     return { type: 'group', items: childBlocks };
-    //                 } else {
-    //                     return null;
-    //                 }
-
-    //             } else {
-    //                 // For other elements, process child nodes
-    //                 const text = element.innerText.trim();
-    //                 if (text) {
-    //                     return { type: element.tagName.toLowerCase(), text };
-    //                 } else {
-    //                     return null;
-    //                 }
-    //             }
-    //         } else if (node.nodeType === Node.TEXT_NODE) {
-    //             const text = node.textContent?.trim();
-    //             if (text) {
-    //                 return { type: 'text', text };
-    //             }
-    //         }
-    //         return null;
-    //     }
-
-    //     doc.body.childNodes.forEach(node => {
-    //         const block = processNode(node);
-    //         if (block) {
-    //             blocks.push(block);
-    //         }
-    //     });
-
-    //     return blocks;
-    // }
-
     static extractClipboardContent(htmlContent: string) {
         const parser = new DOMParser();
         const doc = parser.parseFromString(htmlContent, 'text/html');
-
+    
         interface Block {
             type: string;
             text?: string;
             items?: Block[];
         }
-
+    
         const blocks: Block[] = [];
-
+    
         function processNode(node: Node, currentText: string = ''): { blocks: Block[], text: string } {
             let collectedText = currentText;
             let blocks: Block[] = [];
-
+    
             if (node.nodeType === Node.ELEMENT_NODE) {
                 const element = node as HTMLElement;
                 const type = element.tagName.toLowerCase();
-
+    
                 if (['style', 'script'].includes(type)) {
                     return { blocks, text: collectedText };
                 }
-
-                if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'pre', 'code', 'blockquote'].includes(type)) {
+    
+                if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'pre', 'blockquote'].includes(type)) {
                     if (collectedText.trim()) {
                         blocks.push({ type: 'p', text: collectedText.trim() });
                         collectedText = '';
                     }
-                    const text = element.textContent?.trim();
-                    if (text) {
-                        blocks.push({ type, text });
+    
+                    let text = '';
+                    // Especial: se for <pre>, preserve formatação (ex: blocos de código)
+                    if (type === 'pre') {
+                        text = element.textContent || '';
+                    } else {
+                        // Concatena texto dos filhos, incluindo <code> como parte do texto
+                        text = Array.from(element.childNodes)
+                            .map(child => child.textContent || '')
+                            .join('');
                     }
+    
+                    if (text.trim()) {
+                        blocks.push({ type, text: text.trim() });
+                    }
+    
                 } else if (type === 'ul' || type === 'ol') {
                     if (collectedText.trim()) {
                         blocks.push({ type: 'p', text: collectedText.trim() });
                         collectedText = '';
                     }
+    
                     const items: Block[] = [];
                     element.querySelectorAll(':scope > li').forEach(li => {
                         const text = (li as HTMLElement).textContent?.trim();
@@ -497,10 +427,12 @@ export class Editor extends BaseUIComponent {
                             items.push({ type: 'li', text });
                         }
                     });
+    
                     if (items.length > 0) {
                         blocks.push({ type, items });
                     }
                 } else {
+                    // Outros elementos: processar recursivamente
                     element.childNodes.forEach(child => {
                         const result = processNode(child, collectedText);
                         blocks = blocks.concat(result.blocks);
@@ -511,20 +443,21 @@ export class Editor extends BaseUIComponent {
                 const text = node.textContent || '';
                 collectedText += text;
             }
+    
             return { blocks, text: collectedText };
         }
-
+    
         let collectedText = '';
         doc.body.childNodes.forEach(node => {
             const result = processNode(node, collectedText);
             blocks.push(...result.blocks);
             collectedText = result.text;
         });
-
+    
         if (collectedText.trim()) {
             blocks.push({ type: 'p', text: collectedText.trim() });
         }
-
+    
         return blocks;
     }
 
