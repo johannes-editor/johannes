@@ -710,3 +710,75 @@ describe("DOMUtils.getParentFromSelection", () => {
         expect(result).toBeNull();
     });
 });
+
+describe("DOMUtils.getParentTargetBySelector", () => {
+    afterEach(() => {
+        document.body.innerHTML = "";
+    });
+
+    test("should return the target element if it matches the selector", () => {
+        const element = document.createElement("div");
+        element.classList.add("target");
+        document.body.appendChild(element);
+
+        const event = new MouseEvent("click", { bubbles: true });
+        Object.defineProperty(event, "target", { value: element });
+
+        const result = DOMUtils.getParentTargetBySelector(event, ".target");
+
+        expect(result).toBe(element);
+    });
+
+    test("should return the parent element that matches the selector", () => {
+        const parent = document.createElement("div");
+        parent.classList.add("parent");
+        const child = document.createElement("span");
+        parent.appendChild(child);
+        document.body.appendChild(parent);
+
+        const event = new MouseEvent("click", { bubbles: true });
+        Object.defineProperty(event, "target", { value: child });
+
+        const result = DOMUtils.getParentTargetBySelector(event, ".parent");
+
+        expect(result).toBe(parent);
+    });
+
+    test("should return null if no matching ancestor is found", () => {
+        const parent = document.createElement("div");
+        const child = document.createElement("span");
+        parent.appendChild(child);
+        document.body.appendChild(parent);
+
+        const event = new MouseEvent("click", { bubbles: true });
+        Object.defineProperty(event, "target", { value: child });
+
+        const result = DOMUtils.getParentTargetBySelector(event, ".not-found");
+
+        expect(result).toBeNull();
+    });
+
+    test("should return null if event.target is not an Element or Node", () => {
+        const event = new MouseEvent("click");
+        Object.defineProperty(event, "target", { value: null });
+
+        const result = DOMUtils.getParentTargetBySelector(event, ".any");
+
+        expect(result).toBeNull();
+    });
+
+    test("should return parent if event.target is a Text node", () => {
+        const parent = document.createElement("div");
+        parent.classList.add("wrapper");
+        const textNode = document.createTextNode("Hello");
+        parent.appendChild(textNode);
+        document.body.appendChild(parent);
+
+        const event = new MouseEvent("click", { bubbles: true });
+        Object.defineProperty(event, "target", { value: textNode });
+
+        const result = DOMUtils.getParentTargetBySelector(event, ".wrapper");
+
+        expect(result).toBe(parent);
+    });
+});
