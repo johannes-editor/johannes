@@ -1065,3 +1065,75 @@ describe("DOMUtils.findClickedElementOrAncestorByDataContentType", () => {
         expect(result).toBe(element);
     });
 });
+
+
+describe("DOMUtils.isSelectedTextDescendantOf", () => {
+    let container: HTMLElement;
+
+    beforeEach(() => {
+        container = document.createElement("div");
+        container.innerHTML = `<div class="wrapper"><p class="target">Some <b>bold</b> text</p></div>`;
+        document.body.appendChild(container);
+    });
+
+    afterEach(() => {
+        document.body.innerHTML = "";
+        const selection = window.getSelection();
+        selection?.removeAllRanges();
+    });
+
+    function selectTextInsideElement(selector: string) {
+        const element = container.querySelector(selector);
+        const textNode = element?.firstChild;
+        if (textNode) {
+            const range = document.createRange();
+            range.setStart(textNode, 0);
+            range.setEnd(textNode, textNode.textContent!.length);
+
+            const selection = window.getSelection();
+            selection?.removeAllRanges();
+            selection?.addRange(range);
+        }
+    }
+
+    test("should return true if selected text is within an element matching the selector", () => {
+        selectTextInsideElement(".target");
+        const result = DOMUtils.isSelectedTextDescendantOf(".wrapper");
+        expect(result).toBe(true);
+    });
+
+    test("should return false if selected text is not within an element matching the selector", () => {
+        selectTextInsideElement(".target");
+        const result = DOMUtils.isSelectedTextDescendantOf(".nonexistent");
+        expect(result).toBe(false);
+    });
+
+    test("should return false if no selection exists", () => {
+        const selection = window.getSelection();
+        selection?.removeAllRanges();
+        const result = DOMUtils.isSelectedTextDescendantOf(".target");
+        expect(result).toBe(false);
+    });
+
+    test("should return false if selection has no range", () => {
+        const selection = window.getSelection();
+        selection?.removeAllRanges();
+        const result = DOMUtils.isSelectedTextDescendantOf(".target");
+        expect(result).toBe(false);
+    });
+
+    test("should return true if selected text is inside a text node inside a matching element", () => {
+        const bold = container.querySelector("b")!;
+        const textNode = bold.firstChild!;
+        const range = document.createRange();
+        range.setStart(textNode, 0);
+        range.setEnd(textNode, textNode.textContent!.length);
+
+        const selection = window.getSelection();
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+
+        const result = DOMUtils.isSelectedTextDescendantOf(".target");
+        expect(result).toBe(true);
+    });
+});
