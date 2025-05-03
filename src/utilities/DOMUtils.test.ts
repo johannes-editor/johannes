@@ -854,3 +854,74 @@ describe("DOMUtils.isEventTargetDescendantOf", () => {
         expect(result).toBe(false);
     });
 });
+
+
+describe("DOMUtils.findClickedElementOrAncestorByClass", () => {
+    afterEach(() => {
+        document.body.innerHTML = "";
+    });
+
+    test("should return the clicked element if it has the class", () => {
+        const element = document.createElement("div");
+        element.classList.add("clickable");
+        document.body.appendChild(element);
+
+        const event = new MouseEvent("click");
+        Object.defineProperty(event, "target", { value: element });
+
+        const result = DOMUtils.findClickedElementOrAncestorByClass(event, "clickable");
+        expect(result).toBe(element);
+    });
+
+    test("should return the ancestor element with the class", () => {
+        const parent = document.createElement("div");
+        parent.classList.add("clickable");
+        const child = document.createElement("span");
+        parent.appendChild(child);
+        document.body.appendChild(parent);
+
+        const event = new MouseEvent("click");
+        Object.defineProperty(event, "target", { value: child });
+
+        const result = DOMUtils.findClickedElementOrAncestorByClass(event, "clickable");
+        expect(result).toBe(parent);
+    });
+
+    test("should return the parent if the clicked target is a Text node", () => {
+        const parent = document.createElement("div");
+        parent.classList.add("clickable");
+        const textNode = document.createTextNode("text");
+        parent.appendChild(textNode);
+        document.body.appendChild(parent);
+
+        const event = new MouseEvent("click");
+        Object.defineProperty(event, "target", { value: textNode });
+
+        const result = DOMUtils.findClickedElementOrAncestorByClass(event, "clickable");
+        expect(result).toBe(parent);
+    });
+
+    test("should return null if neither the element nor its ancestors have the class", () => {
+        const outer = document.createElement("div");
+        const inner = document.createElement("span");
+        outer.appendChild(inner);
+        document.body.appendChild(outer);
+
+        const event = new MouseEvent("click");
+        Object.defineProperty(event, "target", { value: inner });
+
+        const result = DOMUtils.findClickedElementOrAncestorByClass(event, "nonexistent");
+        expect(result).toBeNull();
+    });
+
+    test("should handle elements with no parent safely", () => {
+        const element = document.createElement("div");
+        element.classList.add("clickable");
+
+        const event = new MouseEvent("click");
+        Object.defineProperty(event, "target", { value: element });
+
+        const result = DOMUtils.findClickedElementOrAncestorByClass(event, "clickable");
+        expect(result).toBe(element);
+    });
+});
