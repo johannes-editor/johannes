@@ -363,6 +363,11 @@ p {
     user-select: text;
 }
 
+.johannes-content-element,
+.list-item {
+
+    min-height: 1lh;
+}
 
 .johannes-content-element {
     width: 100%;
