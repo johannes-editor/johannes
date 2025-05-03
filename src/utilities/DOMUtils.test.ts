@@ -626,3 +626,87 @@ describe("DOMUtils.removeClassesWithPrefix", () => {
         expect(element.classList.contains("other-class")).toBe(true);
     });
 });
+
+describe("DOMUtils.getParentFromSelection", () => {
+    let element: HTMLElement;
+
+    beforeEach(() => {
+        element = document.createElement("div");
+        document.body.appendChild(element);
+    });
+
+    afterEach(() => {
+        document.body.innerHTML = "";
+    });
+
+    test("should return null if there is no valid selection", () => {
+        const result = DOMUtils.getParentFromSelection(".parent");
+        expect(result).toBeNull();
+    });
+
+    test("should return the element if it matches the selector and is the common ancestor", () => {
+        element.classList.add("parent");
+        const span = document.createElement("span");
+        element.appendChild(span);
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(span);
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+
+        const result = DOMUtils.getParentFromSelection(".parent");
+
+        expect(result).toBe(element);
+    });
+
+    test("should return the parent element if it matches the selector", () => {
+        const parent = document.createElement("div");
+        parent.classList.add("parent");
+        const child = document.createElement("span");
+        child.textContent = "Test";
+        parent.appendChild(child);
+        document.body.appendChild(parent);
+
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(child);
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+
+        const result = DOMUtils.getParentFromSelection(".parent");
+
+        expect(result).toBe(parent);
+    });
+
+    test("should return null if no matching parent is found", () => {
+        const parent = document.createElement("div");
+        const child = document.createElement("span");
+        child.textContent = "Test";
+        parent.appendChild(child);
+        document.body.appendChild(parent);
+
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(child);
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+
+        const result = DOMUtils.getParentFromSelection(".non-existent");
+
+        expect(result).toBeNull();
+    });
+
+    test("should return null if common ancestor is not an element", () => {
+        const selection = window.getSelection();
+        const range = document.createRange();
+        const textNode = document.createTextNode("Hello");
+        document.body.appendChild(textNode);
+        range.selectNodeContents(textNode);
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+
+        const result = DOMUtils.getParentFromSelection(".parent");
+
+        expect(result).toBeNull();
+    });
+});
