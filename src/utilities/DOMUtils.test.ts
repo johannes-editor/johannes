@@ -782,3 +782,75 @@ describe("DOMUtils.getParentTargetBySelector", () => {
         expect(result).toBe(parent);
     });
 });
+
+describe("DOMUtils.isEventTargetDescendantOf", () => {
+    afterEach(() => {
+        document.body.innerHTML = "";
+    });
+
+    test("should return true if the target element matches the selector", () => {
+        const target = document.createElement("div");
+        target.classList.add("match");
+        document.body.appendChild(target);
+
+        const event = new KeyboardEvent("keydown");
+        Object.defineProperty(event, "target", { value: target });
+
+        const result = DOMUtils.isEventTargetDescendantOf(event, ".match");
+
+        expect(result).toBe(true);
+    });
+
+    test("should return true if a parent element matches the selector", () => {
+        const parent = document.createElement("div");
+        parent.classList.add("parent");
+        const child = document.createElement("span");
+        parent.appendChild(child);
+        document.body.appendChild(parent);
+
+        const event = new KeyboardEvent("keydown");
+        Object.defineProperty(event, "target", { value: child });
+
+        const result = DOMUtils.isEventTargetDescendantOf(event, ".parent");
+
+        expect(result).toBe(true);
+    });
+
+    test("should return false if no element in the tree matches the selector", () => {
+        const wrapper = document.createElement("div");
+        const inner = document.createElement("span");
+        wrapper.appendChild(inner);
+        document.body.appendChild(wrapper);
+
+        const event = new KeyboardEvent("keydown");
+        Object.defineProperty(event, "target", { value: inner });
+
+        const result = DOMUtils.isEventTargetDescendantOf(event, ".not-found");
+
+        expect(result).toBe(false);
+    });
+
+    test("should return false if the event target is not an Element", () => {
+        const event = new KeyboardEvent("keydown");
+        Object.defineProperty(event, "target", { value: null });
+
+        const result = DOMUtils.isEventTargetDescendantOf(event, ".any");
+
+        expect(result).toBe(false);
+    });
+
+    test("should return false if the event target is a Text node", () => {
+        const parent = document.createElement("div");
+        parent.classList.add("some-parent");
+        const textNode = document.createTextNode("test");
+        parent.appendChild(textNode);
+        document.body.appendChild(parent);
+
+        const event = new KeyboardEvent("keydown");
+        Object.defineProperty(event, "target", { value: textNode });
+
+        const result = DOMUtils.isEventTargetDescendantOf(event, ".some-parent");
+
+        expect(result).toBe(false);
+    });
+});
