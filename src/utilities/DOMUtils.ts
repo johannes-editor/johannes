@@ -701,12 +701,13 @@ export class DOMUtils {
 
     static getNextContentEditable(element: HTMLElement): HTMLElement | null {
         const allContentEditables: HTMLElement[] = Array.from(document.querySelectorAll('[contenteditable="true"]')) as HTMLElement[];
-
+    
         const index = allContentEditables.indexOf(element);
-        if (index < allContentEditables.length - 1) {
-            return allContentEditables[index + 1];
+        if (index === -1 || index >= allContentEditables.length - 1) {
+            return null;
         }
-        return null;
+    
+        return allContentEditables[index + 1];
     }
 
 

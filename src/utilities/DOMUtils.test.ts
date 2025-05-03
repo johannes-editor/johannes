@@ -69,3 +69,102 @@ describe("Utils", () => {
     });
 
 });
+
+
+describe("DOMUtils.restoreCaretFromMarker", () => {
+    beforeEach(() => {
+        document.body.innerHTML = "";
+        window.getSelection()?.removeAllRanges();
+    });
+
+    test("should do nothing when no marker exists", () => {
+        const container = document.createElement("div");
+        container.innerHTML = "Hello World";
+        document.body.appendChild(container);
+
+        DOMUtils.restoreCaretFromMarker(container);
+
+        const selection = window.getSelection();
+        expect(selection?.rangeCount).toBe(0);
+    });
+
+    test("should work with complex nested structure", () => {
+        const container = document.createElement("div");
+        container.innerHTML = `
+                <p>Paragraph <span>with <strong>nested <span id='caret-start-marker' style='display: none;'></span>elements</strong></span></p>
+            `;
+        document.body.appendChild(container);
+
+        DOMUtils.restoreCaretFromMarker(container);
+
+        const selection = window.getSelection();
+        expect(selection?.rangeCount).toBe(1);
+
+        const range = selection?.getRangeAt(0);
+        expect(range?.collapsed).toBe(true);
+
+        expect(container.querySelector("#caret-start-marker")).toBeNull();
+    });
+
+    test("should not throw error when container is empty", () => {
+        const container = document.createElement("div");
+        document.body.appendChild(container);
+
+        expect(() => DOMUtils.restoreCaretFromMarker(container)).not.toThrow();
+    });
+});
+
+describe("DOMUtils.getNextContentEditable", () => {
+    beforeEach(() => {
+        document.body.innerHTML = "";
+    });
+
+    test("should return the next contenteditable element", () => {
+        const first = document.createElement("div");
+        first.setAttribute("contenteditable", "true");
+        const second = document.createElement("div");
+        second.setAttribute("contenteditable", "true");
+        const third = document.createElement("div");
+        third.setAttribute("contenteditable", "true");
+
+        document.body.append(first, second, third);
+
+        const result = DOMUtils.getNextContentEditable(first);
+        expect(result).toBe(second);
+    });
+
+    test("should return null if element is the last contenteditable", () => {
+        const first = document.createElement("div");
+        first.setAttribute("contenteditable", "true");
+        const second = document.createElement("div");
+        second.setAttribute("contenteditable", "true");
+
+        document.body.append(first, second);
+
+        const result = DOMUtils.getNextContentEditable(second);
+        expect(result).toBeNull();
+    });
+
+    test("should return null if element is not in the list", () => {
+        const editable1 = document.createElement("div");
+        editable1.setAttribute("contenteditable", "true");
+
+        const editable2 = document.createElement("div");
+        editable2.setAttribute("contenteditable", "true");
+
+        const notEditable = document.createElement("div"); // <- este não é contenteditable
+
+        document.body.append(editable1, editable2);
+
+        const result = DOMUtils.getNextContentEditable(notEditable);
+        expect(result).toBeNull();
+    });
+
+    test("should return null when no contenteditable elements exist", () => {
+        const element = document.createElement("div");
+        document.body.appendChild(element);
+
+        const result = DOMUtils.getNextContentEditable(element);
+        expect(result).toBeNull();
+    });
+});
