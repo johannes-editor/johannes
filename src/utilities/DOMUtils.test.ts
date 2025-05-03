@@ -457,3 +457,120 @@ describe("DOMUtils.querySelectorIncludingSelf", () => {
     });
 
 });
+
+describe("DOMUtils.isTargetDescendantOfSelector", () => {
+    
+    test("should return true if the target is a descendant of the selector", () => {
+        const container = document.createElement("div");
+        const parent = document.createElement("div");
+        const child = document.createElement("div");
+
+        parent.classList.add("parent");
+        child.classList.add("child");
+        parent.appendChild(child);
+        container.appendChild(parent);
+        document.body.appendChild(container);
+
+        const event = new MouseEvent("click", {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+        });
+
+        child.dispatchEvent(event);
+
+        const result = DOMUtils.isTargetDescendantOfSelector(event, ".parent");
+        expect(result).toBe(true);
+    });
+
+    test("should return false if the target is not a descendant of the selector", () => {
+        const container = document.createElement("div");
+        const parent = document.createElement("div");
+        const child = document.createElement("div");
+
+        parent.classList.add("parent");
+        child.classList.add("child");
+        container.appendChild(parent);
+        container.appendChild(child);
+        document.body.appendChild(container);
+
+        const event = new MouseEvent("click", {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+        });
+
+        child.dispatchEvent(event);
+
+        const result = DOMUtils.isTargetDescendantOfSelector(event, ".parent");
+        expect(result).toBe(false);
+    });
+
+    test("should return true if the target itself matches the selector", () => {
+        const container = document.createElement("div");
+        const element = document.createElement("div");
+
+        element.classList.add("parent");
+        container.appendChild(element);
+        document.body.appendChild(container);
+
+        const event = new MouseEvent("click", {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+        });
+
+        element.dispatchEvent(event);
+
+        const result = DOMUtils.isTargetDescendantOfSelector(event, ".parent");
+        expect(result).toBe(true);
+    });
+
+    test("should return true if the target is a text node inside a matching element", () => {
+        const element = document.createElement("div");
+        element.classList.add("parent");
+    
+        const textNode = document.createTextNode("Hello");
+        element.appendChild(textNode);
+        document.body.appendChild(element);
+    
+        const event = new MouseEvent("click", {
+            bubbles: true,
+            cancelable: true,
+            composed: true,
+        });
+    
+        textNode.dispatchEvent(event);
+    
+        const result = DOMUtils.isTargetDescendantOfSelector(event, ".parent");
+        console.log("Result:", result);
+    
+        expect(result).toBe(true);
+    });
+
+    test("should return false if the event target is null", () => {
+        const event = {} as MouseEvent;
+
+        const result = DOMUtils.isTargetDescendantOfSelector(event, ".parent");
+        expect(result).toBe(false);
+    });
+
+    test("should return false if the target has no parent matching the selector", () => {
+        const container = document.createElement("div");
+        const child = document.createElement("div");
+        child.classList.add("child");
+        container.appendChild(child);
+        document.body.appendChild(container);
+
+        const event = new MouseEvent("click", {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+        });
+
+        child.dispatchEvent(event);
+
+        const result = DOMUtils.isTargetDescendantOfSelector(event, ".parent");
+        expect(result).toBe(false);
+    });
+});
