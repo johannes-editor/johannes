@@ -1137,3 +1137,62 @@ describe("DOMUtils.isSelectedTextDescendantOf", () => {
         expect(result).toBe(true);
     });
 });
+
+
+describe("DOMUtils.getBlockFromEvent", () => {
+    let container: HTMLElement;
+
+    beforeEach(() => {
+        container = document.createElement("div");
+        container.innerHTML = `
+            <div class="block" id="block">
+                <div class="child" id="child">Click me</div>
+            </div>
+        `;
+        document.body.appendChild(container);
+    });
+
+    afterEach(() => {
+        document.body.innerHTML = "";
+    });
+
+    test("should return the closest .block ancestor from event target", () => {
+        const child = document.getElementById("child")!;
+        const event = new MouseEvent("click", { bubbles: true });
+        Object.defineProperty(event, "target", { value: child });
+
+        const block = DOMUtils.getBlockFromEvent(event);
+        expect(block).toBe(document.getElementById("block"));
+    });
+
+    test("should return null if the event target is not within a .block", () => {
+        const outside = document.createElement("div");
+        outside.textContent = "Outside";
+        document.body.appendChild(outside);
+
+        const event = new MouseEvent("click", { bubbles: true });
+        Object.defineProperty(event, "target", { value: outside });
+
+        const block = DOMUtils.getBlockFromEvent(event);
+        expect(block).toBeNull();
+    });
+
+    test("should return null if the target is not an Element", () => {
+        const textNode = document.createTextNode("text");
+        container.appendChild(textNode);
+
+        const event = new Event("click");
+        Object.defineProperty(event, "target", { value: textNode });
+
+        const block = DOMUtils.getBlockFromEvent(event);
+        expect(block).toBeNull();
+    });
+
+    test("should return null if the event has no target", () => {
+        const event = new Event("click");
+        Object.defineProperty(event, "target", { value: null });
+
+        const block = DOMUtils.getBlockFromEvent(event);
+        expect(block).toBeNull();
+    });
+});
