@@ -1196,3 +1196,47 @@ describe("DOMUtils.getBlockFromEvent", () => {
         expect(block).toBeNull();
     });
 });
+
+describe("DOMUtils.getCurrentActiveBlock", () => {
+    let container: HTMLElement;
+
+    beforeEach(() => {
+        document.body.innerHTML = `
+            <div class="block" id="block">
+                <div contenteditable="true" id="editable">Text</div>
+            </div>
+            <div id="outside" contenteditable="true">Outside</div>
+        `;
+        container = document.body;
+    });
+
+    afterEach(() => {
+        document.body.innerHTML = "";
+    });
+
+    test("should return the closest .block element from the active element", () => {
+        const editable = document.getElementById("editable")!;
+        editable.focus();
+
+        const block = DOMUtils.getCurrentActiveBlock();
+        expect(block).toBe(document.getElementById("block"));
+    });
+
+    test("should return null if the active element is not inside a .block", () => {
+        const outside = document.getElementById("outside")!;
+        outside.focus();
+
+        const block = DOMUtils.getCurrentActiveBlock();
+        expect(block).toBeNull();
+    });
+
+    test("should return null if there is no active element", () => {
+        Object.defineProperty(document, "activeElement", {
+            value: null,
+            configurable: true,
+        });
+
+        const block = DOMUtils.getCurrentActiveBlock();
+        expect(block).toBeNull();
+    });
+});
