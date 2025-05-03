@@ -1,4 +1,5 @@
 import { DOMUtils } from "./DOMUtils";
+import { fireEvent } from '@testing-library/dom';
 
 describe("Utils", () => {
 
@@ -365,4 +366,94 @@ describe("DOMUtils.sanitizeContentEditable", () => {
 
         window.getSelection = originalGetSelection;
     });
+});
+
+
+describe("DOMUtils.querySelectorIncludingSelf", () => {
+
+    test("should return element if it matches the selector", () => {
+        const element = document.createElement("div");
+        element.classList.add("test-class");
+
+        const result = DOMUtils.querySelectorIncludingSelf(element, ".test-class");
+
+        expect(result).toBe(element);
+    });
+
+    test("should return first matching child element if element does not match", () => {
+        const element = document.createElement("div");
+        const child = document.createElement("span");
+        child.classList.add("test-class");
+        element.appendChild(child);
+
+        const result = DOMUtils.querySelectorIncludingSelf(element, ".test-class");
+
+        expect(result).toBe(child);
+    });
+
+    test("should return null if element does not match and has no matching children", () => {
+        const element = document.createElement("div");
+
+        const result = DOMUtils.querySelectorIncludingSelf(element, ".test-class");
+
+        expect(result).toBeNull();
+    });
+
+    test("should return element if ID matches", () => {
+        const element = document.createElement("div");
+        element.id = "test-id";
+
+        const result = DOMUtils.querySelectorIncludingSelf(element, "#test-id");
+
+        expect(result).toBe(element);
+    });
+
+    test("should return element if class matches", () => {
+        const element = document.createElement("div");
+        element.classList.add("test-class");
+
+        const result = DOMUtils.querySelectorIncludingSelf(element, ".test-class");
+
+        expect(result).toBe(element);
+    });
+
+    test("should return element if it matches selector even with a more generic selector", () => {
+        const element = document.createElement("div");
+
+        const result = DOMUtils.querySelectorIncludingSelf(element, "div");
+
+        expect(result).toBe(element);
+    });
+
+    test("should return element if it matches :hover pseudo-class after mouseover", () => {
+        const element = document.createElement("div");
+        document.body.appendChild(element);
+    
+        element.style.transition = "all 0.2s";
+        element.classList.add("hover-class");
+        element.innerHTML = "Test Hover";
+    
+        const style = document.createElement('style');
+        style.innerHTML = `
+            .hover-class:hover {
+                background-color: yellow;
+            }
+        `;
+        document.head.appendChild(style);
+    
+        fireEvent.mouseOver(element);
+    
+        const result = DOMUtils.querySelectorIncludingSelf(element, ":hover");
+        
+        expect(result).toBe(element);
+    });
+
+    test("should throw an error if the selector is invalid", () => {
+        const element = document.createElement("div");
+
+        expect(() => {
+            DOMUtils.querySelectorIncludingSelf(element, "/* invalid selector */");
+        }).toThrowError();
+    });
+
 });
