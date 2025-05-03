@@ -640,11 +640,16 @@ export class DOMUtils {
         let caretPos = 0;
         if (selection.rangeCount > 0) {
             const range = selection.getRangeAt(0);
-            const rangeEndsAtContentEnd = range.endOffset === element.innerText.length;
-
-            if (rangeEndsAtContentEnd && content.endsWith('<br>')) {
+            const textNodes = DOMUtils.getTextNodesIn(element);
+        
+            const lastTextNode = textNodes[textNodes.length - 1];
+            const rangeEndsAtContentEnd =
+                range.endContainer === lastTextNode &&
+                range.endOffset === lastTextNode.length;
+        
+            if (rangeEndsAtContentEnd && content.endsWith("<br>")) {
                 shouldRestoreCaret = true;
-                caretPos = range.endOffset;
+                caretPos = element.textContent?.length ?? 0;
             }
         }
 

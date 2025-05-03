@@ -293,3 +293,76 @@ describe("DOMUtils.getTextNodesIn", () => {
         expect(result).toHaveLength(0);
     });
 });
+
+describe("DOMUtils.sanitizeContentEditable", () => {
+    let editable: HTMLElement;
+
+    beforeEach(() => {
+        document.body.innerHTML = "";
+        editable = document.createElement("div");
+        editable.setAttribute("contenteditable", "true");
+        document.body.appendChild(editable);
+        window.getSelection()?.removeAllRanges();
+    });
+
+    test("should remove trailing <br> from contenteditable", () => {
+        editable.innerHTML = "Hello<br>";
+        DOMUtils.sanitizeContentEditable(editable);
+        expect(editable.innerHTML).toBe("Hello");
+    });
+
+    test("should not remove <br> when it is not at the end", () => {
+        editable.innerHTML = "Hello<br>World";
+        DOMUtils.sanitizeContentEditable(editable);
+        expect(editable.innerHTML).toBe("Hello<br>World");
+    });
+
+    test("should restore caret when selection is at the end and content ends with <br>", () => {
+        editable.innerHTML = "Hello<br>";
+        const textNode = editable.firstChild!;
+        const range = new Range();
+        range.setStart(textNode, 5);
+        range.setEnd(textNode, 5);
+
+        const selection = window.getSelection()!;
+        selection.removeAllRanges();
+        selection.addRange(range);
+
+        DOMUtils.sanitizeContentEditable(editable);
+
+        const newRange = selection.getRangeAt(0);
+        expect(newRange.startContainer).toBeInstanceOf(Text);
+        expect(newRange.startOffset).toBe(5);
+        expect(editable.innerHTML).toBe("Hello");
+    });
+
+    test("should not restore caret when selection is not at the end", () => {
+        editable.innerHTML = "Hello<br>";
+        const textNode = editable.firstChild!;
+        const range = new Range();
+        range.setStart(textNode, 2);
+        range.setEnd(textNode, 2);
+
+        const selection = window.getSelection()!;
+        selection.removeAllRanges();
+        selection.addRange(range);
+
+        DOMUtils.sanitizeContentEditable(editable);
+
+        const newRange = selection.getRangeAt(0);
+        expect(newRange.startOffset).toBe(2);
+        expect(editable.innerHTML).toBe("Hello");
+    });
+
+    test("should not throw if selection is null", () => {
+        const originalGetSelection = window.getSelection;
+        window.getSelection = () => null;
+
+        editable.innerHTML = "Hello<br>";
+
+        expect(() => DOMUtils.sanitizeContentEditable(editable)).not.toThrow();
+        expect(editable.innerHTML).toBe("Hello<br>");
+
+        window.getSelection = originalGetSelection;
+    });
+});
