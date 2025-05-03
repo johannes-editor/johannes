@@ -519,8 +519,20 @@ export class BlockOperationsService implements IBlockOperationsService {
             }
 
             case ElementFactoryService.ELEMENT_TYPES.SEPARATOR: {
-                newContentBlock = this.elementFactoryService.create(ElementFactoryService.ELEMENT_TYPES.SEPARATOR);
-                break;
+                const separatorBlock = this.elementFactoryService.create(ElementFactoryService.ELEMENT_TYPES.BLOCK_SEPARATOR);
+            
+                const parent = blockElement!.parentElement!;
+                
+                parent.insertBefore(separatorBlock, blockElement);
+            
+                const focusable = blockElement!.querySelector('[contenteditable="true"]') as HTMLElement;
+                if (focusable) {
+                    focusable.focus();
+                    DOMUtils.placeCursorAtEndOfEditableElement(focusable);
+                }
+            
+                EventEmitter.emitDocChangedEvent();
+                return;
             }
 
             case ElementFactoryService.ELEMENT_TYPES.TABLE: {
@@ -585,6 +597,7 @@ export class BlockOperationsService implements IBlockOperationsService {
         }
 
         blockElement!.replaceChild(newContentBlock, contentElement);
+        
 
         const focusable = (newContentBlock.closest('.focusable') || blockElement!.querySelector('.focusable')) as HTMLElement;
         if (focusable) {
@@ -673,45 +686,69 @@ export class BlockOperationsService implements IBlockOperationsService {
             this.createDefaultBlock(block, "");
             return false;
         } else if (contentType == ContentTypes.Table) {
-            // TODO Jump to the next line if exists
             return false;
         } else if (
             contentType == ContentTypes.CheckList ||
             contentType == ContentTypes.BulletedList ||
             contentType == ContentTypes.NumberedList) {
-
+        
             const currentItem = DOMUtils.findClosestAncestorOfActiveElementByClass("list-item");
-
-            if (currentItem && DOMUtils.hasTextContent(currentItem)) {
+            const parentBlock = currentItem?.closest(".block");
+            const listElement = parentBlock?.querySelector("ul, ol");
+            const allListItems = listElement?.querySelectorAll(".list-item");
+        
+            if (!currentItem || !parentBlock || !listElement || !allListItems) return false;
+        
+            if (DOMUtils.hasTextContent(currentItem)) {
                 const clone = DOMUtils.cloneAndInsertAfter(currentItem);
                 if (clone) {
                     const contentCurrent = currentItem.querySelector(".focusable") as Node;
                     const contentClone = clone.querySelector(".focusable") as Node;
-
+        
                     DOMUtils.trimEmptyTextAndBrElements(contentClone);
                     DOMUtils.rearrangeContentAfterSplit(contentCurrent, contentClone);
-
                 }
-            } else if (currentItem) {
-
-                const parentBlock = currentItem.closest(".block");
-
-                if (parentBlock) {
-                    const counter = parentBlock.querySelectorAll(".list-item").length;
+            } else {
+                const isLastItem = currentItem === allListItems[allListItems.length - 1];
+                
+                if (isLastItem) {
                     const newParagraph = ElementFactoryService.blockParagraph();
-
                     DOMUtils.insertAfter(newParagraph, parentBlock);
-
+                    
                     currentItem.remove();
-                    if (counter == 1) {
+                    if (allListItems.length === 1) {
                         parentBlock.remove();
                     }
-
-                    const focusable = (newParagraph as HTMLElement).querySelector("p") as HTMLElement;
-                    DOMUtils.placeCursorAtStartOfEditableElement(focusable as HTMLElement);
+        
+                    const focusable = newParagraph.querySelector("p") as HTMLElement;
+                    DOMUtils.placeCursorAtStartOfEditableElement(focusable);
+                } else {
+                    const newListBlock = parentBlock.cloneNode(false) as HTMLElement;
+                    const newListElement = listElement.cloneNode(false) as HTMLElement;
+                    
+                    const dragHandler = parentBlock.querySelector(".drag-handler-wrapper")?.cloneNode(true);
+                    if (dragHandler) {
+                        newListBlock.appendChild(dragHandler);
+                    }
+                    
+                    newListBlock.appendChild(newListElement);
+                    
+                    const itemsAfter = Array.from(allListItems).slice(Array.from(allListItems).indexOf(currentItem) + 1);
+                    
+                    itemsAfter.forEach(item => {
+                        newListElement.appendChild(item);
+                    });
+                    
+                    DOMUtils.insertAfter(newListBlock, parentBlock);
+                    
+                    currentItem.remove();
+                    
+                    const firstItemInNewList = newListElement.querySelector(".list-item .focusable") as HTMLElement;
+                    if (firstItemInNewList) {
+                        DOMUtils.placeCursorAtStartOfEditableElement(firstItemInNewList);
+                    }
                 }
             }
-
         } else {
             const currentBlock = DOMUtils.findClosestAncestorOfActiveElementByClass("block");
 
