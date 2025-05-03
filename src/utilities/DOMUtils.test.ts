@@ -574,3 +574,55 @@ describe("DOMUtils.isTargetDescendantOfSelector", () => {
         expect(result).toBe(false);
     });
 });
+
+
+describe("DOMUtils.removeClassesWithPrefix", () => {
+    let element: HTMLElement;
+
+    beforeEach(() => {
+        element = document.createElement("div");
+    });
+
+    test("should remove all classes starting with the prefix", () => {
+        element.classList.add("prefix-one", "prefix-two", "other-class");
+
+        DOMUtils.removeClassesWithPrefix(element, "prefix");
+
+        expect(element.classList.contains("prefix-one")).toBe(false);
+        expect(element.classList.contains("prefix-two")).toBe(false);
+        expect(element.classList.contains("other-class")).toBe(true);
+    });
+
+    test("should not remove classes if no class starts with the prefix", () => {
+        element.classList.add("no-prefix", "another-class");
+
+        DOMUtils.removeClassesWithPrefix(element, "prefix");
+
+        expect(element.classList.contains("no-prefix")).toBe(true);
+        expect(element.classList.contains("another-class")).toBe(true);
+    });
+
+    test("should work when the element has no classes", () => {
+        DOMUtils.removeClassesWithPrefix(element, "prefix");
+
+        expect(element.classList.length).toBe(0);
+    });
+
+    test("should not remove classes if the prefix doesn't match any class", () => {
+        element.classList.add("some-class", "other-class");
+
+        DOMUtils.removeClassesWithPrefix(element, "prefix");
+
+        expect(element.classList.contains("some-class")).toBe(true);
+        expect(element.classList.contains("other-class")).toBe(true);
+    });
+
+    test("should not affect other classes not related to the prefix", () => {
+        element.classList.add("prefix-class", "other-class");
+
+        DOMUtils.removeClassesWithPrefix(element, "prefix");
+
+        expect(element.classList.contains("prefix-class")).toBe(false);
+        expect(element.classList.contains("other-class")).toBe(true);
+    });
+});
