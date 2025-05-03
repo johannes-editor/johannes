@@ -675,14 +675,14 @@ export class DOMUtils {
         }
     }
 
-    private static getTextNodesIn(node: Node): Text[] {
+    static getTextNodesIn(node: Node): Text[] {
         let textNodes: Text[] = [];
         if (node.nodeType === Node.TEXT_NODE) {
             textNodes.push(node as Text);
         } else {
             const children = node.childNodes;
             for (let i = 0; i < children.length; i++) {
-                textNodes = textNodes.concat(this.getTextNodesIn(children[i]));
+                textNodes = textNodes.concat(DOMUtils.getTextNodesIn(children[i]));
             }
         }
         return textNodes;

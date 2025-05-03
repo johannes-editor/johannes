@@ -169,9 +169,6 @@ describe("DOMUtils.getNextContentEditable", () => {
     });
 });
 
-
-
-
 describe("DOMUtils.getPreviousContentEditable", () => {
     beforeEach(() => {
         document.body.innerHTML = "";
@@ -237,5 +234,62 @@ describe("DOMUtils.getPreviousContentEditable", () => {
 
         const result = DOMUtils.getPreviousContentEditable(div);
         expect(result).toBeNull();
+    });
+});
+
+
+describe("DOMUtils.getTextNodesIn", () => {
+    const getTextNodesIn = (DOMUtils as any).getTextNodesIn as (node: Node) => Text[];
+
+    beforeEach(() => {
+        document.body.innerHTML = "";
+    });
+
+    test("should return single text node when node is a text node", () => {
+        const textNode = document.createTextNode("Hello");
+        const result = getTextNodesIn(textNode);
+        expect(result).toHaveLength(1);
+        expect(result[0].textContent).toBe("Hello");
+    });
+
+    test("should return all text nodes in a flat structure", () => {
+        const container = document.createElement("div");
+        container.innerHTML = "Hello <span>World</span>";
+        document.body.appendChild(container);
+
+        const result = getTextNodesIn(container);
+        expect(result.map(n => n.textContent)).toEqual(["Hello ", "World"]);
+    });
+
+    test("should return all text nodes in a deeply nested structure", () => {
+        const container = document.createElement("div");
+        container.innerHTML = `
+            <div>
+                <p>Hello <span><b>deep</b> inside</span></p>
+                <p>another <i>level</i></p>
+            </div>
+        `;
+        document.body.appendChild(container);
+
+        const result = getTextNodesIn(container);
+        expect(result.map(n => n.textContent?.trim()).filter(Boolean)).toEqual(["Hello", "deep", "inside", "another", "level"]);
+    });
+
+    test("should return empty array when node has no text", () => {
+        const container = document.createElement("div");
+        container.innerHTML = `<div><span><b></b></span></div>`;
+        document.body.appendChild(container);
+
+        const result = getTextNodesIn(container);
+        expect(result).toHaveLength(0);
+    });
+
+    test("should ignore comment nodes and elements without text", () => {
+        const container = document.createElement("div");
+        container.appendChild(document.createComment("this is a comment"));
+        container.appendChild(document.createElement("span"));
+
+        const result = getTextNodesIn(container);
+        expect(result).toHaveLength(0);
     });
 });
