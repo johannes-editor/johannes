@@ -995,3 +995,73 @@ describe("DOMUtils.findClickedElementOrAncestorById", () => {
         expect(result).toBe(element);
     });
 });
+
+describe("DOMUtils.findClickedElementOrAncestorByDataContentType", () => {
+    afterEach(() => {
+        document.body.innerHTML = "";
+    });
+
+    test("should return clicked element if it has matching data-content-type", () => {
+        const element = document.createElement("div");
+        element.dataset.contentType = "test";
+        document.body.appendChild(element);
+
+        const event = new MouseEvent("click");
+        Object.defineProperty(event, "target", { value: element });
+
+        const result = DOMUtils.findClickedElementOrAncestorByDataContentType(event, "test");
+        expect(result).toBe(element);
+    });
+
+    test("should return ancestor if it has matching data-content-type", () => {
+        const parent = document.createElement("div");
+        parent.dataset.contentType = "test";
+        const child = document.createElement("span");
+        parent.appendChild(child);
+        document.body.appendChild(parent);
+
+        const event = new MouseEvent("click");
+        Object.defineProperty(event, "target", { value: child });
+
+        const result = DOMUtils.findClickedElementOrAncestorByDataContentType(event, "test");
+        expect(result).toBe(parent);
+    });
+
+    test("should return parent if target is a TextNode inside element with matching data-content-type", () => {
+        const parent = document.createElement("div");
+        parent.dataset.contentType = "test";
+        const textNode = document.createTextNode("text here");
+        parent.appendChild(textNode);
+        document.body.appendChild(parent);
+
+        const event = new MouseEvent("click");
+        Object.defineProperty(event, "target", { value: textNode });
+
+        const result = DOMUtils.findClickedElementOrAncestorByDataContentType(event, "test");
+        expect(result).toBe(parent);
+    });
+
+    test("should return null if no element or ancestor has matching data-content-type", () => {
+        const div = document.createElement("div");
+        const span = document.createElement("span");
+        div.appendChild(span);
+        document.body.appendChild(div);
+
+        const event = new MouseEvent("click");
+        Object.defineProperty(event, "target", { value: span });
+
+        const result = DOMUtils.findClickedElementOrAncestorByDataContentType(event, "nonexistent");
+        expect(result).toBeNull();
+    });
+
+    test("should handle element with no parentElement safely", () => {
+        const element = document.createElement("div");
+        element.dataset.contentType = "test";
+
+        const event = new MouseEvent("click");
+        Object.defineProperty(event, "target", { value: element });
+
+        const result = DOMUtils.findClickedElementOrAncestorByDataContentType(event, "test");
+        expect(result).toBe(element);
+    });
+});
