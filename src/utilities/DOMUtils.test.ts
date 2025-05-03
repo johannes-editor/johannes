@@ -152,7 +152,7 @@ describe("DOMUtils.getNextContentEditable", () => {
         const editable2 = document.createElement("div");
         editable2.setAttribute("contenteditable", "true");
 
-        const notEditable = document.createElement("div"); // <- este não é contenteditable
+        const notEditable = document.createElement("div");
 
         document.body.append(editable1, editable2);
 
@@ -165,6 +165,77 @@ describe("DOMUtils.getNextContentEditable", () => {
         document.body.appendChild(element);
 
         const result = DOMUtils.getNextContentEditable(element);
+        expect(result).toBeNull();
+    });
+});
+
+
+
+
+describe("DOMUtils.getPreviousContentEditable", () => {
+    beforeEach(() => {
+        document.body.innerHTML = "";
+    });
+
+    test("should return the previous contenteditable element when in the middle", () => {
+        const div1 = document.createElement("div");
+        div1.setAttribute("contenteditable", "true");
+
+        const div2 = document.createElement("div");
+        div2.setAttribute("contenteditable", "true");
+
+        const div3 = document.createElement("div");
+        div3.setAttribute("contenteditable", "true");
+
+        document.body.append(div1, div2, div3);
+
+        const result = DOMUtils.getPreviousContentEditable(div2);
+        expect(result).toBe(div1);
+    });
+
+    test("should return the previous contenteditable element when at the end", () => {
+        const div1 = document.createElement("div");
+        div1.setAttribute("contenteditable", "true");
+
+        const div2 = document.createElement("div");
+        div2.setAttribute("contenteditable", "true");
+
+        document.body.append(div1, div2);
+
+        const result = DOMUtils.getPreviousContentEditable(div2);
+        expect(result).toBe(div1);
+    });
+
+    test("should return null when the element is the first contenteditable", () => {
+        const div1 = document.createElement("div");
+        div1.setAttribute("contenteditable", "true");
+
+        const div2 = document.createElement("div");
+        div2.setAttribute("contenteditable", "true");
+
+        document.body.append(div1, div2);
+
+        const result = DOMUtils.getPreviousContentEditable(div1);
+        expect(result).toBeNull();
+    });
+
+    test("should return null if the element is not in the list", () => {
+        const editable = document.createElement("div");
+        editable.setAttribute("contenteditable", "true");
+
+        const notInList = document.createElement("div");
+
+        document.body.append(editable);
+
+        const result = DOMUtils.getPreviousContentEditable(notInList);
+        expect(result).toBeNull();
+    });
+
+    test("should return null when no contenteditable elements exist", () => {
+        const div = document.createElement("div");
+        document.body.appendChild(div);
+
+        const result = DOMUtils.getPreviousContentEditable(div);
         expect(result).toBeNull();
     });
 });
