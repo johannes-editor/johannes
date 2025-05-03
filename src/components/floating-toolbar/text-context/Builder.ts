@@ -1,38 +1,56 @@
-import { DropdownMenu } from "../components/floating-toolbar/dropdown-tool/DropdownMenu";
-import { DropdownMenuList } from "../components/floating-toolbar/dropdown-tool/DropdownMenuList";
-import { DropdownMenuListItem } from "../components/floating-toolbar/dropdown-tool/DropdownMenuListItem";
-import { SVGIcon } from "../components/common/SVGIcon";
-import { FloatingToolbarSeparator } from "../components/floating-toolbar/separator/FloatingToolbarSeparator";
-import { ButtonGroup } from "../components/floating-toolbar/button-group/ButtonGroup";
-import { ButtonGroupItem } from "../components/floating-toolbar/button-group/ButtonGroupItem";
-import { ColorIcon } from "../components/floating-toolbar/dropdown-tool/ColorIcon";
-import { DropdownMenuButton } from "../components/floating-toolbar/dropdown-tool/DropdownMenuButton";
-import { BlockOperationsService } from "../services/block-operations/BlockOperationsService";
-import { DropdownMenuListItemTitle } from "@/components/floating-toolbar/dropdown-tool/DropdownMenuListItemTitle";
+import { DropdownMenu } from "../base/dropdown-tool/DropdownMenu";
+import { DropdownMenuList } from "../base/dropdown-tool/DropdownMenuList";
+import { DropdownMenuListItem } from "../base/dropdown-tool/DropdownMenuListItem";
+import { SVGIcon } from "../../common/SVGIcon";
+import { FloatingToolbarSeparator } from "../base/separator/FloatingToolbarSeparator";
+import { ButtonGroup } from "../base/button-group/ButtonGroup";
+import { ButtonGroupItem } from "../base/button-group/ButtonGroupItem";
+import { ColorIcon } from "../base/dropdown-tool/ColorIcon";
+import { DropdownMenuButton } from "../base/dropdown-tool/DropdownMenuButton";
+import { DropdownMenuListItemTitle } from "@/components/floating-toolbar/base/dropdown-tool/DropdownMenuListItemTitle";
 import { ElementFactoryService } from "@/services/element-factory/ElementFactoryService";
 import { Commands } from "@/commands/Commands";
 import { Icons } from "@/common/Icons";
 import { Sizes } from "@/common/Sizes";
 import { Colors } from "@/common/Colors";
-import { TextContextFloatingToolbar } from "@/components/floating-toolbar/TextContextFloatingToolbar";
+import { Toolbar } from "@/components/floating-toolbar/text-context/Toolbar";
 import { ButtonIDs } from "@/core/ButtonIDs";
 import { DropdownItemIDs } from "@/core/DropdownItemIDs";
 import { DropdownListIDs } from "@/core/DropdownListIDs";
 import { DropdownMenuIDs } from "@/core/DropdownMenuIDs";
 
-export class TextContextFloatingToolbarBuilder {
+/**
+ * Builder is a factory class responsible for constructing a fully configured
+ * FloatingToolbar instance with predefined UI components.
+ *
+ * It assembles dropdown menus, button groups, separators, and commands
+ * into a cohesive toolbar structure used in the text editing context.
+ *
+ * Usage example:
+ * ```ts
+ * const toolbar = Builder.build();
+ * ```
+ */
+export class Builder {
 
-    static build(): TextContextFloatingToolbar {
+    /**
+     * Builds and returns a fully configured FloatingToolbar instance.
+     * The toolbar includes dropdowns for block transformations, color options,
+     * formatting buttons, and additional text operations.
+     *
+     * @returns {Toolbar} A complete floating toolbar ready to be rendered or inserted.
+     */
+    static build(): Toolbar {
 
         const id = ""
-        const floatingBar = TextContextFloatingToolbar.getInstance();
+        const floatingBar = Toolbar.getInstance();
 
-        floatingBar.appendDropdown(TextContextFloatingToolbarBuilder.turnIntoDropdown());
-        floatingBar.appendSeparator(TextContextFloatingToolbarBuilder.separator("turnIntoSeparator"));
-        floatingBar.appendButtonGroup(TextContextFloatingToolbarBuilder.buttonGroup());
-        floatingBar.appendDropdown(TextContextFloatingToolbarBuilder.colorDropdown());
-        floatingBar.appendSeparator(TextContextFloatingToolbarBuilder.separator("textOperationsSeparator"));
-        floatingBar.appendDropdown(TextContextFloatingToolbarBuilder.moreOptionsDropdown());
+        floatingBar.appendDropdown(Builder.turnIntoDropdown());
+        floatingBar.appendSeparator(Builder.separator("turnIntoSeparator"));
+        floatingBar.appendButtonGroup(Builder.buttonGroup());
+        floatingBar.appendDropdown(Builder.colorDropdown());
+        floatingBar.appendSeparator(Builder.separator("textOperationsSeparator"));
+        floatingBar.appendDropdown(Builder.moreOptionsDropdown());
 
         return floatingBar;
     }

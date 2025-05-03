@@ -1,4 +1,4 @@
-import { BaseUIComponent } from "../../common/BaseUIComponent";
+import { BaseUIComponent } from "../../../common/BaseUIComponent";
 
 export class ButtonGroup extends BaseUIComponent {
 

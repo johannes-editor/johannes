@@ -1,6 +1,6 @@
 import { DefaultJSEvents } from "@/common/DefaultJSEvents";
-import { BaseUIComponent } from "../../common/BaseUIComponent";
-import { TextContextFloatingToolbar } from "../TextContextFloatingToolbar";
+import { BaseUIComponent } from "../../../common/BaseUIComponent";
+import { Toolbar } from "../../text-context/Toolbar";
 import { InputLinkBox } from "./InputLinkBox";
 import { KeyboardKeys } from "@/common/KeyboardKeys";
 import { ICommandEventDetail } from "@/commands/ICommandEventDetail";
@@ -17,7 +17,7 @@ export class InputLinkBoxWrapper extends BaseUIComponent {
 
     private savedSelectionRange: Range | null = null;
 
-    textContextFloatingToolbar: TextContextFloatingToolbar;
+    textContextFloatingToolbar: Toolbar;
 
     constructor() {
         const inputLinkBox = new InputLinkBox();
@@ -33,7 +33,7 @@ export class InputLinkBoxWrapper extends BaseUIComponent {
         this.button = button;
         inputLinkBox.setParentWrapper(this);
 
-        this.textContextFloatingToolbar = TextContextFloatingToolbar.getInstance();
+        this.textContextFloatingToolbar = Toolbar.getInstance();
 
         this.attachEvent();
     }
@@ -97,12 +97,6 @@ export class InputLinkBoxWrapper extends BaseUIComponent {
                 document.body.classList.remove('ctrl-active');
             }
         });
-
-        // document.addEventListener("showInputLinkBoxRequested", () => {
-        //     this.show();
-        //     // this.highlightSelectedText();
-        //     this.inputLinkBox.focus();
-        // });
 
         this.inputLinkBox.htmlElement.addEventListener(DefaultJSEvents.Keydown, (event: KeyboardEvent) => {
             if (event.key == KeyboardKeys.Enter) {

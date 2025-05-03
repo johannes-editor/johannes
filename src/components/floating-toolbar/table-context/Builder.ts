@@ -2,20 +2,20 @@ import { Commands } from "@/commands/Commands";
 import { Colors } from "@/common/Colors";
 import { Sizes } from "@/common/Sizes";
 import { SVGIcon } from "@/components/common/SVGIcon";
-import { ColorIcon } from "@/components/floating-toolbar/dropdown-tool/ColorIcon";
-import { DropdownMenu } from "@/components/floating-toolbar/dropdown-tool/DropdownMenu";
-import { DropdownMenuButton } from "@/components/floating-toolbar/dropdown-tool/DropdownMenuButton";
-import { DropdownMenuList } from "@/components/floating-toolbar/dropdown-tool/DropdownMenuList";
-import { DropdownMenuListItem } from "@/components/floating-toolbar/dropdown-tool/DropdownMenuListItem";
-import { DropdownMenuListItemTitle } from "@/components/floating-toolbar/dropdown-tool/DropdownMenuListItemTitle";
-import { FloatingToolbarSeparator } from "@/components/floating-toolbar/separator/FloatingToolbarSeparator";
-import { TableContextFloatingToolbar } from "@/components/floating-toolbar/TableContextFloatingToolbar";
+import { ColorIcon } from "@/components/floating-toolbar/base/dropdown-tool/ColorIcon";
+import { DropdownMenu } from "@/components/floating-toolbar/base/dropdown-tool/DropdownMenu";
+import { DropdownMenuButton } from "@/components/floating-toolbar/base/dropdown-tool/DropdownMenuButton";
+import { DropdownMenuList } from "@/components/floating-toolbar/base/dropdown-tool/DropdownMenuList";
+import { DropdownMenuListItem } from "@/components/floating-toolbar/base/dropdown-tool/DropdownMenuListItem";
+import { DropdownMenuListItemTitle } from "@/components/floating-toolbar/base/dropdown-tool/DropdownMenuListItemTitle";
+import { FloatingToolbarSeparator } from "@/components/floating-toolbar/base/separator/FloatingToolbarSeparator";
+import { Toolbar as TableContextFloatingToolbar } from "@/components/floating-toolbar/table-context/Toolbar";
 import { DependencyContainer } from "@/core/DependencyContainer";
 import { ElementFactoryService } from "@/services/element-factory/ElementFactoryService";
 import { ITableOperationsService } from "@/services/table-operations/ITableOperationsService";
 import { Icons } from "@/common/Icons";
 
-export class TableContextFloatingToolbarBuilder {
+export class Builder {
 
     static build(): TableContextFloatingToolbar {
 
@@ -23,9 +23,9 @@ export class TableContextFloatingToolbarBuilder {
 
         const tableToolbar = TableContextFloatingToolbar.getInstance();
 
-        tableToolbar.appendDropdown(TableContextFloatingToolbarBuilder.tableOptions(tableOperationService));
-        tableToolbar.appendSeparator(TableContextFloatingToolbarBuilder.separator("tableOperationsSeparator"));
-        tableToolbar.appendDropdown(TableContextFloatingToolbarBuilder.tableColorDropdown());
+        tableToolbar.appendDropdown(Builder.tableOptions(tableOperationService));
+        tableToolbar.appendSeparator(Builder.separator("tableOperationsSeparator"));
+        tableToolbar.appendDropdown(Builder.tableColorDropdown());
 
 
         return tableToolbar;

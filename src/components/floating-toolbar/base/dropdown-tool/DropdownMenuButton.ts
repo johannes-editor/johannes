@@ -1,5 +1,5 @@
-import { SVGIcon } from "../../common/SVGIcon";
-import { BaseUIComponent } from "../../common/BaseUIComponent";
+import { SVGIcon } from "../../../common/SVGIcon";
+import { BaseUIComponent } from "../../../common/BaseUIComponent";
 import { DropdownMenuList } from "./DropdownMenuList";
 import { Sizes } from "@/common/Sizes";
 import { CustomUIEvents } from "@/common/CustomUIEvents";

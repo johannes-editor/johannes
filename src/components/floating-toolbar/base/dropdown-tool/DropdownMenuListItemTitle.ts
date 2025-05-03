@@ -1,5 +1,5 @@
 import { SVGIcon } from "@/components/common/SVGIcon";
-import { BaseUIComponent } from "../../common/BaseUIComponent";
+import { BaseUIComponent } from "../../../common/BaseUIComponent";
 import { DropdownMenuList } from "./DropdownMenuList";
 import { IDropdownMenuItem } from "./IDropdownMenuItem";
 

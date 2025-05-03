@@ -7,7 +7,7 @@ import { DependencyContainer } from "@/core/DependencyContainer";
 import { IQuickMenu } from "../quick-menu/IQuickMenu";
 import { IShortcutListeners } from "@/core/IShortcutListeners";
 import { ITableListeners } from "@/core/listeners/ITableListeners";
-import { ITableContextFloatingToolbar } from "../floating-toolbar/ITableContextFloatingToolbar";
+import { ITableContextFloatingToolbar } from "../floating-toolbar/table-context/ITableContextFloatingToolbar";
 import { DOMUtils } from "@/utilities/DOMUtils";
 import { TableUtils } from "@/utilities/TableUtils";
 import { DefaultJSEvents } from "@/common/DefaultJSEvents";

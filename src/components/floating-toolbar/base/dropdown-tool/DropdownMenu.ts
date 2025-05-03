@@ -1,5 +1,5 @@
 import { Utils } from "@/utilities/Utils";
-import { BaseUIComponent } from "../../common/BaseUIComponent";
+import { BaseUIComponent } from "../../../common/BaseUIComponent";
 import { DropdownMenuButton } from "./DropdownMenuButton";
 import { DropdownMenuList } from "./DropdownMenuList";
 

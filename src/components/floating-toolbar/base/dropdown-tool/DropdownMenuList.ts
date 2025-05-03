@@ -1,5 +1,5 @@
-import { BaseUIComponent } from "../../common/BaseUIComponent";
-import { CircularDoublyLinkedList } from "../../../common/CircularDoublyLinkedList";
+import { BaseUIComponent } from "../../../common/BaseUIComponent";
+import { CircularDoublyLinkedList } from "../../../../common/CircularDoublyLinkedList";
 import { DropdownMenuListItem } from "./DropdownMenuListItem";
 import { IDropdownMenuItem } from "./IDropdownMenuItem";
 import { JNode } from "@/common/JNode";

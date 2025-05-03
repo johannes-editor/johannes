@@ -1,10 +1,10 @@
 import { Editor } from "@/components/editor/Editor";
 import { AddBlockBuilder } from "./AddBlockBuilder";
-import { TextContextFloatingToolbarBuilder } from "./TextContextFloatingToolbarBuilder";
+import { Builder as TextContextFloatingToolbarBuilder } from "../components/floating-toolbar/text-context/Builder";
+import { Builder as TableContextFloatingToolbarBuilder } from "../components/floating-toolbar/table-context/Builder";
 import { QuickMenuBuilder } from "./QuickMenuBuilder";
 import { TitleBuilder } from "./TitleBuilder";
 import { ContentBuilder } from "./ContentBuilder";
-import { TableContextFloatingToolbarBuilder } from "./TableContextFloatingToolbarBuilder";
 import { MediaInputterBuilder } from "./MediaInputterBuilder";
 
 export class EditorBuilder {

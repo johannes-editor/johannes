@@ -1,4 +1,4 @@
-import { BaseUIComponent } from '../common/BaseUIComponent';
+import { BaseUIComponent } from '../../common/BaseUIComponent';
 import { DropdownMenu } from './dropdown-tool/DropdownMenu';
 import { FloatingToolbarSeparator } from './separator/FloatingToolbarSeparator';
 import { ButtonGroup } from './button-group/ButtonGroup';
@@ -6,7 +6,7 @@ import { CustomEvents } from '@/common/CustomEvents';
 import { DefaultJSEvents } from '@/common/DefaultJSEvents';
 import { ZIndex } from '@/common/ZIndex';
 
-export abstract class FloatingToolbar extends BaseUIComponent {
+export abstract class FloatingToolbarBase extends BaseUIComponent {
 
     dropdowns: DropdownMenu[];
     separators: FloatingToolbarSeparator[];
@@ -104,16 +104,6 @@ export abstract class FloatingToolbar extends BaseUIComponent {
         // Prevent focus change when click on this element
         this.htmlElement.addEventListener(DefaultJSEvents.Mousedown, (event) => {
             event.preventDefault();
-        });
-
-
-        document.addEventListener("showInputLinkBoxRequested", () => {
-            this.canHide = false;
-        });
-
-        document.addEventListener("showInputLinkBoxFinished", () => {
-            this.canHide = true;
-            this.restoreRangeSelection();
         });
 
         document.addEventListener(CustomEvents.blockDeleted, () => {

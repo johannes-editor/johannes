@@ -1,5 +1,5 @@
-import { SVGIcon } from "../../common/SVGIcon";
-import { BaseUIComponent } from "../../common/BaseUIComponent";
+import { SVGIcon } from "../../../common/SVGIcon";
+import { BaseUIComponent } from "../../../common/BaseUIComponent";
 import { CustomEvents } from "@/common/CustomEvents";
 import { ICommandEventDetail } from "@/commands/ICommandEventDetail";
 import { Commands } from "@/commands/Commands";

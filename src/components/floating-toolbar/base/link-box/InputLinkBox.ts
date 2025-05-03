@@ -1,4 +1,4 @@
-import { BaseUIComponent } from "../../common/BaseUIComponent";
+import { BaseUIComponent } from "../../../common/BaseUIComponent";
 import { InputLinkBoxWrapper } from "./InputLinkBoxWrapper";
 import { DefaultJSEvents } from "@/common/DefaultJSEvents";
 

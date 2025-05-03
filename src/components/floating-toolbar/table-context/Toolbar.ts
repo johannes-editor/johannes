@@ -1,14 +1,14 @@
-import { FloatingToolbar } from "./FloatingToolbar";
+import { FloatingToolbarBase } from "../base/FloatingToolbarBase";
 import { IFocusStack } from "@/core/IFocusStack";
 import { DependencyContainer } from "@/core/DependencyContainer";
 import { ITableContextFloatingToolbar } from "./ITableContextFloatingToolbar";
 import { ZIndex } from "@/common/ZIndex";
-import { Directions } from "../../common/Directions";
-import { DefaultJSEvents } from "../../common/DefaultJSEvents";
-import { DOMElements } from "../../common/DOMElements";
+import { Directions } from "../../../common/Directions";
+import { DefaultJSEvents } from "../../../common/DefaultJSEvents";
+import { DOMElements } from "../../../common/DOMElements";
 import { TableUtils } from "@/utilities/TableUtils";
 import { KeyboardKeys } from "@/common/KeyboardKeys";
-import { TextContextFloatingToolbar } from "./TextContextFloatingToolbar";
+import { Toolbar as TextContextFloatingToolbar } from "../text-context/Toolbar";
 import { SelectionModes } from "./SelectionMode";
 import { Colors } from "@/common/Colors";
 import { DOMUtils } from "@/utilities/DOMUtils";
@@ -18,10 +18,10 @@ import { CustomUIEvents } from "@/common/CustomUIEvents";
 import { IUIEventDetail } from "@/commands/IUIEventDetail";
 import { Utils } from "@/utilities/Utils";
 
-export class TableContextFloatingToolbar extends FloatingToolbar implements ITableContextFloatingToolbar {
+export class Toolbar extends FloatingToolbarBase implements ITableContextFloatingToolbar {
 
     private static id: string = "tableFloatingToolbar";
-    private static instance: TableContextFloatingToolbar;
+    private static instance: Toolbar;
 
     focusStack: IFocusStack;
     selectedCells: HTMLTableCellElement[] = [];
@@ -36,11 +36,11 @@ export class TableContextFloatingToolbar extends FloatingToolbar implements ITab
 
     private constructor(focusStack: IFocusStack, tableOperationsService: ITableOperationsService) {
 
-        if (TableContextFloatingToolbar.instance) {
+        if (Toolbar.instance) {
             throw new Error("Use TableContextFloatingToolbar.getInstance() to get instance.");
         }
 
-        super(TableContextFloatingToolbar.id);
+        super(Toolbar.id);
         this.clearAndHide = this.clearAndHide.bind(this);
         this.htmlElement.style.zIndex = ZIndex.ModeratelyImportant;
         this.controller = new AbortController();
@@ -336,7 +336,7 @@ export class TableContextFloatingToolbar extends FloatingToolbar implements ITab
         const customEvent = event as CustomEvent<IUIEventDetail>;
         const details = customEvent.detail;
 
-        if (TableContextFloatingToolbar.id == details.targetId!) {
+        if (Toolbar.id == details.targetId!) {
             this.clearAndHide();
         }
     }
@@ -443,6 +443,6 @@ export class TableContextFloatingToolbar extends FloatingToolbar implements ITab
     static getInstance() {
         const focusStack = DependencyContainer.Instance.resolve<IFocusStack>("IFocusStack");
         const tableOperationsService = DependencyContainer.Instance.resolve<ITableOperationsService>("ITableOperationsService");
-        return new TableContextFloatingToolbar(focusStack, tableOperationsService);
+        return new Toolbar(focusStack, tableOperationsService);
     }
 }

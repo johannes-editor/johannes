@@ -55,7 +55,8 @@ export class ElementFactoryService implements IElementFactoryService {
         GITLAB_SNIPPET: "gitlab-snippet",
         CODEPEN: "codepen",
         CALLOUT: "callout",
-        SEPARATOR: "separator"
+        SEPARATOR: "separator",
+        BLOCK_SEPARATOR: "block-separator"
     }
 
     private constructor() {
@@ -101,6 +102,7 @@ export class ElementFactoryService implements IElementFactoryService {
         this.register(ElementFactoryService.ELEMENT_TYPES.CODEPEN, ElementFactoryService.placeholderCreator(ContentTypes.Iframe, Icons.CodePen, "Embed a CodePen web demo", [CommonClasses.ShowMediaInputEmbed, "codepen-embed-placeholder-text"]));
         this.register(ElementFactoryService.ELEMENT_TYPES.CALLOUT, ElementFactoryService.calloutCreator());
         this.register(ElementFactoryService.ELEMENT_TYPES.SEPARATOR, ElementFactoryService.separatorCreator());
+        this.register(ElementFactoryService.ELEMENT_TYPES.BLOCK_SEPARATOR, ElementFactoryService.blockSeparatorCreator());
 
         ElementFactoryService._instance = this;
     }
@@ -131,6 +133,12 @@ export class ElementFactoryService implements IElementFactoryService {
     private static blockParagraphCreator(): ElementCreator {
         return content => {
             return ElementFactoryService.blockParagraph(content);
+        };
+    }
+
+    private static blockSeparatorCreator(): ElementCreator {
+        return content => {
+            return ElementFactoryService.blockSeparator();
         };
     }
 
@@ -375,6 +383,7 @@ export class ElementFactoryService implements IElementFactoryService {
         };
     }
 
+
     static paragraph(content: string | null = null): HTMLElement {
         const p = document.createElement('p');
 
@@ -534,6 +543,35 @@ export class ElementFactoryService implements IElementFactoryService {
 
         return newDiv;
     }
+
+    static blockSeparator(content: string | null = null) {
+        let newDiv = document.createElement('div');
+        let newElement = ElementFactoryService.separator();
+
+        newDiv.id = `b-${Utils.generateUniqueId()}`;
+        newDiv.appendChild(newElement);
+        newDiv.classList.add('block');
+        newDiv.classList.add('deletable');
+
+        return newDiv;
+    }
+
+    static separator() {
+        const content = document.createElement("div");
+        content.classList.add("johannes-content-element");
+
+        const wrapper = document.createElement("div");
+        wrapper.classList.add("separator-wrapper");
+
+        const separator = document.createElement('hr');
+        separator.classList.add('separator');
+        wrapper.appendChild(separator);
+        content.appendChild(wrapper);
+
+        return content;
+    }
+
+
 
     static blockHeading(level: number, content: string | null = null) {
         let newDiv = document.createElement('div');

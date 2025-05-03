@@ -1,5 +1,5 @@
 import { BaseUIComponent } from "../common/BaseUIComponent";
-import { CustomEvents } from "@/common/CustomEvents";
+import { FloatingToolbarCssClass } from "../floating-toolbar/base/FloatingToolbarCssClass";
 
 export class Title extends BaseUIComponent {
 
@@ -13,7 +13,7 @@ export class Title extends BaseUIComponent {
     init(): HTMLElement {
 
         const htmlElement = document.createElement("div");
-        htmlElement.classList.add("title");
+        htmlElement.classList.add("title", FloatingToolbarCssClass.IgnoreTextContextFloatingToolbar);
 
         const h1 = document.createElement("h1");
         h1.setAttribute("contentEditable", "true");

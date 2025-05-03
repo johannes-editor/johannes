@@ -1,5 +1,5 @@
 import { DOMUtils } from "@/utilities/DOMUtils";
-import { FloatingToolbar } from "./FloatingToolbar";
+import { FloatingToolbarBase } from "../base/FloatingToolbarBase";
 import { ZIndex } from "@/common/ZIndex";
 import { DefaultJSEvents } from "@/common/DefaultJSEvents";
 import { EventEmitter } from "@/commands/EventEmitter";
@@ -9,11 +9,23 @@ import { Colors } from "@/common/Colors";
 import { ButtonIDs } from "@/core/ButtonIDs";
 import { KeyboardKeys } from "@/common/KeyboardKeys";
 import { Utils } from "@/utilities/Utils";
+import { FloatingToolbarCssClass } from "../base/FloatingToolbarCssClass";
+import { CommonCssClass } from "@/components/common/CommonCssClass";
 
-export class TextContextFloatingToolbar extends FloatingToolbar {
+/**
+ * Floating toolbar component for text context operations.
+ * 
+ * This singleton toolbar appears near selected text and provides
+ * formatting options like bold, italic, underline, color changes, etc.
+ * 
+ * It is context-aware and hides/shows itself based on selection state.
+ * 
+ * Use `Toolbar.getInstance()` to access the instance.
+ */
+export class Toolbar extends FloatingToolbarBase {
 
     private static id: string = "textFloatingToolbar";
-    private static instance: TextContextFloatingToolbar;
+    private static instance: Toolbar;
     private textOperationsService: ITextOperationsService;
     private initialRect: DOMRect | null = null;
 
@@ -27,11 +39,11 @@ export class TextContextFloatingToolbar extends FloatingToolbar {
 
     private constructor(textOperationsService: ITextOperationsService) {
 
-        if (TextContextFloatingToolbar.instance) {
+        if (Toolbar.instance) {
             throw new Error("Use TextContextFloatingToolbar.getInstance() to get instance.");
         }
 
-        super(TextContextFloatingToolbar.id);
+        super(Toolbar.id);
 
         this.htmlElement.style.zIndex = ZIndex.VeryImportant;
         this.textOperationsService = textOperationsService;
@@ -39,21 +51,29 @@ export class TextContextFloatingToolbar extends FloatingToolbar {
         this.attachEvents();
     }
 
-    static getInstance(): TextContextFloatingToolbar {
+    /**
+    * Returns the singleton instance of the `Toolbar`.
+    * 
+    * @returns {Toolbar} The singleton instance.
+    */
+    static getInstance(): Toolbar {
 
         const textOperationsService = DependencyContainer.Instance.resolve<ITextOperationsService>("ITextOperationsService");;
 
-        if (!TextContextFloatingToolbar.instance) {
-            TextContextFloatingToolbar.instance = new TextContextFloatingToolbar(textOperationsService);
+        if (!Toolbar.instance) {
+            Toolbar.instance = new Toolbar(textOperationsService);
         }
 
-        return TextContextFloatingToolbar.instance;
+        return Toolbar.instance;
     }
 
+    /**
+    * Updates toolbar buttons' active states based on the current text selection.
+    */
     processSelectionChangeEffects() {
 
         this.checkMultipleBlocksSelection();
-        
+
         EventEmitter.emitResetActiveButtonsElementEvent("hiliteColor");
         EventEmitter.emitResetActiveButtonsElementEvent("foreColor");
 
@@ -96,11 +116,12 @@ export class TextContextFloatingToolbar extends FloatingToolbar {
         this.emitChangeComponentColorEvent(isInlineCode, ButtonIDs.InlineCode);
         this.emitChangeComponentColorEvent(isUnderline, ButtonIDs.Underline);
         this.emitChangeComponentColorEvent(isStrikeThrough, ButtonIDs.Strikethrough);
-
-        // Check if selection includes more than one block
-        
     }
 
+    /**
+    * Checks if the current selection includes multiple `.block` elements
+    * and hides or shows UI parts accordingly.
+    */
     private checkMultipleBlocksSelection() {
         const selection = window.getSelection();
 
@@ -111,7 +132,7 @@ export class TextContextFloatingToolbar extends FloatingToolbar {
         if (!selection.rangeCount) return;
 
         const range = selection.getRangeAt(0);
-        const blockElements = range.cloneContents().querySelectorAll('.block');
+        const blockElements = range.cloneContents().querySelectorAll(".".concat(CommonCssClass.Block ));
 
         if (!this.moreTextOptions) {
             this.moreTextOptions = document.querySelector("#moreTextOptionButton");
@@ -174,7 +195,7 @@ export class TextContextFloatingToolbar extends FloatingToolbar {
         this.htmlElement.addEventListener(DefaultJSEvents.Mouseup, (event) => { event.preventDefault(); });
 
         document.addEventListener(DefaultJSEvents.Mouseup, debouncedProcessAfterChange);
-        document.addEventListener(DefaultJSEvents.BblClick, debouncedProcessAfterChange);
+        document.addEventListener(DefaultJSEvents.DblClick, debouncedProcessAfterChange);
         document.addEventListener(DefaultJSEvents.SelectionChange, debouncedProcessAfterChange);
 
         document.addEventListener(DefaultJSEvents.Keydown, (event) => {
@@ -216,7 +237,6 @@ export class TextContextFloatingToolbar extends FloatingToolbar {
         });
 
         document.addEventListener(DefaultJSEvents.SelectionChange, (event) => {
-
             this.showHide(event, isSelecting);
         });
 
@@ -230,8 +250,6 @@ export class TextContextFloatingToolbar extends FloatingToolbar {
 
             setTimeout(() => {
                 if (this.canHide && (event.key === KeyboardKeys.Escape) && !this.lockedHide) {
-
-
                     if (this.anyDropdownVisible()) {
                         this.hideAllDropdownVisible();
                     } else {
@@ -268,7 +286,10 @@ export class TextContextFloatingToolbar extends FloatingToolbar {
         return positionChanged;
     }
 
+    //Regras para exibir ou ocultar o TextContextFloatingToolbar
     showHide(event: Event, isSelecting: boolean) {
+
+        //Workaround para funcionar no Firefox
 
         //This block checks for an active selection and whether it contains any content.
         // In Firefox, the `selectionchange` event may be fired even while typing,
@@ -290,22 +311,30 @@ export class TextContextFloatingToolbar extends FloatingToolbar {
         } else if (hasContent && !isSelecting) {
             if (!this.isVisible) {
 
-                const ignoreFloatingToolbar = DOMUtils.isSelectedTextDescendantOf(".ignore-text-floating-toolbar") || DOMUtils.isSelectedTextDescendantOf(".gist");
-                if (ignoreFloatingToolbar) {
+                if (!this.canShowFloatingToolbar()) {
                     return;
                 }
-
                 // event.stopImmediatePropagation();
                 this.show();
             } else if (this.shouldUpdatePosition()) {
 
-                const ignoreFloatingToolbar = DOMUtils.isSelectedTextDescendantOf(".gist") || DOMUtils.isSelectedTextDescendantOf(".gist");
-                if (ignoreFloatingToolbar) {
+                if (!this.canShowFloatingToolbar()) {
                     return;
                 }
             }
         }
+    }
 
+    private canShowFloatingToolbar(): boolean {
+        const hasContent = this.hasSelection();
+    
+        if (!hasContent) return false;
+    
+        const inIgnoredContext =
+            DOMUtils.isSelectedTextDescendantOf(".".concat(FloatingToolbarCssClass.IgnoreTextContextFloatingToolbar)) ||
+            DOMUtils.isSelectedTextDescendantOf(".".concat(FloatingToolbarCssClass.Gist))
+    
+        return !inIgnoredContext;
     }
 
     hasSelection(): boolean {
@@ -379,6 +408,9 @@ export class TextContextFloatingToolbar extends FloatingToolbar {
         this.htmlElement.style.top = `${topPosition}px`;
     }
 
+    /**
+    * Shows the toolbar near the current text selection.
+    */
     show(): void {
 
         const selection = window.getSelection();
@@ -398,6 +430,9 @@ export class TextContextFloatingToolbar extends FloatingToolbar {
 
     }
 
+    /**
+    * Hides the toolbar if it's allowed to hide.
+    */
     hideTurnInto(): void {
         const shouldHide = this.isSelectionWithinElementWithClass("hide-turninto");
 
