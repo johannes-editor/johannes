@@ -14,6 +14,7 @@ import { MediaInputter } from "../media-inputter/MediaInputter";
 import { InputLinkBoxWrapper } from "../floating-toolbar/base/link-box/InputLinkBoxWrapper";
 import { DefaultJSEvents } from '@/common/DefaultJSEvents';
 import { Utils } from "@/utilities/Utils";
+import { DOMUtils } from "@/utilities/DOMUtils";
 
 export class Editor extends BaseUIComponent {
 
@@ -88,13 +89,11 @@ export class Editor extends BaseUIComponent {
 
         const contentWrapper = document.createElement("div");
         contentWrapper.classList.add("content-wrapper");
-        // contentWrapper.setAttribute("contenteditable", "true");
 
         if (window.editorConfig?.enableTitle !== false) {
             contentWrapper.appendChild(this.props.title.htmlElement);
         }
 
-        // Content is required
         contentWrapper.appendChild(this.props.content.htmlElement);
 
         htmlElement.appendChild(contentWrapper);
@@ -168,7 +167,6 @@ export class Editor extends BaseUIComponent {
             }
         });
 
-        //Focus on the first paragraph
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
                 const firstParagraph = document.querySelector("#johannesEditor > .content .block p") as HTMLElement;
@@ -184,70 +182,76 @@ export class Editor extends BaseUIComponent {
         }
 
         document.addEventListener(DefaultJSEvents.Paste, (event: ClipboardEvent) => {
-            const target = event.target as HTMLElement | null;
-
-            if (target?.getAttribute('contenteditable') === 'true') {
-
-                if (!Utils.isEventFromContentWrapper(event)) {
-                    return;
-                }
-
-                event.preventDefault();
-                event.stopImmediatePropagation();
-
-                const clipboardData = event.clipboardData;
-                if (clipboardData) {
-
-                    console.log("colou");
-                    const text = clipboardData.getData('text/plain');
-                    const textHtml = clipboardData.getData('text/html');
-
-                    if (textHtml !== "") {
-                        const blocks = Editor.extractClipboardContent(textHtml);
-
-                        if (blocks.length > 0) {
-
-                            if (blocks[0].text) {
-                                Editor.insertTextAtCursor(blocks[0].text);
-                            }
-
-                            blocks.slice(1).forEach(block => {
-
-                                if (block.type == "ul" || block.type == "ol") {
-
-                                    const first = block.items?.[0]?.text;
-                                    const newBlock = this.blockOperationsService.insertBlock("block-" + block.type, first || "", null);
-
-                                    block.items?.slice(1).forEach(item => {
-                                        this.blockOperationsService.insertLiIntoListBlock(item.text || "", newBlock)
-                                    });
-
-                                } else {
-                                    this.blockOperationsService.insertBlock("block-" + block.type, block.text || "", null);
-                                }
-
-                            });
-                        }
-
-                        return;
-                    }
-
-                    const paragraphs = text.split('\n\r')
-                        .map(item => item = item.replace("\n", ""))
-                        .filter(line => line.trim() !== '');
-
-                    if (paragraphs.length > 0) {
-                        Editor.insertTextAtCursor(paragraphs[0]);
-
-                        paragraphs.slice(1).forEach(textContent => {
-                            this.blockOperationsService.createDefaultBlock(null, textContent);
-                        });
-                    }
-                }
-            }
+            Editor.handlePasteEvent(event, this.blockOperationsService);
         }, true);
+        
 
         this.attachDragHandler();
+    }
+
+    static handlePasteEvent(event: ClipboardEvent, blockOperationsService: IBlockOperationsService) {
+        const target = event.target as HTMLElement | null;
+    
+        if (target?.getAttribute('contenteditable') !== 'true') return;
+        if (!Utils.isEventFromContentWrapper(event)) return;
+    
+        event.preventDefault();
+        event.stopImmediatePropagation();
+    
+        const clipboardData = event.clipboardData;
+        if (!clipboardData) return;
+    
+        const text = clipboardData.getData('text/plain');
+        const textHtml = clipboardData.getData('text/html');
+    
+        if (textHtml !== "") {
+            const currentBlock = DOMUtils.getContentTypeFromActiveElement();
+            const isParagraph = currentBlock === 'p';
+    
+            if (isParagraph) {
+                const blocks = Editor.extractClipboardContent(textHtml);
+    
+                if (blocks.length > 0) {
+                    if (blocks[0].text) {
+                        Editor.insertTextAtCursor(blocks[0].text);
+                    }
+    
+                    blocks.slice(1).forEach(block => {
+                        if (block.type === "ul" || block.type === "ol") {
+                            const first = block.items?.[0]?.text;
+                            const newBlock = blockOperationsService.insertBlock("block-" + block.type, first || "", null);
+    
+                            block.items?.slice(1).forEach(item => {
+                                blockOperationsService.insertLiIntoListBlock(item.text || "", newBlock);
+                            });
+    
+                        } else {
+                            blockOperationsService.insertBlock("block-" + block.type, block.text || "", null);
+                        }
+                    });
+                }
+    
+            } else {
+                const plainText = clipboardData.getData('text/plain');
+                if (plainText) {
+                    Editor.insertTextAtCursor(plainText);
+                }
+            }
+    
+            return;
+        }
+    
+        const paragraphs = text.split('\n\r')
+            .map(line => line.replace("\n", ""))
+            .filter(line => line.trim() !== '');
+    
+        if (paragraphs.length > 0) {
+            Editor.insertTextAtCursor(paragraphs[0]);
+    
+            paragraphs.slice(1).forEach(textContent => {
+                blockOperationsService.createDefaultBlock(null, textContent);
+            });
+        }
     }
 
     static insertTextAtCursor(text: string): void {
@@ -372,67 +376,75 @@ export class Editor extends BaseUIComponent {
     static extractClipboardContent(htmlContent: string) {
         const parser = new DOMParser();
         const doc = parser.parseFromString(htmlContent, 'text/html');
-    
+
         interface Block {
             type: string;
             text?: string;
             items?: Block[];
         }
-    
+
         const blocks: Block[] = [];
-    
+
         function processNode(node: Node, currentText: string = ''): { blocks: Block[], text: string } {
             let collectedText = currentText;
             let blocks: Block[] = [];
-    
+
             if (node.nodeType === Node.ELEMENT_NODE) {
                 const element = node as HTMLElement;
                 const type = element.tagName.toLowerCase();
-    
+
                 if (['style', 'script'].includes(type)) {
                     return { blocks, text: collectedText };
                 }
-    
+
                 if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'pre', 'blockquote'].includes(type)) {
                     if (collectedText.trim()) {
                         blocks.push({ type: 'p', text: collectedText.trim() });
                         collectedText = '';
                     }
-    
+
                     let text = '';
-                    // Especial: se for <pre>, preserve formatação (ex: blocos de código)
                     if (type === 'pre') {
                         text = element.textContent || '';
                     } else {
-                        // Concatena texto dos filhos, incluindo <code> como parte do texto
                         text = Array.from(element.childNodes)
                             .map(child => child.textContent || '')
                             .join('');
                     }
-    
+
                     if (text.trim()) {
                         blocks.push({ type, text: text.trim() });
                     }
-    
+
                 } else if (type === 'ul' || type === 'ol') {
                     if (collectedText.trim()) {
                         blocks.push({ type: 'p', text: collectedText.trim() });
                         collectedText = '';
                     }
-    
+
                     const items: Block[] = [];
-                    element.querySelectorAll(':scope > li').forEach(li => {
-                        const text = (li as HTMLElement).textContent?.trim();
-                        if (text) {
-                            items.push({ type: 'li', text });
+
+                    function collectListItems(liElement: HTMLElement) {
+                        const cloned = liElement.cloneNode(true) as HTMLElement;
+                        cloned.querySelectorAll('ul, ol').forEach(nested => nested.remove());
+                        const mainText = cloned.textContent?.trim();
+                        if (mainText) {
+                            items.push({ type: 'li', text: mainText });
                         }
+
+                        liElement.querySelectorAll(':scope > ul > li, :scope > ol > li').forEach(nestedLi => {
+                            collectListItems(nestedLi as HTMLElement);
+                        });
+                    }
+
+                    element.querySelectorAll(':scope > li').forEach(li => {
+                        collectListItems(li as HTMLElement);
                     });
-    
+
                     if (items.length > 0) {
                         blocks.push({ type, items });
                     }
                 } else {
-                    // Outros elementos: processar recursivamente
                     element.childNodes.forEach(child => {
                         const result = processNode(child, collectedText);
                         blocks = blocks.concat(result.blocks);
@@ -443,22 +455,21 @@ export class Editor extends BaseUIComponent {
                 const text = node.textContent || '';
                 collectedText += text;
             }
-    
+
             return { blocks, text: collectedText };
         }
-    
+
         let collectedText = '';
         doc.body.childNodes.forEach(node => {
             const result = processNode(node, collectedText);
             blocks.push(...result.blocks);
             collectedText = result.text;
         });
-    
+
         if (collectedText.trim()) {
             blocks.push({ type: 'p', text: collectedText.trim() });
         }
-    
+
         return blocks;
     }
-
 }

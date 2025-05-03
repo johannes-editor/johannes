@@ -129,6 +129,7 @@ export class BlockToolbox implements IBlockToolbox {
         const block = cell.closest('.block');
         if (block) {
             const optionsWrapper = block.querySelector('.block-toolbar') as HTMLElement;
+            
             if (optionsWrapper) {
                 if (forceHideElement) {
                     optionsWrapper.classList.add('hidden');
@@ -145,11 +146,11 @@ export class BlockToolbox implements IBlockToolbox {
 
         if (!content) return;
 
-        const block = content.closest(".block");
+        const block = content.closest(".".concat(CommonClasses.Block));
 
         if (!block) return;
 
-        let optionsButtonExists = block.querySelector('.block-toolbar-wrapper') !== null;
+        let optionsButtonExists = block.querySelector(".".concat(CommonClasses.BlockToolbarWrapper)) !== null;
         if (!optionsButtonExists) {
 
             const includeLanguageSelectionTool = content.classList.contains(ToolboxOptions.LanguageSelectionToolClass);
@@ -278,6 +279,7 @@ export class BlockToolbox implements IBlockToolbox {
         const htmlElement = document.createElement("div");
         htmlElement.classList.add("block-toolbar", "soft-box-shadow");
         htmlElement.id = `btb-${Utils.generateUniqueId()}`;
+        htmlElement.setAttribute("spellcheck", "false");
 
         htmlElementWrapper.appendChild(htmlElement);
 

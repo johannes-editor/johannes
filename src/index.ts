@@ -11,14 +11,14 @@ import { BlockOperationsService } from './services/block-operations/BlockOperati
 import { ElementFactoryService } from './services/element-factory/ElementFactoryService';
 import { TextOperationsService } from './services/text-operations/TextOperationsService';
 import { TableOperationsService } from './services/table-operations/TableOperationsService';
-import { TableContextFloatingToolbar } from './components/floating-toolbar/TableContextFloatingToolbar';
+import { Toolbar as TableContextFloatingToolbar } from './components/floating-toolbar/table-context/Toolbar';
 import { Memento } from './core/Memento';
 import { EditableNavigation } from './core/EditableNavigation';
 import { BlockToolbox } from './components/block-toolbox/BlockToolbox';
 import { ImageAlt } from './core/listeners/ImageAlt';
 
 /**
- * This script initializes the editor and sets up event listeners once the DOM content has fully loaded.
+ * Initializes the editor and sets up event listeners once the DOM content has fully loaded.
  * It is responsible for building the user interface and starting the event listening process to handle commands.
  *
  * The `DOMContentLoaded` event ensures that all the DOM content has been fully parsed and loaded before the initialization begins.

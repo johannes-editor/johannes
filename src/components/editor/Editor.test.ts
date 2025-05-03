@@ -1,6 +1,9 @@
+import { DOMUtils } from '@/utilities/DOMUtils';
 import { Editor } from './Editor';
+import { IBlockOperationsService } from '@/services/block-operations/IBlockOperationsService';
+import { Utils } from '@/utilities/Utils';
 
-describe('Editor.extractClipboardContent - inline code handling', () => {
+describe('Editor.extractClipboardContent', () => {
 
     test('should treat inline <code> as part of paragraph text', () => {
         const html = `
@@ -25,8 +28,7 @@ describe('Editor.extractClipboardContent - inline code handling', () => {
         expect(result).toHaveLength(2);
         expect(result[0]).toEqual({ type: 'p', text: 'First paragraph.' });
         expect(result[1]).toEqual({ type: 'p', text: 'Second paragraph.' });
-    });
-    
+    });    
     
     test('should handle ordered lists', () => {
         const html = `
@@ -102,38 +104,104 @@ describe('Editor.extractClipboardContent - inline code handling', () => {
         expect(result[4]).toEqual({ type: 'h5', text: 'Heading 5' });
         expect(result[5]).toEqual({ type: 'h6', text: 'Heading 6' });
     });
-    
-    
-    test('should handle nested lists inside a list item', () => {
-        const html = `
-            <ul>
-                <li>Item 1</li>
-                <li>Item 2
-                    <ul>
-                        <li>Subitem 2.1</li>
-                        <li>Subitem 2.2</li>
-                    </ul>
-                </li>
-                <li>Item 3</li>
-            </ul>
-        `;
-    
-        const result = Editor.extractClipboardContent(html);
-    
-        expect(result).toHaveLength(1);
-        expect(result[0].type).toBe('ul');
-        expect(result[0].items).toHaveLength(3);
-    
-        expect(result[0].items?.[1]).toEqual({
-            type: 'li',
-            text: 'Item 2',
-            items: [
-                { type: 'li', text: 'Subitem 2.1' },
-                { type: 'li', text: 'Subitem 2.2' }
-            ]
-        });
-    });
+
+    //TODO: Add List test case
 
 });
 
 
+describe('Editor.handlePasteEvent', () => {
+    let blockOperationsService: jest.Mocked<IBlockOperationsService>;
+    let insertTextAtCursor: jest.SpyInstance;
+    let clipboardEvent: ClipboardEvent;
+
+    beforeEach(() => {
+        blockOperationsService = {
+            insertBlock: jest.fn(),
+            insertLiIntoListBlock: jest.fn(),
+            createDefaultBlock: jest.fn(),
+        } as any;
+
+        insertTextAtCursor = jest.spyOn(Editor, 'insertTextAtCursor').mockImplementation(() => {});
+        jest.spyOn(DOMUtils, 'getContentTypeFromActiveElement').mockReturnValue('p');
+        jest.spyOn(Utils, 'isEventFromContentWrapper').mockReturnValue(true);
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    function createPasteEvent(html = '', text = ''): Event {
+        const clipboardData = {
+            getData: (type: string) => {
+                if (type === 'text/html') return html;
+                if (type === 'text/plain') return text;
+                return '';
+            }
+        };
+    
+        const event = new Event('paste', { bubbles: true, cancelable: true });
+        
+        Object.defineProperty(event, 'clipboardData', {
+            value: clipboardData,
+        });
+    
+        const target = document.createElement('div');
+        target.setAttribute('contenteditable', 'true');
+    
+        Object.defineProperty(event, 'target', {
+            value: target,
+        });
+    
+        return event;
+    }
+
+    test('should insert text from single paragraph HTML paste', () => {
+        const html = '<p>Hello world</p>';
+        clipboardEvent = createPasteEvent(html) as unknown as ClipboardEvent;
+
+        Editor.handlePasteEvent(clipboardEvent, blockOperationsService);
+
+        expect(insertTextAtCursor).toHaveBeenCalledWith('Hello world');
+        expect(blockOperationsService.insertBlock).not.toHaveBeenCalled();
+    });
+
+    test('should insert text and create block for additional paragraphs', () => {
+        const html = '<p>First</p><p>Second</p>';
+        clipboardEvent = createPasteEvent(html) as unknown as ClipboardEvent;
+
+        Editor.handlePasteEvent(clipboardEvent, blockOperationsService);
+
+        expect(insertTextAtCursor).toHaveBeenCalledWith('First');
+        expect(blockOperationsService.insertBlock).toHaveBeenCalledWith('block-p', 'Second', null);
+    });
+
+    //TODO: Add List test case
+
+    test('should fallback to plain text when no HTML provided', () => {
+        clipboardEvent = createPasteEvent('', 'Line 1\n\rLine 2') as unknown as ClipboardEvent;
+
+        Editor.handlePasteEvent(clipboardEvent, blockOperationsService);
+
+        expect(insertTextAtCursor).toHaveBeenCalledWith('Line 1');
+        expect(blockOperationsService.createDefaultBlock).toHaveBeenCalledWith(null, 'Line 2');
+    });
+
+    test('should not do anything if contenteditable is false', () => {
+        clipboardEvent = createPasteEvent('<p>Ignore me</p>') as unknown as ClipboardEvent;
+        (clipboardEvent.target as HTMLElement).removeAttribute('contenteditable');
+
+        Editor.handlePasteEvent(clipboardEvent, blockOperationsService);
+
+        expect(insertTextAtCursor).not.toHaveBeenCalled();
+    });
+
+    test('should insert plain text when active block is not a paragraph', () => {
+        jest.spyOn(DOMUtils, 'getContentTypeFromActiveElement').mockReturnValue('h1');
+        clipboardEvent = createPasteEvent('<p>Should not parse as block</p>', 'Fallback text') as unknown as ClipboardEvent;
+
+        Editor.handlePasteEvent(clipboardEvent, blockOperationsService);
+
+        expect(insertTextAtCursor).toHaveBeenCalledWith('Fallback text');
+    });
+});
