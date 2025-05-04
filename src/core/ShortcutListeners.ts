@@ -6,15 +6,21 @@ import { IShortcutListeners } from "./IShortcutListeners";
 import { DefaultJSEvents } from "@/common/DefaultJSEvents";
 import { Utils } from "@/utilities/Utils";
 import { DOMUtils } from "@/utilities/DOMUtils";
+import { IFocusStack } from "@/core/IFocusStack";
+import { DependencyContainer } from "./DependencyContainer";
 
 export class ShortcutListeners implements IShortcutListeners {
 
     private static instance: ShortcutListeners | null = null;
 
-    private constructor() {
+    focusStack: IFocusStack;
+
+    private constructor(focusStack: IFocusStack) {
         if (ShortcutListeners.instance) {
             throw new Error("Use ShortcutListeners.getInstance() to get instance.");
         }
+
+        this.focusStack = focusStack;
 
         this.listen();
     }
@@ -28,7 +34,9 @@ export class ShortcutListeners implements IShortcutListeners {
             return ShortcutListeners.instance;
         }
 
-        return new ShortcutListeners();
+        const focusStack = DependencyContainer.Instance.resolve<IFocusStack>("IFocusStack");
+
+        return new ShortcutListeners(focusStack);
     }
 
     private listen() {
@@ -45,6 +53,12 @@ export class ShortcutListeners implements IShortcutListeners {
                 // Converts to paragraph when pressing Ctrl+Shift+Enter
                 event.preventDefault();
                 event.stopPropagation();
+                
+                //when has text selection
+                const block = DOMUtils.findClosestAncestorOfSelectionByClass("block");
+                if(block){
+                    this.focusStack.push(block);
+                }
 
                 document.dispatchEvent(new CustomEvent<ICommandEventDetail>(CustomEvents.emittedCommand, {
                     detail: {
@@ -59,6 +73,11 @@ export class ShortcutListeners implements IShortcutListeners {
                 event.preventDefault();
                 event.stopPropagation();
 
+                const block = DOMUtils.findClosestAncestorOfSelectionByClass("block");
+                if(block){
+                    this.focusStack.push(block);
+                }
+
                 document.dispatchEvent(new CustomEvent<ICommandEventDetail>(CustomEvents.emittedCommand, {
                     detail: {
                         command: Commands.transformBlock,
@@ -72,6 +91,11 @@ export class ShortcutListeners implements IShortcutListeners {
                 event.preventDefault();
                 event.stopPropagation();
 
+                const block = DOMUtils.findClosestAncestorOfSelectionByClass("block");
+                if(block){
+                    this.focusStack.push(block);
+                }
+
                 document.dispatchEvent(new CustomEvent<ICommandEventDetail>(CustomEvents.emittedCommand, {
                     detail: {
                         command: Commands.transformBlock,
@@ -83,6 +107,11 @@ export class ShortcutListeners implements IShortcutListeners {
                 // Converts to numbered list when pressing Ctrl+Shift+/
                 event.preventDefault();
                 event.stopPropagation();
+
+                const block = DOMUtils.findClosestAncestorOfSelectionByClass("block");
+                if(block){
+                    this.focusStack.push(block);
+                }
 
                 document.dispatchEvent(new CustomEvent<ICommandEventDetail>(CustomEvents.emittedCommand, {
                     detail: {
@@ -96,6 +125,11 @@ export class ShortcutListeners implements IShortcutListeners {
                 event.preventDefault();
                 event.stopPropagation();
 
+                const block = DOMUtils.findClosestAncestorOfSelectionByClass("block");
+                if(block){
+                    this.focusStack.push(block);
+                }
+
                 document.dispatchEvent(new CustomEvent<ICommandEventDetail>(CustomEvents.emittedCommand, {
                     detail: {
                         command: Commands.transformBlock,
@@ -107,6 +141,11 @@ export class ShortcutListeners implements IShortcutListeners {
                 // Converts to h2 when pressing Ctrl+Alt+2
                 event.preventDefault();
                 event.stopPropagation();
+
+                const block = DOMUtils.findClosestAncestorOfSelectionByClass("block");
+                if(block){
+                    this.focusStack.push(block);
+                }
 
                 document.dispatchEvent(new CustomEvent<ICommandEventDetail>(CustomEvents.emittedCommand, {
                     detail: {
@@ -120,6 +159,11 @@ export class ShortcutListeners implements IShortcutListeners {
                 event.preventDefault();
                 event.stopPropagation();
 
+                const block = DOMUtils.findClosestAncestorOfSelectionByClass("block");
+                if(block){
+                    this.focusStack.push(block);
+                }
+
                 document.dispatchEvent(new CustomEvent<ICommandEventDetail>(CustomEvents.emittedCommand, {
                     detail: {
                         command: Commands.transformBlock,
@@ -131,6 +175,11 @@ export class ShortcutListeners implements IShortcutListeners {
                 // Converts to h4 when pressing Ctrl+Alt+4
                 event.preventDefault();
                 event.stopPropagation();
+
+                const block = DOMUtils.findClosestAncestorOfSelectionByClass("block");
+                if(block){
+                    this.focusStack.push(block);
+                }
 
                 document.dispatchEvent(new CustomEvent<ICommandEventDetail>(CustomEvents.emittedCommand, {
                     detail: {
@@ -144,6 +193,11 @@ export class ShortcutListeners implements IShortcutListeners {
                 event.preventDefault();
                 event.stopPropagation();
 
+                const block = DOMUtils.findClosestAncestorOfSelectionByClass("block");
+                if(block){
+                    this.focusStack.push(block);
+                }
+
                 document.dispatchEvent(new CustomEvent<ICommandEventDetail>(CustomEvents.emittedCommand, {
                     detail: {
                         command: Commands.transformBlock,
@@ -155,6 +209,11 @@ export class ShortcutListeners implements IShortcutListeners {
                 // Converts to h6 when pressing Ctrl+Alt+6
                 event.preventDefault();
                 event.stopPropagation();
+
+                const block = DOMUtils.findClosestAncestorOfSelectionByClass("block");
+                if(block){
+                    this.focusStack.push(block);
+                }
 
                 document.dispatchEvent(new CustomEvent<ICommandEventDetail>(CustomEvents.emittedCommand, {
                     detail: {
@@ -168,6 +227,11 @@ export class ShortcutListeners implements IShortcutListeners {
                 event.preventDefault();
                 event.stopPropagation();
 
+                const block = DOMUtils.findClosestAncestorOfSelectionByClass("block");
+                if(block){
+                    this.focusStack.push(block);
+                }
+
                 document.dispatchEvent(new CustomEvent<ICommandEventDetail>(CustomEvents.emittedCommand, {
                     detail: {
                         command: Commands.duplicateBlock,
@@ -178,13 +242,25 @@ export class ShortcutListeners implements IShortcutListeners {
                 event.preventDefault();
                 event.stopPropagation();
 
+                const block = DOMUtils.findClosestAncestorOfSelectionByClass("block");
+                if(block){
+                    this.focusStack.push(block);
+                }
+
                 document.dispatchEvent(new CustomEvent<ICommandEventDetail>(CustomEvents.emittedCommand, {
                     detail: {
                         command: Commands.deleteBlock,
                     }
                 }));
             } else if (event.key === "\\" && (event.ctrlKey || event.metaKey)) {
+                
                 // Clear formatting when pressing Ctrl+\
+
+                const block = DOMUtils.findClosestAncestorOfSelectionByClass("block");
+                if(block){
+                    this.focusStack.push(block);
+                }
+                
                 document.dispatchEvent(new CustomEvent<ICommandEventDetail>(CustomEvents.emittedCommand, {
                     detail: {
                         command: Commands.removeFormat,

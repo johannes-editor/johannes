@@ -414,11 +414,16 @@ export class BlockOperationsService implements IBlockOperationsService {
             blockElement = this.focusStack.peek()?.closest(".block") || null;
         }
 
+        if(!blockElement){
+            console.error("blockElement is null");
+            return;
+        }
+
         if (!element) {
             element = DOMUtils.findClosestAncestorOfActiveElementByClass(".block");
         }
 
-        let contentElement = blockElement!.querySelector('.swittable') as HTMLElement;
+        let contentElement = blockElement.querySelector('.swittable') as HTMLElement;
 
         this.focusStack.peek()?.focus();
 
