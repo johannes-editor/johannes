@@ -641,12 +641,12 @@ export class DOMUtils {
         if (selection.rangeCount > 0) {
             const range = selection.getRangeAt(0);
             const textNodes = DOMUtils.getTextNodesIn(element);
-        
+
             const lastTextNode = textNodes[textNodes.length - 1];
             const rangeEndsAtContentEnd =
                 range.endContainer === lastTextNode &&
                 range.endOffset === lastTextNode.length;
-        
+
             if (rangeEndsAtContentEnd && content.endsWith("<br>")) {
                 shouldRestoreCaret = true;
                 caretPos = element.textContent?.length ?? 0;
@@ -706,12 +706,12 @@ export class DOMUtils {
 
     static getNextContentEditable(element: HTMLElement): HTMLElement | null {
         const allContentEditables: HTMLElement[] = Array.from(document.querySelectorAll('[contenteditable="true"]')) as HTMLElement[];
-    
+
         const index = allContentEditables.indexOf(element);
         if (index === -1 || index >= allContentEditables.length - 1) {
             return null;
         }
-    
+
         return allContentEditables[index + 1];
     }
 
@@ -941,5 +941,85 @@ export class DOMUtils {
             selection?.addRange(range);
             marker.parentNode?.removeChild(marker);
         }
+    }
+
+    static isCaretInFirstVisualLine(): boolean {
+        const sel = window.getSelection();
+        if (!sel || sel.rangeCount === 0) return false;
+
+        const range = sel.getRangeAt(0).cloneRange();
+
+        const marker = document.createElement('span');
+        marker.textContent = '\u200B';
+        marker.style.display = 'inline-block';
+        range.insertNode(marker);
+
+        const caretRect = marker.getBoundingClientRect();
+        const editable = marker.closest('[contenteditable]');
+
+        let isInFirstLine = false;
+        if (editable) {
+            const lines = Array.from(editable.getClientRects());
+            if (lines.length > 0) {
+                const firstLineTop = lines[0].top;
+                isInFirstLine = Math.abs(caretRect.top - firstLineTop) < 1;
+            }
+        }
+
+        marker.remove();
+        return isInFirstLine;
+    }
+
+    static isCaretInLastVisualLine(): boolean {
+        const sel = window.getSelection();
+        if (!sel || sel.rangeCount === 0) return false;
+
+        const range = sel.getRangeAt(0).cloneRange();
+
+        const marker = document.createElement('span');
+        marker.textContent = '\u200B';
+        marker.style.display = 'inline-block';
+        range.insertNode(marker);
+
+        const caretRect = marker.getBoundingClientRect();
+        const editable = marker.closest('[contenteditable]');
+
+        let isInLastLine = false;
+        if (editable) {
+            const lines = Array.from(editable.getClientRects());
+            if (lines.length > 0) {
+                const lastLineBottom = lines[lines.length - 1].bottom;
+                isInLastLine = Math.abs(caretRect.bottom - lastLineBottom) < 1;
+            }
+        }
+
+        marker.remove();
+        return isInLastLine;
+    }
+
+    static isCursorAtStart(element: HTMLElement): boolean {
+        const sel = window.getSelection();
+        if (!sel || sel.rangeCount === 0) return false;
+
+        const range = sel.getRangeAt(0);
+        const preRange = range.cloneRange();
+
+        preRange.selectNodeContents(element);
+        preRange.setEnd(range.startContainer, range.startOffset);
+
+        return preRange.toString().trim() === '';
+    }
+
+    static isCursorAtEnd(element: HTMLElement): boolean {
+        const sel = window.getSelection();
+        if (!sel || sel.rangeCount === 0) return false;
+
+        const range = sel.getRangeAt(0);
+        const postRange = range.cloneRange();
+
+        postRange.selectNodeContents(element);
+        postRange.setStart(range.endContainer, range.endOffset);
+
+        return postRange.toString().trim() === '';
     }
 }

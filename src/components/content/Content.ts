@@ -16,7 +16,6 @@ import { Utils } from "@/utilities/Utils";
 
 export class Content extends BaseUIComponent {
 
-
     quickMenu: IQuickMenu;
     tableToolbar: ITableContextFloatingToolbar;
     contentWrapper: HTMLElement | null = null;
@@ -343,7 +342,6 @@ export class Content extends BaseUIComponent {
                     const selection = document.getSelection();
                     if (!selection) return;
 
-                    // Remove current selection
                     if (!selection.isCollapsed) {
                         selection.deleteFromDocument();
                     }
@@ -352,7 +350,6 @@ export class Content extends BaseUIComponent {
                     const textNode = document.createTextNode(tabCharacter);
                     range.insertNode(textNode);
 
-                    // Move o cursor após o texto inserido
                     range.setStartAfter(textNode);
                     range.setEndAfter(textNode);
                     selection.removeAllRanges();
@@ -393,100 +390,6 @@ export class Content extends BaseUIComponent {
                 }
             }
         });
-    }
-
-    static isCursorAtEnd(target: HTMLElement): boolean {
-        const focusableParent = target.closest('.focusable');
-        if (!focusableParent) return false;
-
-        const selection = window.getSelection()!;
-        if (!selection.rangeCount) return false;
-
-        const range = selection.getRangeAt(0);
-        let endNode: Node | null = range.endContainer;
-        if (endNode.nodeType === Node.TEXT_NODE) {
-            endNode = endNode.parentNode;
-        }
-        return range.collapsed && endNode === focusableParent && range.endOffset === (range.endContainer.textContent || '').length;
-    }
-
-    static isCursorAtStart(target: HTMLElement): boolean {
-        const focusableParent = target.closest('.focusable');
-        if (!focusableParent) return false;
-
-        const selection = window.getSelection()!;
-        if (!selection.rangeCount) return false;
-
-        const range = selection.getRangeAt(0);
-
-        let startNode: Node | null = range.startContainer;
-        if (startNode.nodeType === Node.TEXT_NODE) {
-            startNode = startNode.parentNode;
-        }
-        return range.collapsed && startNode === focusableParent && range.startOffset === 0;
-    }
-
-    static isAtFirstVisibleLine(element: HTMLElement) {
-        const selection = window.getSelection()!;
-        if (!selection.rangeCount) return false;
-        const range = selection.getRangeAt(0).cloneRange();
-        range.collapse(true);
-        range.setStart(element, 0);
-        const rangeTop = range.getBoundingClientRect().top;
-        const elementTop = element.getBoundingClientRect().top;
-
-        return rangeTop === elementTop;
-    }
-
-    static isAtLastVisibleLine(element: HTMLElement) {
-        const selection = window.getSelection()!;
-        if (!selection.rangeCount) return false;
-        const range = selection.getRangeAt(0).cloneRange();
-        range.collapse(false);
-        range.setEnd(element, element.childNodes.length);
-        const rangeBottom = range.getBoundingClientRect().bottom;
-        const elementBottom = element.getBoundingClientRect().bottom;
-
-        return rangeBottom === elementBottom;
-    }
-
-    static didCursorMove(event: KeyboardEvent): Promise<boolean> {
-        const selection = window.getSelection()!;
-        if (!selection.rangeCount) return Promise.resolve(false);
-
-        const originalRange = selection.getRangeAt(0).cloneRange();
-        const originalRect = originalRange.getBoundingClientRect();
-
-        return new Promise<boolean>(resolve => {
-            setTimeout(() => {
-                const newRange = selection.getRangeAt(0).cloneRange();
-                const newRect = newRange.getBoundingClientRect();
-
-                const didMove = !(originalRect.top === newRect.top && originalRect.left === newRect.left);
-                if (!didMove) {
-                    event.preventDefault();
-                }
-                resolve(didMove);
-            }, 0);
-        });
-    }
-
-    static isCursorOnFirstLine(): boolean {
-        const selection = window.getSelection();
-        if (!selection || !selection.rangeCount) return false;
-
-        const range = selection.getRangeAt(0);
-
-        return range.startOffset === 0 && range.startContainer === range.commonAncestorContainer;
-    }
-
-    static isCursorOnLastLine(): boolean {
-        const selection = window.getSelection();
-        if (!selection || !selection.rangeCount) return false;
-
-        const range = selection.getRangeAt(0);
-
-        return range.endOffset === range.endContainer.textContent?.length && range.endContainer === range.commonAncestorContainer;
     }
 
     static getInstance(): Content {

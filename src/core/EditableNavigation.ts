@@ -1,7 +1,6 @@
 import { DOMUtils } from "@/utilities/DOMUtils";
 import { IEditableNavigation } from "./IEditableNavigation";
 import { Directions } from "@/common/Directions";
-import { Boundaries } from "@/common/Boundaries";
 import { TableUtils } from "@/utilities/TableUtils";
 import { IQuickMenu } from "@/components/quick-menu/IQuickMenu";
 import { DependencyContainer } from "./DependencyContainer";
@@ -37,11 +36,11 @@ export class EditableNavigation implements IEditableNavigation {
 
     private handleArrowKeys(event: KeyboardEvent) {
 
-        if(!event.key.startsWith('Arrow')){
+        if (!event.key.startsWith('Arrow')) {
             return;
         }
 
-        if(!Utils.isEventFromContentWrapper(event)){
+        if (!Utils.isEventFromContentWrapper(event)) {
             return;
         }
 
@@ -59,7 +58,14 @@ export class EditableNavigation implements IEditableNavigation {
                         event.stopImmediatePropagation();
 
                         if (event.key == Directions.ArrowUp || event.key == Directions.ArrowDown) {
-                            this.placeCaretInSimilarPosition(currentEditable, nextEditable, event.key as Directions);
+                            const refRect = EditableNavigation.getCaretRect();
+
+                            nextEditable.focus();
+                            EditableNavigation.placeCaretInSimilarPosition(
+                                nextEditable,
+                                event.key as Directions,
+                                refRect
+                            );
                         }
 
                         if (event.key == Directions.ArrowLeft) {
@@ -90,8 +96,8 @@ export class EditableNavigation implements IEditableNavigation {
 
         if (sel && sel.rangeCount > 0) {
             const { atStart, atEnd } = DOMUtils.getSelectionTextInfo(element);
-            const isAtFirstLine = this.isAtLineBoundary(element, Boundaries.First);
-            const isAtLastLine = this.isAtLineBoundary(element, Boundaries.Last);
+            const isAtFirstLine = DOMUtils.isCaretInFirstVisualLine();
+            const isAtLastLine = DOMUtils.isCaretInLastVisualLine();
 
             if ((direction === Directions.ArrowLeft && atStart) || (direction === Directions.ArrowRight && atEnd) ||
                 (direction === Directions.ArrowUp && (atStart || isAtFirstLine)) ||
@@ -100,34 +106,6 @@ export class EditableNavigation implements IEditableNavigation {
             } else {
                 return false;
             }
-        }
-
-        return false;
-    }
-
-    private isAtLineBoundary(element: HTMLElement, boundary: Boundaries): boolean {
-
-        const hasTextContent = element.textContent?.trim() !== "";
-
-        if (!hasTextContent) {
-            return true;
-        }
-
-        const selection = window.getSelection();
-        if (!selection || selection.rangeCount === 0) return false;
-
-        const range = selection.getRangeAt(0);
-        const rect = range.getClientRects()[0];
-
-        if (!rect) return true;
-
-        const elementRect = element.getBoundingClientRect();
-        const tolerance = 11;
-
-        if (boundary === Boundaries.First) {
-            return Math.abs(rect.top - elementRect.top) < tolerance;
-        } else if (boundary === Boundaries.Last) {
-            return Math.abs(rect.bottom - elementRect.bottom) < tolerance;
         }
 
         return false;
@@ -165,70 +143,93 @@ export class EditableNavigation implements IEditableNavigation {
     private findVerticalEditableIndex(current: HTMLElement, allEditables: HTMLElement[], direction: Directions): number {
         const currentIndex = allEditables.indexOf(current);
         let nextIndex = currentIndex;
-    
+
         if (direction === Directions.ArrowUp) {
             nextIndex--;
         } else if (direction === Directions.ArrowDown) {
             nextIndex++;
         }
-    
+
         if (nextIndex >= 0 && nextIndex < allEditables.length) {
             return nextIndex;
         }
-    
+
         return -1;
     }
 
-    private placeCaretInSimilarPosition(current: HTMLElement, next: HTMLElement, direction: Directions) {
+    private static placeCaretInSimilarPosition(
+        next: HTMLElement,
+        direction: Directions,
+        referenceRect: DOMRect
+    ) {
         const sel = window.getSelection();
-        if (sel && sel.rangeCount > 0) {
-            const currentRange = sel.getRangeAt(0);
-            const rect = currentRange.getBoundingClientRect();
-    
-            sel.removeAllRanges();
-            const range = document.createRange();
-    
-            const walker = document.createTreeWalker(next, NodeFilter.SHOW_TEXT);
-            let node;
-            let bestNode = null;
-            let bestOffset = 0;
-            let bestDistance = Infinity;
-    
-            while ((node = walker.nextNode())) {
-                if (!node || !node.nodeValue) continue;
-    
-                for (let i = 0; i <= node.nodeValue.length; i++) {
-                    range.setStart(node, i);
-                    range.collapse(true);
-                    const testRect = range.getBoundingClientRect();
-    
-                    if (!testRect || (testRect.width === 0 && testRect.height === 0)) continue;
-    
-                    const dx = testRect.left - rect.left;
-                    const dy = testRect.top - rect.top;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-    
-                    if (distance < bestDistance) {
-                        bestDistance = distance;
-                        bestNode = node;
-                        bestOffset = i;
-                    }
-                }
-            }
-    
-            if (bestNode) {
-                range.setStart(bestNode, bestOffset);
+        if (!sel) return;
+
+        sel.removeAllRanges();
+        const range = document.createRange();
+
+        const walker = document.createTreeWalker(next, NodeFilter.SHOW_TEXT);
+        let node: Text | null;
+        let bestNode: Text | null = null;
+        let bestOffset = 0;
+        let bestDistance = Infinity;
+
+        while ((node = walker.nextNode() as Text)) {
+            const text = node.nodeValue!;
+            for (let i = 0; i <= text.length; i++) {
+                range.setStart(node, i);
                 range.collapse(true);
-                sel.addRange(range);
-            } else {
-                range.selectNodeContents(next);
-                if (direction === Directions.ArrowUp) {
-                    range.collapse(false);
-                } else if (direction === Directions.ArrowDown) {
-                    range.collapse(true);
+                const r = range.getBoundingClientRect();
+
+                if (!r) continue;
+
+                const dx = r.left - referenceRect.left;
+                const dy = r.top - referenceRect.top;
+                const dist = Math.hypot(dx, dy);
+                if (dist < bestDistance) {
+                    bestDistance = dist;
+                    bestNode = node;
+                    bestOffset = i;
                 }
-                sel.addRange(range);
             }
         }
-    }    
+
+        if (bestNode) {
+            range.setStart(bestNode, bestOffset);
+            range.collapse(true);
+            sel.addRange(range);
+        } else {
+            range.selectNodeContents(next);
+            direction === Directions.ArrowUp
+                ? range.collapse(false)
+                : range.collapse(true);
+            sel.addRange(range);
+        }
+    }
+
+    private static getCaretRect(): DOMRect {
+        const sel = window.getSelection();
+        if (!sel || sel.rangeCount === 0) {
+            return new DOMRect(0, 0, 0, 0);
+        }
+
+        const range = sel.getRangeAt(0).cloneRange();
+
+        const marker = document.createElement('span');
+        marker.textContent = '\u200B';
+        Object.assign(marker.style, {
+            display: 'inline-block',
+            width: '0px',
+            height: '0px',
+            overflow: 'hidden',
+        });
+
+        range.insertNode(marker);
+
+        const rect = marker.getBoundingClientRect();
+
+        marker.remove();
+
+        return rect;
+    }
 }

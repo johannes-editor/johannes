@@ -1,6 +1,221 @@
 import { DOMUtils } from "./DOMUtils";
 import { fireEvent } from '@testing-library/dom';
 
+describe("DOMUtils.isCursorAtStart", () => {
+    beforeEach(() => {
+        document.body.innerHTML = "";
+    });
+
+    test("should return true when cursor is at the start of contenteditable", () => {
+        const element = document.createElement("div");
+        element.setAttribute("contenteditable", "true");
+        element.innerHTML = "Hello, world!";
+        document.body.appendChild(element);
+
+        const firstChild = element.firstChild;
+        if (firstChild) {
+            const range = document.createRange();
+            range.setStart(firstChild, 0);
+            range.setEnd(firstChild, 0);
+            const sel = window.getSelection();
+            sel?.removeAllRanges();
+            sel?.addRange(range);
+
+            const result = DOMUtils.isCursorAtStart(element);
+            expect(result).toBe(true);
+        } else {
+            expect(false).toBe(true);
+        }
+    });
+
+    test("should return false when cursor is not at the start of contenteditable", () => {
+        const element = document.createElement("div");
+        element.setAttribute("contenteditable", "true");
+        element.innerHTML = "Hello, world!";
+        document.body.appendChild(element);
+
+        const range = document.createRange();
+        const firstChild = element.firstChild;
+        if (firstChild) {
+            range.setStart(element.firstChild, 5);
+            range.setEnd(element.firstChild, 5);
+        }
+
+        const sel = window.getSelection();
+        sel?.removeAllRanges();
+        sel?.addRange(range);
+
+        const result = DOMUtils.isCursorAtStart(element);
+        expect(result).toBe(false);
+    });
+
+    test("should return true when contenteditable is empty and cursor is at the start", () => {
+        const element = document.createElement("div");
+        element.setAttribute("contenteditable", "true");
+        document.body.appendChild(element);
+
+        const range = document.createRange();
+        range.setStart(element, 0);
+        range.setEnd(element, 0);
+        const sel = window.getSelection();
+        sel?.removeAllRanges();
+        sel?.addRange(range);
+
+        const result = DOMUtils.isCursorAtStart(element);
+        expect(result).toBe(true);
+    });
+
+    test("should return false when there is no selection", () => {
+        const element = document.createElement("div");
+        element.setAttribute("contenteditable", "true");
+        element.innerHTML = "Hello, world!";
+        document.body.appendChild(element);
+
+        const sel = window.getSelection();
+        if (sel) {
+            sel.removeAllRanges();
+        }
+
+        const result = DOMUtils.isCursorAtStart(element);
+        expect(result).toBe(false);
+    });
+
+    test("should return false when contenteditable is empty and cursor is not at the start", () => {
+        const element = document.createElement("div");
+        element.setAttribute("contenteditable", "true");
+        document.body.appendChild(element);
+
+        const range = document.createRange();
+
+        try {
+            range.setStart(element, 1);
+            range.setEnd(element, 1);
+        } catch (e) {
+            const result = DOMUtils.isCursorAtStart(element);
+            expect(result).toBe(false);
+        }
+    });
+
+    test("should return false when no contenteditable elements exist", () => {
+        const element = document.createElement("div");
+        document.body.appendChild(element);
+
+        const result = DOMUtils.isCursorAtStart(element);
+        expect(result).toBe(false);
+    });
+});
+
+describe("DOMUtils.isCursorAtEnd", () => {
+    beforeEach(() => {
+        document.body.innerHTML = "";
+    });
+
+    test("should return true when cursor is at the end of contenteditable", () => {
+        const element = document.createElement("div");
+        element.setAttribute("contenteditable", "true");
+        element.innerHTML = "Hello, world!";
+        document.body.appendChild(element);
+
+        const range = document.createRange();
+        const firstChild = element.firstChild;
+        if (firstChild) {
+            range.setStart(firstChild, element.innerHTML.length);
+            range.setEnd(firstChild, element.innerHTML.length);
+        }
+
+        const sel = window.getSelection();
+        sel?.removeAllRanges();
+        sel?.addRange(range);
+
+        const result = DOMUtils.isCursorAtEnd(element);
+        expect(result).toBe(true);
+    });
+
+    test("should return false when cursor is not at the end of contenteditable", () => {
+        const element = document.createElement("div");
+        element.setAttribute("contenteditable", "true");
+        element.innerHTML = "Hello, world!";
+        document.body.appendChild(element);
+
+        const range = document.createRange();
+        const firstChild = element.firstChild;
+        if (firstChild) {
+            range.setStart(firstChild, 5);
+            range.setEnd(firstChild, 5);
+        }
+
+        const sel = window.getSelection();
+        sel?.removeAllRanges();
+        sel?.addRange(range);
+
+        const result = DOMUtils.isCursorAtEnd(element);
+        expect(result).toBe(false);
+    });
+
+    test("should return true when contenteditable is empty and cursor is at the end", () => {
+        const element = document.createElement("div");
+        element.setAttribute("contenteditable", "true");
+        document.body.appendChild(element);
+
+        const range = document.createRange();
+        range.setStart(element, 0);
+        range.setEnd(element, 0);
+        const sel = window.getSelection();
+        sel?.removeAllRanges();
+        sel?.addRange(range);
+
+        const result = DOMUtils.isCursorAtEnd(element);
+        expect(result).toBe(true);
+    });
+
+    test("should return false when there is no selection", () => {
+        const element = document.createElement("div");
+        element.setAttribute("contenteditable", "true");
+        element.innerHTML = "Hello, world!";
+        document.body.appendChild(element);
+
+        const sel = window.getSelection();
+        if (sel) {
+            sel.removeAllRanges();
+        }
+
+        const result = DOMUtils.isCursorAtEnd(element);
+        expect(result).toBe(false);
+    });
+
+    test("should return false when contenteditable is empty and cursor is not at the end", () => {
+        const element = document.createElement("div");
+        element.setAttribute("contenteditable", "true");
+        document.body.appendChild(element);
+
+        const range = document.createRange();
+
+        try {
+            range.setStart(element, 1);
+            range.setEnd(element, 1);
+
+            const sel = window.getSelection();
+            sel?.removeAllRanges();
+            sel?.addRange(range);
+
+            const result = DOMUtils.isCursorAtEnd(element);
+            expect(result).toBe(false);
+        } catch (e) {
+            const result = DOMUtils.isCursorAtEnd(element);
+            expect(result).toBe(false);
+        }
+    });
+
+    test("should return false when no contenteditable elements exist", () => {
+        const element = document.createElement("div");
+        document.body.appendChild(element);
+
+        const result = DOMUtils.isCursorAtEnd(element);
+        expect(result).toBe(false);
+    });
+});
+
+
 describe("Utils", () => {
 
     beforeEach(() => {
@@ -70,6 +285,10 @@ describe("Utils", () => {
     });
 
 });
+
+
+
+
 
 
 describe("DOMUtils.restoreCaretFromMarker", () => {
@@ -428,11 +647,11 @@ describe("DOMUtils.querySelectorIncludingSelf", () => {
     test("should return element if it matches :hover pseudo-class after mouseover", () => {
         const element = document.createElement("div");
         document.body.appendChild(element);
-    
+
         element.style.transition = "all 0.2s";
         element.classList.add("hover-class");
         element.innerHTML = "Test Hover";
-    
+
         const style = document.createElement('style');
         style.innerHTML = `
             .hover-class:hover {
@@ -440,11 +659,11 @@ describe("DOMUtils.querySelectorIncludingSelf", () => {
             }
         `;
         document.head.appendChild(style);
-    
+
         fireEvent.mouseOver(element);
-    
+
         const result = DOMUtils.querySelectorIncludingSelf(element, ":hover");
-        
+
         expect(result).toBe(element);
     });
 
@@ -459,7 +678,7 @@ describe("DOMUtils.querySelectorIncludingSelf", () => {
 });
 
 describe("DOMUtils.isTargetDescendantOfSelector", () => {
-    
+
     test("should return true if the target is a descendant of the selector", () => {
         const container = document.createElement("div");
         const parent = document.createElement("div");
@@ -529,22 +748,22 @@ describe("DOMUtils.isTargetDescendantOfSelector", () => {
     test("should return true if the target is a text node inside a matching element", () => {
         const element = document.createElement("div");
         element.classList.add("parent");
-    
+
         const textNode = document.createTextNode("Hello");
         element.appendChild(textNode);
         document.body.appendChild(element);
-    
+
         const event = new MouseEvent("click", {
             bubbles: true,
             cancelable: true,
             composed: true,
         });
-    
+
         textNode.dispatchEvent(event);
-    
+
         const result = DOMUtils.isTargetDescendantOfSelector(event, ".parent");
         console.log("Result:", result);
-    
+
         expect(result).toBe(true);
     });
 
