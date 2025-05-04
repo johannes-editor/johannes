@@ -1,7 +1,7 @@
-import { QuickMenu } from "../components/quick-menu/QuickMenu";
-import { QuickMenuSection } from "../components/quick-menu/QuickMenuSection";
-import { QuickMenuItem } from "../components/quick-menu/QuickMenuItem";
-import { ElementFactoryService } from "../services/element-factory/ElementFactoryService";
+import { QuickMenu } from "./QuickMenu";
+import { QuickMenuSection } from "./QuickMenuSection";
+import { QuickMenuItem } from "./QuickMenuItem";
+import { ElementFactoryService } from "../../services/element-factory/ElementFactoryService";
 import { Icons } from "@/common/Icons";
 
 export class QuickMenuBuilder {
