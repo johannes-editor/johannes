@@ -730,24 +730,39 @@ export class BlockOperationsService implements IBlockOperationsService {
                 } else {
                     const newListBlock = parentBlock.cloneNode(false) as HTMLElement;
                     const newListElement = listElement.cloneNode(false) as HTMLElement;
-                    
+                
                     const dragHandler = parentBlock.querySelector(".drag-handler-wrapper")?.cloneNode(true);
                     if (dragHandler) {
                         newListBlock.appendChild(dragHandler);
                     }
-                    
+                
                     newListBlock.appendChild(newListElement);
-                    
-                    const itemsAfter = Array.from(allListItems).slice(Array.from(allListItems).indexOf(currentItem) + 1);
-                    
+                
+                    const itemsAfter = Array.from(allListItems).slice(
+                        Array.from(allListItems).indexOf(currentItem) + 1
+                    );
+                
                     itemsAfter.forEach(item => {
                         newListElement.appendChild(item);
                     });
-                    
-                    DOMUtils.insertAfter(newListBlock, parentBlock);
-                    
+                
+                    const hasItemsAfter = newListElement.querySelectorAll(".list-item").length > 0;
+                    if (hasItemsAfter) {
+                        DOMUtils.insertAfter(newListBlock, parentBlock);
+                    }
+                
                     currentItem.remove();
-                    
+                
+                    const remainingItems = listElement.querySelectorAll(".list-item");
+                    if (remainingItems.length === 0) {
+                        parentBlock.remove();
+                    }
+                
+                    const newListItems = newListElement.querySelectorAll(".list-item");
+                    if (newListItems.length === 0 && newListBlock.isConnected) {
+                        newListBlock.remove();
+                    }
+                
                     const firstItemInNewList = newListElement.querySelector(".list-item .focusable") as HTMLElement;
                     if (firstItemInNewList) {
                         DOMUtils.placeCursorAtStartOfEditableElement(firstItemInNewList);
