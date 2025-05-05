@@ -78,11 +78,14 @@ export class EmbedTool {
 
             const safeVideoId = encodeURIComponent(videoId);
 
-            iframe.src = `https://www.youtube.com/embed/${safeVideoId}`;
+            iframe.src = `https://www.youtube-nocookie.com/embed/${safeVideoId}`;
             iframe.frameBorder = "0";
             iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
             iframe.allowFullscreen = true;
+            iframe.loading = "lazy";
+            iframe.title = "YouTube video player";
             container.appendChild(iframe);
+            iframe.referrerPolicy = "no-referrer";
             this.finalizeEmbed(container, [], element);
         } else {
             console.error('Invalid YouTube video URL');
@@ -92,18 +95,22 @@ export class EmbedTool {
     static embedYouTubeShortAsIframe(urlObj: URL, element: HTMLElement): void {
         const pathSegments = urlObj.pathname.split('/');
         const shortId = pathSegments[pathSegments.length - 1];
-
+    
         if (shortId) {
             const container = EmbedTool.createEmbedContainer(["embed-container"]);
-
+    
             const iframe = document.createElement('iframe');
-
-            const safeShortIdId = encodeURIComponent(shortId);
-
-            iframe.src = `https://www.youtube.com/embed/${safeShortIdId}`;
+    
+            const safeShortId = encodeURIComponent(shortId);
+    
+            iframe.src = `https://www.youtube-nocookie.com/embed/${safeShortId}`;
             iframe.frameBorder = "0";
             iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
             iframe.allowFullscreen = true;
+            iframe.loading = "lazy";
+            iframe.title = "YouTube video player";
+            iframe.referrerPolicy = "no-referrer";
+    
             container.appendChild(iframe);
             EmbedTool.finalizeEmbed(container, [], element);
         } else {
@@ -111,60 +118,87 @@ export class EmbedTool {
         }
     }
 
-    static embedYouTubePlaylistAsIframe(urlObj: URL, element: HTMLElement) {
+    static embedYouTubePlaylistAsIframe(urlObj: URL, element: HTMLElement): void {
         const listId = urlObj.searchParams.get('list');
         if (listId) {
             const container = EmbedTool.createEmbedContainer(["embed-container"]);
-
+    
             const safeListId = encodeURIComponent(listId);
-
+    
             const iframe = document.createElement('iframe');
-            iframe.src = `https://www.youtube.com/embed/videoseries?list=${safeListId}`;
-            iframe.setAttribute("allowfullscreen", "true");
+            iframe.src = `https://www.youtube-nocookie.com/embed/videoseries?list=${safeListId}`;
+            iframe.frameBorder = "0";
+            iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+            iframe.allowFullscreen = true;
+            iframe.loading = "lazy";
+            iframe.title = "YouTube playlist player";
+            iframe.referrerPolicy = "no-referrer";
+    
             container.appendChild(iframe);
             EmbedTool.finalizeEmbed(container, [], element);
         } else {
             console.error('Invalid YouTube playlist URL');
         }
-    }
+    }    
 
-    static embedSpotifyContent(urlObj: URL, element: HTMLElement, type: EmbedTypes) {
+    static embedSpotifyContent(urlObj: URL, element: HTMLElement, type: EmbedTypes): void {
         const contentId = urlObj.pathname.split('/').pop();
-        const container = this.createEmbedContainer(["embed-container"]);
-        container.classList.add("spotify-embed");
-
-
         if (!contentId) {
             console.error("contentId is empty");
             return;
         }
-
+    
         const safeContentId = encodeURIComponent(contentId);
-
-
-        const iframe = document.createElement('iframe');
-        iframe.classList.add("spotify-embed");
-        iframe.src = `https://open.spotify.com/embed/${type}/${safeContentId}`;
-        iframe.frameBorder = "0";
-        iframe.setAttribute("scrolling", "no");
-
-        switch (type) {
-            case EmbedTypes.SpotifyTrack:
-                iframe.style.height = "80px";
-                break;
-            case EmbedTypes.SpotifyPlaylist:
-            case EmbedTypes.SpotifyShow:
-            case EmbedTypes.SpotifyEpisode:
-            case EmbedTypes.SpotifyArtist:
-                iframe.style.height = "380px";
-                break;
-            default:
-                iframe.style.height = "300px";
-        }
-
-        container.appendChild(iframe);
+    
+        // Cria um placeholder visual
+        const container = this.createEmbedContainer(["embed-container", "spotify-embed"]);
+        const placeholder = document.createElement("div");
+        placeholder.classList.add("spotify-placeholder");
+        placeholder.textContent = "Clique para carregar o Spotify";
+        placeholder.style.cursor = "pointer";
+        placeholder.style.display = "flex";
+        placeholder.style.alignItems = "center";
+        placeholder.style.justifyContent = "center";
+        placeholder.style.height = "100px";
+        placeholder.style.backgroundColor = "#1db954";
+        placeholder.style.color = "white";
+        placeholder.style.fontWeight = "bold";
+        placeholder.style.borderRadius = "8px";
+    
+        // Evento: usuário clicou → criar o iframe dinamicamente
+        placeholder.addEventListener("click", () => {
+            const iframe = document.createElement('iframe');
+            iframe.classList.add("spotify-embed");
+            iframe.src = `https://open.spotify.com/embed/${type}/${safeContentId}`;
+            iframe.frameBorder = "0";
+            iframe.allowFullscreen = true;
+            iframe.loading = "lazy";
+            iframe.title = "Spotify player";
+            iframe.referrerPolicy = "no-referrer";
+            iframe.scrolling = "no";
+    
+            switch (type) {
+                case EmbedTypes.SpotifyTrack:
+                    iframe.style.height = "80px";
+                    break;
+                case EmbedTypes.SpotifyPlaylist:
+                case EmbedTypes.SpotifyShow:
+                case EmbedTypes.SpotifyEpisode:
+                case EmbedTypes.SpotifyArtist:
+                    iframe.style.height = "380px";
+                    break;
+                default:
+                    iframe.style.height = "300px";
+            }
+    
+            container.innerHTML = ""; // limpa o placeholder
+            container.appendChild(iframe);
+        });
+    
+        container.appendChild(placeholder);
         this.finalizeEmbed(container, [], element);
     }
+    
 
     static async embedGistAsScript(urlObj: URL, element: HTMLElement) {
         const gistId = urlObj.pathname.split('/').pop();
