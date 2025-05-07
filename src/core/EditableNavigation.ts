@@ -6,6 +6,7 @@ import { IQuickMenu } from "@/components/quick-menu/IQuickMenu";
 import { DependencyContainer } from "./DependencyContainer";
 import { DefaultJSEvents } from "@/common/DefaultJSEvents";
 import { Utils } from "@/utilities/Utils";
+import { Boundaries } from "@/common/Boundaries";
 
 export class EditableNavigation implements IEditableNavigation {
 
@@ -83,6 +84,34 @@ export class EditableNavigation implements IEditableNavigation {
         }
     }
 
+    private isAtLineBoundary(element: HTMLElement, boundary: Boundaries): boolean {
+
+        const hasTextContent = element.textContent?.trim() !== "";
+
+        if (!hasTextContent) {
+            return true;
+        }
+
+        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0) return false;
+
+        const range = selection.getRangeAt(0);
+        const rect = range.getClientRects()[0];
+
+        if (!rect) return true;
+
+        const elementRect = element.getBoundingClientRect();
+        const tolerance = 11;
+
+        if (boundary === Boundaries.First) {
+            return Math.abs(rect.top - elementRect.top) < tolerance;
+        } else if (boundary === Boundaries.Last) {
+            return Math.abs(rect.bottom - elementRect.bottom) < tolerance;
+        }
+
+        return false;
+    }
+
     private shouldSwitchEditable(element: HTMLElement, direction: Directions): boolean {
 
         const sel = window.getSelection();
@@ -96,8 +125,8 @@ export class EditableNavigation implements IEditableNavigation {
 
         if (sel && sel.rangeCount > 0) {
             const { atStart, atEnd } = DOMUtils.getSelectionTextInfo(element);
-            const isAtFirstLine = DOMUtils.isCaretInFirstVisualLine();
-            const isAtLastLine = DOMUtils.isCaretInLastVisualLine();
+            const isAtFirstLine = this.isAtLineBoundary(element, Boundaries.First);
+            const isAtLastLine = this.isAtLineBoundary(element, Boundaries.Last);
 
             if ((direction === Directions.ArrowLeft && atStart) || (direction === Directions.ArrowRight && atEnd) ||
                 (direction === Directions.ArrowUp && (atStart || isAtFirstLine)) ||
