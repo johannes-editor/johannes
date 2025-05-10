@@ -20,6 +20,8 @@ export class Content extends BaseUIComponent {
     tableToolbar: ITableContextFloatingToolbar;
     contentWrapper: HTMLElement | null = null;
 
+    private contentEditableTimeout: number | null = null;
+
     constructor() {
 
         super({});
@@ -63,6 +65,16 @@ export class Content extends BaseUIComponent {
         });
     }
 
+    static isFocusInsideEditor(): boolean {
+        const activeElement = document.activeElement;
+        if (!activeElement) return false;
+
+        const editor = document.querySelector('#johannesEditor');
+        if (!editor) return false;
+
+        return editor.contains(activeElement);
+    }
+
     // Allow multi-block selection 
     handleSelectionChange = () => {
         if (!this.contentWrapper) {
@@ -88,14 +100,24 @@ export class Content extends BaseUIComponent {
                     }
                 }, 0);
             }
-        } else {
-            if (this.contentWrapper && this.contentWrapper.getAttribute("contenteditable") === "true") {
-                this.contentWrapper.removeAttribute("contenteditable");
-            }
+        } else if (this.contentWrapper &&
+            this.contentWrapper.getAttribute("contenteditable") === "true") {
+            setTimeout(() => {
+                if (!Content.isFocusInsideEditor()) {
+                    this.contentWrapper?.removeAttribute("contenteditable");
+                }
+            }, 300);
         }
     };
 
     attachEvent(): void {
+
+        document.addEventListener(DefaultJSEvents.Keydown, (event) => {
+            if (event.key === KeyboardKeys.Enter) {
+
+                this.safelyRemoveContentEditable();
+            }
+        }, true);
 
         this.clearSelectionOnDrag();
         this.reRenderPlaceholder();
@@ -394,8 +416,20 @@ export class Content extends BaseUIComponent {
 
     static getInstance(): Content {
 
-        const shortcutListener = DependencyContainer.Instance.resolve<IShortcutListeners>("IShortcutListeners");
-        const tableListeners = DependencyContainer.Instance.resolve<ITableListeners>("ITableListeners");
         return new Content();
+    }
+
+    private safelyRemoveContentEditable() {
+        if (!this.contentWrapper) return;
+
+        this.contentWrapper.removeAttribute('contenteditable');
+        this.clearContentEditableTimeout();
+    }
+
+    private clearContentEditableTimeout() {
+        if (this.contentEditableTimeout) {
+            clearTimeout(this.contentEditableTimeout);
+            this.contentEditableTimeout = null;
+        }
     }
 }
