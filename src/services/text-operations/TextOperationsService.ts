@@ -205,7 +205,7 @@ export class TextOperationsService implements ITextOperationsService {
 
     execBold(): void {
         this.memento.saveState();
-
+    
         const boldApplier = rangy.createClassApplier("bold", {
             elementTagName: "span",
             elementProperties: {
@@ -215,96 +215,138 @@ export class TextOperationsService implements ITextOperationsService {
             },
             toggle: true
         });
-
-        boldApplier.toggleSelection();
-
+    
+        const selection = rangy.getSelection();
+    
+        if (selection.rangeCount === 0 || selection.isCollapsed) {
+            console.warn("No valid text selection to apply bold.");
+            return;
+        }
+    
+        try {
+            boldApplier.toggleSelection();
+        } catch (error) {
+            console.error("Failed to apply bold formatting:", error);
+            return;
+        }
+    
         const isBold = this.checkBoldState();
-        EventEmitter.emitChangeComponentColorEvent(ButtonIDs.Bold, isBold ? Colors.IconActiveBlue : Colors.IconDefaultBlack);
+        EventEmitter.emitChangeComponentColorEvent(
+            ButtonIDs.Bold,
+            isBold ? Colors.IconActiveBlue : Colors.IconDefaultBlack
+        );
         EventEmitter.emitDocChangedEvent();
     }
 
     private checkBoldState(): boolean {
         const selection = rangy.getSelection();
         if (!selection.rangeCount) return false;
-
+    
         const range = selection.getRangeAt(0);
         if (!range) return false;
-
-        const spanBold = range.commonAncestorContainer.querySelectorAll("span[style*='font-weight: bold'], span[style*='font-weight: 700']");
-        return spanBold.length > 0;
+    
+        let container = range.commonAncestorContainer;
+    
+        if (container.nodeType === Node.TEXT_NODE) {
+            container = container.parentElement;
+        }
+    
+        if (!(container instanceof Element)) return false;
+    
+        try {
+            const spanBold = container.querySelectorAll(
+                "span[style*='font-weight: bold'], span[style*='font-weight: 700']"
+            );
+            return spanBold.length > 0;
+        } catch (error) {
+            console.error("Failed to check bold state:", error);
+            return false;
+        }
     }
 
     execInlineCode(): void {
-
         this.memento.saveState();
-
-        if (this.toggleInlineCode()) {
-            if (this.queryInlineCodeCommandState()) {
-                EventEmitter.emitChangeComponentColorEvent(ButtonIDs.InlineCode, Colors.IconActiveBlue);
-            } else {
-                EventEmitter.emitChangeComponentColorEvent(ButtonIDs.InlineCode, Colors.IconDefaultBlack);
+    
+        try {
+            const toggled = this.toggleInlineCode();
+    
+            if (toggled) {
+                const isActive = this.queryInlineCodeCommandState();
+                EventEmitter.emitChangeComponentColorEvent(
+                    ButtonIDs.InlineCode,
+                    isActive ? Colors.IconActiveBlue : Colors.IconDefaultBlack
+                );
             }
+        } catch (error) {
+            console.error("Failed to toggle inline code formatting:", error);
         }
-
+    
         EventEmitter.emitDocChangedEvent();
     }
 
     toggleInlineCode(): boolean {
         const selection = window.getSelection();
-        if (!selection || selection.rangeCount === 0) return false;
-
-        const range = selection.getRangeAt(0);
-        let selectedContent: DocumentFragment | HTMLSpanElement = range.extractContents();
-
-        let isCode = false;
-        const containsCode = document.createElement('span');
-        containsCode.appendChild(selectedContent.cloneNode(true));
-
-        if (containsCode.querySelector('code')) {
-            isCode = true;
-            containsCode.querySelectorAll('code').forEach(code => {
-                const textNode = document.createTextNode(code.textContent || '');
-                code.parentNode?.replaceChild(textNode, code);
-            });
-            selectedContent = containsCode;
+        if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
+            console.warn("No valid selection for inline code.");
+            return false;
         }
-
-        let parentCode = selection.anchorNode;
-        while (parentCode && parentCode.nodeName !== "CODE" && parentCode.nodeName !== "BODY") {
-            parentCode = parentCode.parentNode;
+    
+        try {
+            const range = selection.getRangeAt(0);
+    
+            let selectedContent: DocumentFragment | HTMLSpanElement = range.extractContents();
+    
+            let isCode = false;
+            const containsCode = document.createElement('span');
+            containsCode.appendChild(selectedContent.cloneNode(true));
+    
+            if (containsCode.querySelector('code')) {
+                isCode = true;
+                containsCode.querySelectorAll('code').forEach(code => {
+                    const textNode = document.createTextNode(code.textContent || '');
+                    code.parentNode?.replaceChild(textNode, code);
+                });
+                selectedContent = containsCode;
+            }
+    
+            let parentCode = selection.anchorNode;
+            while (parentCode && parentCode.nodeName !== "CODE" && parentCode.nodeName !== "BODY") {
+                parentCode = parentCode.parentNode;
+            }
+    
+            if (parentCode && parentCode.nodeName === "CODE") {
+                isCode = true;
+                const textNode = document.createTextNode(parentCode.textContent || '');
+                parentCode.parentNode?.replaceChild(textNode, parentCode);
+            }
+    
+            if (!isCode) {
+                const codeElement = document.createElement("code");
+                codeElement.appendChild(selectedContent);
+                range.insertNode(codeElement);
+            } else {
+                range.insertNode(selectedContent);
+            }
+    
+            selection.removeAllRanges();
+            selection.addRange(range);
+    
+            const content = DOMUtils.getActiveContentEditable();
+            if (content) {
+                content.normalize();
+                DOMUtils.mergeInlineElements(content);
+            }
+    
+            return true;
+        } catch (error) {
+            console.error("Error applying inline code:", error);
+            return false;
         }
-
-        if (parentCode && parentCode.nodeName === "CODE") {
-            isCode = true;
-            const textNode = document.createTextNode(parentCode.textContent || '');
-            parentCode.parentNode?.replaceChild(textNode, parentCode);
-        }
-
-        if (!isCode) {
-            const codeElement = document.createElement("code");
-            codeElement.appendChild(selectedContent);
-            range.insertNode(codeElement);
-        } else {
-            range.insertNode(containsCode);
-        }
-
-        selection.removeAllRanges();
-        selection.addRange(range);
-
-
-        const content = DOMUtils.getActiveContentEditable();
-        if (content) {
-            content.normalize();
-
-            DOMUtils.mergeInlineElements(content);
-        }
-
-        return true;
     }
 
     execItalic(): void {
         this.memento.saveState();
-
+    
         const italicApplier = rangy.createClassApplier("italic", {
             elementTagName: "span",
             elementProperties: {
@@ -314,28 +356,55 @@ export class TextOperationsService implements ITextOperationsService {
             },
             toggle: true
         });
-
-        italicApplier.toggleSelection();
-
+    
+        const selection = rangy.getSelection();
+        if (selection.rangeCount === 0 || selection.isCollapsed) {
+            console.warn("No valid text selection to apply italic.");
+            return;
+        }
+    
+        try {
+            italicApplier.toggleSelection();
+        } catch (error) {
+            console.error("Failed to apply italic formatting:", error);
+            return;
+        }
+    
         const isItalic = this.checkItalicState();
-        EventEmitter.emitChangeComponentColorEvent(ButtonIDs.Italic, isItalic ? Colors.IconActiveBlue : Colors.IconDefaultBlack);
+        EventEmitter.emitChangeComponentColorEvent(
+            ButtonIDs.Italic,
+            isItalic ? Colors.IconActiveBlue : Colors.IconDefaultBlack
+        );
         EventEmitter.emitDocChangedEvent();
     }
 
     private checkItalicState(): boolean {
         const selection = rangy.getSelection();
         if (!selection.rangeCount) return false;
-
+    
         const range = selection.getRangeAt(0);
         if (!range) return false;
-
-        const spanItalic = range.commonAncestorContainer.querySelectorAll("span[style*='font-style: italic']");
-        return spanItalic.length > 0;
+    
+        let container = range.commonAncestorContainer;
+    
+        if (container.nodeType === Node.TEXT_NODE) {
+            container = container.parentElement;
+        }
+    
+        if (!(container instanceof Element)) return false;
+    
+        try {
+            const spanItalic = container.querySelectorAll("span[style*='font-style: italic']");
+            return spanItalic.length > 0;
+        } catch (error) {
+            console.error("Failed to check italic state:", error);
+            return false;
+        }
     }
 
     execStrikeThrough(): void {
         this.memento.saveState();
-
+    
         const strikethroughApplier = rangy.createClassApplier("strikethrough", {
             elementTagName: "span",
             elementProperties: {
@@ -345,28 +414,55 @@ export class TextOperationsService implements ITextOperationsService {
             },
             toggle: true
         });
-
-        strikethroughApplier.toggleSelection();
-
+    
+        const selection = rangy.getSelection();
+        if (selection.rangeCount === 0 || selection.isCollapsed) {
+            console.warn("No valid text selection to apply strikethrough.");
+            return;
+        }
+    
+        try {
+            strikethroughApplier.toggleSelection();
+        } catch (error) {
+            console.error("Failed to apply strikethrough formatting:", error);
+            return;
+        }
+    
         const isStrikethrough = this.checkStrikethroughState();
-        EventEmitter.emitChangeComponentColorEvent(ButtonIDs.Strikethrough, isStrikethrough ? Colors.IconActiveBlue : Colors.IconDefaultBlack);
+        EventEmitter.emitChangeComponentColorEvent(
+            ButtonIDs.Strikethrough,
+            isStrikethrough ? Colors.IconActiveBlue : Colors.IconDefaultBlack
+        );
         EventEmitter.emitDocChangedEvent();
     }
 
     private checkStrikethroughState(): boolean {
         const selection = rangy.getSelection();
         if (!selection.rangeCount) return false;
-
+    
         const range = selection.getRangeAt(0);
         if (!range) return false;
-
-        const spanStrikethrough = range.commonAncestorContainer.querySelectorAll("span[style*='text-decoration: line-through']");
-        return spanStrikethrough.length > 0;
+    
+        let container = range.commonAncestorContainer;
+    
+        if (container.nodeType === Node.TEXT_NODE) {
+            container = container.parentElement;
+        }
+    
+        if (!(container instanceof Element)) return false;
+    
+        try {
+            const spanStrikethrough = container.querySelectorAll("span[style*='text-decoration: line-through']");
+            return spanStrikethrough.length > 0;
+        } catch (error) {
+            console.error("Failed to check strikethrough state:", error);
+            return false;
+        }
     }
 
     execUnderline(): void {
         this.memento.saveState();
-
+    
         const underlineApplier = rangy.createClassApplier("underline", {
             elementTagName: "span",
             elementProperties: {
@@ -376,68 +472,108 @@ export class TextOperationsService implements ITextOperationsService {
             },
             toggle: true
         });
-
-        underlineApplier.toggleSelection();
-
+    
+        const selection = rangy.getSelection();
+        if (selection.rangeCount === 0 || selection.isCollapsed) {
+            console.warn("No valid text selection to apply underline.");
+            return;
+        }
+    
+        try {
+            underlineApplier.toggleSelection();
+        } catch (error) {
+            console.error("Failed to apply underline formatting:", error);
+            return;
+        }
+    
         setTimeout(() => {
-            const isUnderlined = this.checkUnderlineState();
-            EventEmitter.emitChangeComponentColorEvent(ButtonIDs.Underline, isUnderlined ? Colors.IconActiveBlue : Colors.IconDefaultBlack);
+            try {
+                const isUnderlined = this.checkUnderlineState();
+                EventEmitter.emitChangeComponentColorEvent(
+                    ButtonIDs.Underline,
+                    isUnderlined ? Colors.IconActiveBlue : Colors.IconDefaultBlack
+                );
+            } catch (error) {
+                console.error("Failed to check underline state:", error);
+            }
         }, 10);
-
+    
         EventEmitter.emitDocChangedEvent();
     }
 
     private checkUnderlineState(): boolean {
         const selection = rangy.getSelection();
         if (!selection.rangeCount) return false;
-
+    
         const range = selection.getRangeAt(0);
         if (!range) return false;
-
-        const spanUnderline = range.commonAncestorContainer.querySelectorAll("span[style*='text-decoration: underline']");
-        return spanUnderline.length > 0;
+    
+        let container = range.commonAncestorContainer;
+        if (container.nodeType === Node.TEXT_NODE) {
+            container = container.parentElement;
+        }
+    
+        if (!(container instanceof Element)) return false;
+    
+        try {
+            const spanUnderline = container.querySelectorAll("span[style*='text-decoration: underline']");
+            return spanUnderline.length > 0;
+        } catch (error) {
+            console.error("Failed to check underline state:", error);
+            return false;
+        }
     }
 
     execHiliteColor(value: string): void {
         this.memento.saveState();
-
         this.lastDropdownColorChangeTime = Date.now();
-
+    
         const className = `highlight-${value.replace(/[^a-zA-Z0-9]/g, '')}`;
+        const selection = rangy.getSelection();
+        if (selection.rangeCount === 0 || selection.isCollapsed) {
+            console.warn("No valid text selection to apply background highlight.");
+            return;
+        }
     
-        const highlightApplier = rangy.createClassApplier(className, {
-            elementTagName: "span",
-            // elementProperties: {
-            //     style: {
-            //         backgroundColor: value
-            //     }
-            // },
-            toggle: true
-        });
+        try {
+            const highlightApplier = rangy.createClassApplier(className, {
+                elementTagName: "span",
+                toggle: true
+            });
     
-        highlightApplier.toggleSelection();
-
+            highlightApplier.toggleSelection();
+        } catch (error) {
+            console.error("Failed to apply highlight color:", error);
+            return;
+        }
+    
         EventEmitter.emitShowHideActiveElementEvent("hiliteColor", value, "show");
         EventEmitter.emitDocChangedEvent();
     }
 
     execForeColor(value: string): void {
         this.memento.saveState();
-
         this.lastDropdownColorChangeTime = Date.now();
-
-        const colorApplier = rangy.createClassApplier(`textColor-${value.replace(/[^a-zA-Z0-9]/g, '')}`, {
-            elementTagName: "span",
-            // elementProperties: {
-            //     style: {
-            //         color: value
-            //     }
-            // },
-            toggle: true
-        });
-
-        colorApplier.toggleSelection();
-
+    
+        const className = `textColor-${value.replace(/[^a-zA-Z0-9]/g, '')}`;
+        const selection = rangy.getSelection();
+        if (selection.rangeCount === 0 || selection.isCollapsed) {
+            console.warn("No valid text selection to apply foreground color.");
+            return;
+        }
+    
+        try {
+            const colorApplier = rangy.createClassApplier(className, {
+                elementTagName: "span",
+                toggle: true
+            });
+    
+            colorApplier.toggleSelection();
+        } catch (error) {
+            console.error("Failed to apply text color:", error);
+            return;
+        }
+    
         EventEmitter.emitShowHideActiveElementEvent("foreColor", value, "show");
         EventEmitter.emitDocChangedEvent();
     }
