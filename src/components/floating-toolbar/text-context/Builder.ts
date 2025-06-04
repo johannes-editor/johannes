@@ -196,7 +196,7 @@ export class Builder {
 
         moreOptionsList.append(new DropdownMenuListItem("copyOption", moreOptionsList, Commands.copySelected, null, SVGIcons.copy.htmlElement, "Copy", "Ctrl+C"));
         //moreOptionsList.append(new DropdownMenuListItem("cutOption", moreOptionsList, Commands.cutSelected, null, SVGIcons.cut.htmlElement, "Cut", "Ctrl+X"));
-        //moreOptionsList.append(new DropdownMenuListItem("pasteOption", moreOptionsList, Commands.past, null, SVGIcons.paste.htmlElement, "Replace", "Ctrl+V"));
+        //moreOptionsList.append(new DropdownMenuListItem("pasteOption", moreOptionsList, Commands.paste, null, SVGIcons.paste.htmlElement, "Replace", "Ctrl+V"));
         moreOptionsList.append(new DropdownMenuListItem("duplicateOption", moreOptionsList, Commands.duplicateBlock, null, SVGIcons.duplicate.htmlElement, "Clone", "Ctrl+D"));
         moreOptionsList.append(new DropdownMenuListItem("resetOption", moreOptionsList, Commands.removeFormat, null, SVGIcons.eraser.htmlElement, "Reset Style", "Ctrl+\\"));
 
