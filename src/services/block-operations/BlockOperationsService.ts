@@ -1025,7 +1025,9 @@ export class BlockOperationsService implements IBlockOperationsService {
 
         actual?.remove();
 
-        if (parentBlock && parentBlock.querySelectorAll('.editable').length == 0) {
+        if (parentBlock &&
+            parentBlock.querySelectorAll('.editable').length === 0 &&
+            !parentBlock.querySelector('.johannes-content-element')) {
             parentBlock.remove();
         }
     }
