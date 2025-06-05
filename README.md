@@ -9,7 +9,6 @@ into other web applications.
 
 - **Pure TypeScript** – no additional framework dependencies are required.
 - **Block based** editing with support for paragraphs, headings, tables and more.
-- **Quick menu** and **floating toolbar** components for a better UX.
 - **Undo/redo** support using a `Memento` implementation.
 - Syntax highlighted code blocks via `highlight.js`.
 
