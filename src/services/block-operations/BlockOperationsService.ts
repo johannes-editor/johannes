@@ -1018,12 +1018,27 @@ export class BlockOperationsService implements IBlockOperationsService {
         return focusedElement;
     }
 
+    private cleanupEmptyListItems(block: Element) {
+        const listItems = block.querySelectorAll('li');
+        listItems.forEach(item => {
+            DOMUtils.trimEmptyTextAndBrElements(item);
+            const hasContent = item.querySelector('.focusable, input, .editable');
+            if (!hasContent && !DOMUtils.hasTextContent(item)) {
+                item.remove();
+            }
+        });
+    }
+
     deleteTheCurrentElementAndTheDraggableBlockIfEmpty(currentElement: Element) {
 
         const parentBlock = currentElement.closest('.block');
         const actual = currentElement.closest('.deletable');
 
         actual?.remove();
+
+        if (parentBlock) {
+            this.cleanupEmptyListItems(parentBlock);
+        }
 
         if (parentBlock &&
             parentBlock.querySelectorAll('.editable').length === 0 &&

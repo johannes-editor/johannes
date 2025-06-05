@@ -297,6 +297,43 @@ describe('BlockOperationsService.createNewElementAndSplitContent', () => {
 
             expect(document.body.contains(block)).toBe(false);
         });
+
+        test('should remove empty list items inside block', () => {
+            const block = document.createElement('div');
+            block.className = 'block deletable';
+
+            const listElement = document.createElement('ul');
+            listElement.className = 'johannes-content-element list';
+
+            const createItem = (text: string) => {
+                const li = document.createElement('li');
+                li.className = 'deletable list-item';
+                const input = document.createElement('input');
+                const div = document.createElement('div');
+                div.className = 'focusable editable';
+                div.textContent = text;
+                li.appendChild(input);
+                li.appendChild(div);
+                return li;
+            };
+
+            const li1 = createItem('one');
+            const li2 = createItem('two');
+            const li3 = createItem('three');
+
+            listElement.appendChild(li1);
+            listElement.appendChild(li2);
+            listElement.appendChild(li3);
+            block.appendChild(listElement);
+            document.body.appendChild(block);
+
+            li2.innerHTML = '<br>'; // simulate leftover empty item
+
+            service.deleteTheCurrentElementAndTheDraggableBlockIfEmpty(listElement);
+
+            expect(listElement.querySelectorAll('li').length).toBe(2);
+            expect(listElement.contains(li2)).toBe(false);
+        });
     });
 
 });
