@@ -92,7 +92,7 @@ export class CommandDispatcher {
                 this.textOperationsService.execCut();
                 break;
 
-            case Commands.past:
+            case Commands.paste:
                 this.textOperationsService.execReplace();
                 break;
 
