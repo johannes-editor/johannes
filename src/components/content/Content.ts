@@ -13,6 +13,7 @@ import { TableUtils } from "@/utilities/TableUtils";
 import { DefaultJSEvents } from "@/common/DefaultJSEvents";
 import { KeyboardKeys } from "@/common/KeyboardKeys";
 import { Utils } from "@/utilities/Utils";
+import { BlockOperationsService } from "@/services/block-operations/BlockOperationsService";
 
 export class Content extends BaseUIComponent {
 
@@ -99,6 +100,7 @@ export class Content extends BaseUIComponent {
 
         this.clearSelectionOnDrag();
         this.reRenderPlaceholder();
+        this.observeEmptyBlocks();
 
         document.addEventListener('click', (event) => {
             const target = event.target as HTMLInputElement;
@@ -390,6 +392,16 @@ export class Content extends BaseUIComponent {
                 }
             }
         });
+    }
+
+    observeEmptyBlocks() {
+        const wrapper = document.querySelector('#johannesEditor .content-wrapper');
+        if (!wrapper) return;
+        const service = BlockOperationsService.getInstance();
+        const observer = new MutationObserver(() => {
+            service.removeEmptyBlocks();
+        });
+        observer.observe(wrapper, { childList: true, subtree: true });
     }
 
     static getInstance(): Content {

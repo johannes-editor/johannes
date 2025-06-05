@@ -1018,6 +1018,30 @@ export class BlockOperationsService implements IBlockOperationsService {
         return focusedElement;
     }
 
+    cleanupEmptyListItems(block: Element) {
+        const listItems = block.querySelectorAll('li');
+        listItems.forEach(item => {
+            DOMUtils.trimEmptyTextAndBrElements(item);
+            const hasContent = item.querySelector('.focusable, input, .editable');
+            if (!hasContent && !DOMUtils.hasTextContent(item)) {
+                item.remove();
+            }
+        });
+    }
+
+    removeEmptyBlocks() {
+        const blocks = document.querySelectorAll('.block.deletable');
+        blocks.forEach(block => {
+            this.cleanupEmptyListItems(block);
+            if (
+                block.querySelectorAll('.editable').length === 0 &&
+                !block.querySelector('.johannes-content-element')
+            ) {
+                block.remove();
+            }
+        });
+    }
+
     deleteTheCurrentElementAndTheDraggableBlockIfEmpty(currentElement: Element) {
 
         const parentBlock = currentElement.closest('.block');
@@ -1025,7 +1049,13 @@ export class BlockOperationsService implements IBlockOperationsService {
 
         actual?.remove();
 
-        if (parentBlock && parentBlock.querySelectorAll('.editable').length == 0) {
+        if (parentBlock) {
+            this.cleanupEmptyListItems(parentBlock);
+        }
+
+        if (parentBlock &&
+            parentBlock.querySelectorAll('.editable').length === 0 &&
+            !parentBlock.querySelector('.johannes-content-element')) {
             parentBlock.remove();
         }
     }
