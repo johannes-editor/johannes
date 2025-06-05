@@ -165,7 +165,6 @@ export class EmbedTool {
         placeholder.style.fontWeight = "bold";
         placeholder.style.borderRadius = "8px";
     
-        // Evento: usuário clicou → criar o iframe dinamicamente
         placeholder.addEventListener("click", () => {
             const iframe = document.createElement('iframe');
             iframe.classList.add("spotify-embed");
