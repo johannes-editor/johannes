@@ -1,5 +1,4 @@
 module.exports = {
-    
     preset: 'ts-jest',
     testEnvironment: 'jest-environment-jsdom',
     roots: ['<rootDir>/src'],
@@ -11,15 +10,10 @@ module.exports = {
         '^.+\\.ts$': 'ts-jest'
     },
     moduleNameMapper: {
-        '^@/(.*)$': '<rootDir>/src/$1'
+        '^@/(.*)$': '<rootDir>/src/$1',
+        '\\.svg$': '<rootDir>/__mocks__/svgMock.js'
     },
     resetModules: true,
     clearMocks: true,
     resetMocks: true,
-    // collectCoverage: true,
-    // collectCoverageFrom: [
-    //     'src/**/*.{js,ts}',
-    //     '!src/**/*.d.ts'
-    // ],
-    // coverageReporters: ['html', 'text-summary']
 };
