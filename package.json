@@ -1,7 +1,7 @@
 {
   "name": "johannes",
   "version": "1.0.0",
-  "description": "Johannes Editor",
+  "description": "A lightweight block based text editor built with TypeScript.",
   "main": "index.ts",
   "scripts": {
     "start": "webpack serve",
@@ -11,9 +11,13 @@
     "test": "jest",
     "test:watch": "jest --watch"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["editor", "wysiwyg", "typescript", "block", "javascript", "text"],
+  "author": "DevTricks",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/johannes.git"
+  },
   "devDependencies": {
     "@testing-library/dom": "^10.4.0",
     "@types/jest": "^29.5.12",
