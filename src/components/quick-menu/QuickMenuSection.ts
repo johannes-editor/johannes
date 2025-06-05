@@ -52,16 +52,17 @@ export class QuickMenuSection extends BaseUIComponent {
         this.restore();
 
         if (text !== "") {
-            this.menuItems.forEach(menuItem => {
+            const loweredText = text.toLowerCase();
 
-                if (!(menuItem.filterValue.toLocaleLowerCase().includes(text))) {
+            this.menuItems.forEach(menuItem => {
+                if (!menuItem.filterValue.toLocaleLowerCase().includes(loweredText)) {
                     menuItem.hide();
                 }
             });
 
-            let atLeadOneItem = this.menuItems.any(item => item.filterValue.toLocaleLowerCase().includes(text));
+            const atLeastOneItem = this.menuItems.any(item => item.filterValue.toLocaleLowerCase().includes(loweredText));
 
-            if (!atLeadOneItem) {
+            if (!atLeastOneItem) {
                 this.hide();
             }
         }
