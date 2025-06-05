@@ -42,22 +42,6 @@ npm test
 - `demo/` – static files used by the demo application
 - `tests/` – helper files for unit tests
 
-## CSS Classes
-
-Johannes exposes a set of CSS classes that can be used to style editable blocks:
-
-* `.focusable` – indicates whether an element can be focused
-* `.focus` – highlights the primary focus when multiple focusable elements are present
-* `.deletable` – allows deletion of empty elements via the delete or backspace key
-* `.swittable` – indicates that an element can change its type
-* `.draggable` – marks an element as draggable
-* `.drag-handler` – used along with `draggable="true"` for drag and drop handlers
-* `.block` – general class for block elements
-* `.editable` – focuses the cursor when navigating the document with arrow keys
-* `.key-trigger` – marks elements that trigger actions on key press
-* `.johannes-editor` – the main editor container
-* `.johannes-content-element` – content elements within the editor
-
 ## Contributing
 
 Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to propose
