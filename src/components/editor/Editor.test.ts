@@ -204,4 +204,25 @@ describe('Editor.handlePasteEvent', () => {
 
         expect(insertTextAtCursor).toHaveBeenCalledWith('Fallback text');
     });
+
+    test('should insert plain text when pasting into figcaption', () => {
+        const clipboardData = {
+            getData: (type: string) => {
+                if (type === 'text/html') return '<strong>bold</strong>';
+                if (type === 'text/plain') return 'bold';
+                return '';
+            }
+        };
+
+        clipboardEvent = new Event('paste', { bubbles: true, cancelable: true }) as ClipboardEvent;
+        Object.defineProperty(clipboardEvent, 'clipboardData', { value: clipboardData });
+
+        const target = document.createElement('figcaption');
+        target.setAttribute('contenteditable', 'true');
+        Object.defineProperty(clipboardEvent, 'target', { value: target });
+
+        Editor.handlePasteEvent(clipboardEvent, blockOperationsService);
+
+        expect(insertTextAtCursor).toHaveBeenCalledWith('bold');
+    });
 });
