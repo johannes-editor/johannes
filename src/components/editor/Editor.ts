@@ -214,9 +214,9 @@ export class Editor extends BaseUIComponent {
     
         if (textHtml !== "") {
             const currentBlock = DOMUtils.getContentTypeFromActiveElement();
-            const isParagraph = currentBlock === 'p';
-    
-            if (isParagraph) {
+            const isParagraphOrTitle = currentBlock === 'p' || target?.tagName.toLowerCase() === 'h1';
+
+            if (isParagraphOrTitle) {
                 const blocks = Editor.extractClipboardContent(textHtml);
     
                 if (blocks.length > 0) {
