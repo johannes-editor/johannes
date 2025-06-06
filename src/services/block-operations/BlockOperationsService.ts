@@ -115,7 +115,7 @@ export class BlockOperationsService implements IBlockOperationsService {
             return false;
         }
 
-        if (command == Commands.past) {
+        if (command == Commands.paste) {
             if (navigator.clipboard && navigator.clipboard.readText) {
                 navigator.clipboard.readText().then((pastedText: string) => {
                     const selection = document.getSelection();
@@ -1025,7 +1025,9 @@ export class BlockOperationsService implements IBlockOperationsService {
 
         actual?.remove();
 
-        if (parentBlock && parentBlock.querySelectorAll('.editable').length == 0) {
+        if (parentBlock &&
+            parentBlock.querySelectorAll('.editable').length === 0 &&
+            !parentBlock.querySelector('.johannes-content-element')) {
             parentBlock.remove();
         }
     }

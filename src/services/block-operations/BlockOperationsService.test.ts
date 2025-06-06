@@ -282,4 +282,21 @@ describe('BlockOperationsService.createNewElementAndSplitContent', () => {
         });
     });
 
+    describe('deleteTheCurrentElementAndTheDraggableBlockIfEmpty', () => {
+        test('should remove block when last content element is deleted', () => {
+            const block = document.createElement('div');
+            block.className = 'block deletable';
+
+            const content = document.createElement('p');
+            content.className = 'johannes-content-element editable';
+
+            block.appendChild(content);
+            document.body.appendChild(block);
+
+            service.deleteTheCurrentElementAndTheDraggableBlockIfEmpty(content);
+
+            expect(document.body.contains(block)).toBe(false);
+        });
+    });
+
 });

@@ -1,17 +1,51 @@
 # Johannes Editor
 
-## CSS Classes
+Johannes is a lightweight block based text editor written in TypeScript. It ships without any
+front end framework dependencies and focuses on providing an easy to embed editing experience.
+The project powers a small demo application included in this repository and can be integrated
+into other web applications.
 
-* `.focusable` - Indicates whether an element can be focused.
-* `.focus` - Used to highlight the primary focusable element when multiple focusable elements are present.
-* `.deletable` - Indicates that pressing the delete or backspace key on an empty element allows for its deletion. Pressing backspace focuses on the previous focusable element, and pressing delete focuses on the next focusable element.
-* `.swittable` - Indicates that an element can change its type.
-* `.draggable`  - Denotes that an element is draggable.
-* `.drag-handler` - Used in conjunction with the draggable="true" attribute to facilitate drag-and-drop functionality, typically applied to a button within a block.
-* `.block` - General class for block elements.
-* `.editable` - Used to focus the cursor when navigating the document with directional keys.
-* `.key-trigger` - Specifies elements that trigger actions on key presses.
-* `.johannes-editor` - Designates the main container of the Johannes Editor.
-* `.johannes-content-element` - Specifies content elements within the Johannes Editor.
+## Features
 
-publish
+- **Pure TypeScript** – no additional framework dependencies are required.
+- **Block based** editing with support for paragraphs, headings, tables and more.
+- **Undo/redo** support using a `Memento` implementation.
+- Syntax highlighted code blocks via `highlight.js`.
+
+## Getting Started
+
+Install dependencies and start the development server:
+
+```bash
+npm install
+npm start
+```
+
+To build the production bundle run:
+
+```bash
+npm run build
+```
+
+### Running Tests
+
+The project contains Jest unit tests. Execute them with:
+
+```bash
+npm test
+```
+
+## Project Structure
+
+- `src/` – TypeScript sources and style sheets
+- `demo/` – static files used by the demo application
+- `tests/` – helper files for unit tests
+
+## Contributing
+
+Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to propose
+changes and run the project locally.
+
+## License
+
+This project is released under the [MIT License](LICENSE).

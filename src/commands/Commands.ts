@@ -13,7 +13,7 @@ export enum Commands {
     removeFormat = "removeFormat",
     copySelected = "copySelected",
     cutSelected = "cutSelected",
-    past = "past",
+    paste = "paste",
 
     /** Block operations commands */
     transformBlock = "transformBlock",
