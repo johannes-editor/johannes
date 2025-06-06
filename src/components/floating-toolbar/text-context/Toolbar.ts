@@ -32,6 +32,8 @@ export class Toolbar extends FloatingToolbarBase {
     private moreTextOptions: HTMLElement | null = null;
     private turnIntoOptions: HTMLElement | null = null;
     private turnIntoSeparator: HTMLElement | null = null;
+    private inlineCodeButton: HTMLElement | null = null;
+    private linkButton: HTMLElement | null = null;
     private textOperationsSeparator: HTMLElement | null = null;
 
     private lockedHide = false;
@@ -142,9 +144,17 @@ export class Toolbar extends FloatingToolbarBase {
             this.turnIntoOptions = document.querySelector("#turnIntoButton");
         }
 
+        if (!this.inlineCodeButton) {
+            this.inlineCodeButton = document.querySelector("#inlineCodeButton");
+        }
+
+        if (!this.linkButton) {
+            this.linkButton = document.querySelector("#linkButton");
+        }        
+
         if (!this.turnIntoSeparator) {
             this.turnIntoSeparator = document.querySelector("#turnIntoSeparator");
-        }
+        }    
 
         if (!this.textOperationsSeparator) {
             this.textOperationsSeparator = document.querySelector("#textOperationsSeparator");
@@ -152,17 +162,19 @@ export class Toolbar extends FloatingToolbarBase {
 
         if (blockElements.length > 1) {
 
-
             this.moreTextOptions!.style.display = "none";
+            this.linkButton!.style.display = "none";
             this.turnIntoOptions!.style.display = "none";
             this.turnIntoSeparator!.style.display = "none";
+            this.inlineCodeButton!.style.display = "none";
             this.textOperationsSeparator!.style.display = "none";
-
 
         } else {
             this.moreTextOptions!.style.display = "flex";
+            this.linkButton!.style.display = "flex";
             this.turnIntoOptions!.style.display = "flex";
             this.turnIntoSeparator!.style.display = "flex";
+            this.inlineCodeButton!.style.display = "flex";
             this.textOperationsSeparator!.style.display = "flex";
         }
     }
@@ -226,6 +238,7 @@ export class Toolbar extends FloatingToolbarBase {
         });
 
         document.addEventListener(DefaultJSEvents.Mouseup, (event) => {
+            
             isSelecting = false;
             this.showHide(event, isSelecting);
 
@@ -286,10 +299,7 @@ export class Toolbar extends FloatingToolbarBase {
         return positionChanged;
     }
 
-    //Regras para exibir ou ocultar o TextContextFloatingToolbar
     showHide(event: Event, isSelecting: boolean) {
-
-        //Workaround para funcionar no Firefox
 
         //This block checks for an active selection and whether it contains any content.
         // In Firefox, the `selectionchange` event may be fired even while typing,
@@ -314,7 +324,6 @@ export class Toolbar extends FloatingToolbarBase {
                 if (!this.canShowFloatingToolbar()) {
                     return;
                 }
-                // event.stopImmediatePropagation();
                 this.show();
             } else if (this.shouldUpdatePosition()) {
 
@@ -438,13 +447,13 @@ export class Toolbar extends FloatingToolbarBase {
 
         this.dropdowns.forEach(dropdown => {
             if (dropdown.id === "turnIntoMenu") {
-                dropdown.htmlElement.style.display = shouldHide ? "none" : this.display;
+                dropdown.htmlElement.style.display = shouldHide ? "none" : "flex";
             }
         });
 
         this.separators.forEach(separator => {
             if (separator.id === "turnIntoSeparator") {
-                separator.htmlElement.style.display = shouldHide ? "none" : this.display;
+                separator.htmlElement.style.display = shouldHide ? "none" : "flex";
             }
         });
     }
