@@ -200,6 +200,14 @@ export class Editor extends BaseUIComponent {
     
         const clipboardData = event.clipboardData;
         if (!clipboardData) return;
+
+        if (target && target.tagName === 'FIGCAPTION') {
+            const plainText = clipboardData.getData('text/plain');
+            if (plainText) {
+                Editor.insertTextAtCursor(plainText);
+            }
+            return;
+        }
     
         const text = clipboardData.getData('text/plain');
         const textHtml = clipboardData.getData('text/html');
