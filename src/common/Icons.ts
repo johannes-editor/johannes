@@ -26,6 +26,7 @@ export enum Icons {
     GitHub = "icon-bootstrap-github",
     GitLab = "icon-bootstrap-gitlab",
     CodePen = "icon-codepen",
+    Formula = "icon-wordpress-equation-mark",
     YouTube = "icon-bootstrap-youtube"
 
 }

@@ -6,6 +6,7 @@ import { QuickMenuBuilder } from "../components/quick-menu/QuickMenuBuilder";
 import { TitleBuilder } from "./TitleBuilder";
 import { ContentBuilder } from "./ContentBuilder";
 import { MediaInputterBuilder } from "./MediaInputterBuilder";
+import { MathInputterBuilder } from "./MathInputterBuilder";
 
 export class EditorBuilder {
 
@@ -18,7 +19,8 @@ export class EditorBuilder {
             TextContextFloatingToolbarBuilder.build(),
             QuickMenuBuilder.build(),
             TableContextFloatingToolbarBuilder.build(),
-            MediaInputterBuilder.build()
+            MediaInputterBuilder.build(),
+            MathInputterBuilder.build()
         );
 
         return editor;

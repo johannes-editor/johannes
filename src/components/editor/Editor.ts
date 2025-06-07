@@ -11,6 +11,7 @@ import { Toolbar as TextContextFloatingToolbar } from "../floating-toolbar/text-
 import { IMemento } from "@/core/IMemento";
 import { DependencyContainer } from "@/core/DependencyContainer";
 import { MediaInputter } from "../media-inputter/MediaInputter";
+import { MathInputter } from "../math-inputter/MathInputter";
 import { InputLinkBoxWrapper } from "../floating-toolbar/base/link-box/InputLinkBoxWrapper";
 import { DefaultJSEvents } from '@/common/DefaultJSEvents';
 import { Utils } from "@/utilities/Utils";
@@ -30,6 +31,7 @@ export class Editor extends BaseUIComponent {
     private quickMenu: QuickMenu;
     private tableContextToolbar: TableContextFloatingToolbar;
     private mediaInputter: MediaInputter;
+    private mathInputter: MathInputter;
     private inputLinkBoxWrapper: InputLinkBoxWrapper;
     private blockOperationsService: IBlockOperationsService;
 
@@ -44,6 +46,7 @@ export class Editor extends BaseUIComponent {
         quickMenu: QuickMenu,
         tableToolbar: TableContextFloatingToolbar,
         mediaInputter: MediaInputter,
+        mathInputter: MathInputter,
         inputLinkBoxWrapper: InputLinkBoxWrapper
     ) {
 
@@ -57,6 +60,7 @@ export class Editor extends BaseUIComponent {
             quickMenu: quickMenu,
             tableToolbar: tableToolbar,
             mediaInputter: mediaInputter,
+            mathInputter: mathInputter,
             inputLinkBoxWrapper: inputLinkBoxWrapper
         });
 
@@ -73,6 +77,7 @@ export class Editor extends BaseUIComponent {
         this.quickMenu = quickMenu;
         this.tableContextToolbar = tableToolbar;
         this.mediaInputter = mediaInputter;
+        this.mathInputter = mathInputter;
 
         this.attachEvents();
 
@@ -112,6 +117,7 @@ export class Editor extends BaseUIComponent {
 
         htmlElement.appendChild(this.props.tableToolbar.htmlElement);
         htmlElement.appendChild(this.props.mediaInputter.htmlElement);
+        htmlElement.appendChild(this.props.mathInputter.htmlElement);
         htmlElement.appendChild(this.props.inputLinkBoxWrapper.htmlElement)
 
         return htmlElement;
@@ -124,7 +130,8 @@ export class Editor extends BaseUIComponent {
         textFloatingToolbar: TextContextFloatingToolbar,
         quickMenu: QuickMenu,
         tableFloatingToolbar: TableContextFloatingToolbar,
-        mediaInputter: MediaInputter) {
+        mediaInputter: MediaInputter,
+        mathInputter: MathInputter) {
 
         const elementFactoryService = DependencyContainer.Instance.resolve<IElementFactoryService>("IElementFactoryService");
         const blockOperationsService = DependencyContainer.Instance.resolve<IBlockOperationsService>("IBlockOperationsService");
@@ -132,7 +139,7 @@ export class Editor extends BaseUIComponent {
         const inputLinkBoxWrapper = new InputLinkBoxWrapper();
 
         if (!Editor.instance) {
-            Editor.instance = new Editor(elementFactoryService, blockOperationsService, memento, title, content, addBlock, textFloatingToolbar, quickMenu, tableFloatingToolbar, mediaInputter, inputLinkBoxWrapper);
+            Editor.instance = new Editor(elementFactoryService, blockOperationsService, memento, title, content, addBlock, textFloatingToolbar, quickMenu, tableFloatingToolbar, mediaInputter, mathInputter, inputLinkBoxWrapper);
         }
 
         return Editor.instance;

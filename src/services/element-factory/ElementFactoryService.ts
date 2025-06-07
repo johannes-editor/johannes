@@ -4,6 +4,7 @@ import { Utils } from "@/utilities/Utils";
 import { Icons } from "@/common/Icons";
 import { ToolboxOptions } from "@/components/block-toolbox/ToolboxOptions";
 import { CommonClasses } from "@/common/CommonClasses";
+import { MathInputter } from "@/components/math-inputter/MathInputter";
 import hljs from 'highlight.js';
 import katex from 'katex';
 
@@ -460,29 +461,54 @@ export class ElementFactoryService implements IElementFactoryService {
 
     private static math(content: string): HTMLElement {
         const container = document.createElement('div');
-        container.classList.add("johannes-content-element", "math-block", "swittable", ToolboxOptions.IncludeBlockToolbarClass, ToolboxOptions.ExtraOptionsClass);
+        container.classList.add(
+            "johannes-content-element",
+            "math-block",
+            "swittable",
+            ToolboxOptions.IncludeBlockToolbarClass,
+            ToolboxOptions.ExtraOptionsClass,
+            CommonClasses.ShowMathInputOnClick
+        );
         container.setAttribute('data-content-type', ContentTypes.Math);
 
-        const input = document.createElement('div');
-        input.classList.add('math-input', 'focusable', 'editable');
-        input.contentEditable = 'true';
-        input.setAttribute('data-placeholder', "\\text{Formula}");
-        input.textContent = content || "";
+        const placeholder = document.createElement('div');
+        placeholder.classList.add('content-placeholder', CommonClasses.ShowMathInputOnClick);
 
-        const render = document.createElement('div');
-        render.classList.add('math-render');
+        container.appendChild(placeholder);
+        container.dataset.formula = content || '';
 
-        container.appendChild(input);
-        container.appendChild(render);
-
-        const renderFormula = () => {
-            try {
-                katex.render(input.textContent || '', render, { throwOnError: false });
-            } catch (e) {}
+        const renderPreview = () => {
+            const formula = container.dataset.formula || '';
+            placeholder.innerHTML = '';
+            if (formula) {
+                try {
+                    katex.render(formula, placeholder, { throwOnError: false });
+                } catch (e) {
+                    placeholder.textContent = formula;
+                }
+            } else {
+                const icon = this.createIcon(Icons.Formula);
+                const text = document.createElement('span');
+                text.innerText = 'Write a formula';
+                placeholder.appendChild(icon);
+                placeholder.appendChild(text);
+            }
         };
 
-        input.addEventListener('input', renderFormula);
-        renderFormula();
+        (container as any).renderPreview = renderPreview;
+
+        renderPreview();
+
+        const inputter = MathInputter.getInstance();
+
+        const showAfterCreate = () => {
+            inputter.setTarget(container, renderPreview);
+            inputter.focusStack.push(container);
+            inputter.show();
+        };
+
+        // show input right after creation so user can type immediately
+        setTimeout(showAfterCreate, 0);
 
         return container;
     }
