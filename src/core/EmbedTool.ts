@@ -21,13 +21,7 @@ export class EmbedTool {
         image.src = url.toString();
         image.alt = '';
 
-        const figcaption = document.createElement('figcaption');
-        figcaption.setAttribute("data-placeholder", "Type a caption for this image");
-        figcaption.setAttribute("contenteditable", "true");
-        figcaption.classList.add("editable", "hide-turninto", "hide-moreoptions", "hide-inlineCode");
-
         figContent.appendChild(image);
-        figContent.appendChild(figcaption);
 
         container.appendChild(figContent);
 

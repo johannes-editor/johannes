@@ -3,6 +3,7 @@ import { EventEmitter } from '../../commands/EventEmitter';
 import { DOMUtils } from '../../utilities/DOMUtils';
 import { DependencyContainer } from '../../core/DependencyContainer';
 import { ContentTypes } from '@/common/ContentTypes';
+import { ElementFactoryService } from '../element-factory/ElementFactoryService';
 
 const mockElementFactoryService = {
     create: jest.fn()
@@ -279,6 +280,76 @@ describe('BlockOperationsService.createNewElementAndSplitContent', () => {
         
             expect(firstListItems.length).toBe(1);
             expect(secondListItems.length).toBe(2);
+        });
+    });
+
+    describe('Caption behavior', () => {
+        test('pressing enter at end of figcaption creates new paragraph', () => {
+            const block = document.createElement('div');
+            block.className = 'block deletable';
+
+            const figure = document.createElement('figure');
+            figure.className = 'figure-content';
+            const img = document.createElement('img');
+            figure.appendChild(img);
+            const caption = document.createElement('figcaption');
+            caption.className = 'editable';
+            caption.contentEditable = 'true';
+            caption.textContent = 'Caption text';
+            figure.appendChild(caption);
+            block.appendChild(figure);
+            document.body.appendChild(block);
+
+            jest.spyOn(DOMUtils, 'getSelectionTextInfo').mockReturnValue({ atStart: false, atEnd: true });
+            mockElementFactoryService.create.mockImplementation((type) => {
+                if (type === ElementFactoryService.ELEMENT_TYPES.BLOCK_PARAGRAPH) {
+                    return ElementFactoryService.blockParagraph('');
+                }
+                return document.createElement('div');
+            });
+
+            caption.focus();
+            jest.spyOn(document, 'activeElement', 'get').mockReturnValue(caption);
+
+            const result = service.createNewElementAndSplitContent();
+
+            expect(result).toBe(true);
+            expect(mockElementFactoryService.create).toHaveBeenCalled();
+            expect(caption.textContent).toBe('Caption text');
+        });
+
+        test('pressing enter in the middle of figcaption moves text', () => {
+            const block = document.createElement('div');
+            block.className = 'block deletable';
+
+            const figure = document.createElement('figure');
+            figure.className = 'figure-content';
+            const img = document.createElement('img');
+            figure.appendChild(img);
+            const caption = document.createElement('figcaption');
+            caption.className = 'editable';
+            caption.contentEditable = 'true';
+            caption.textContent = 'Hello world';
+            figure.appendChild(caption);
+            block.appendChild(figure);
+            document.body.appendChild(block);
+
+            jest.spyOn(DOMUtils, 'getSelectionTextInfo').mockReturnValue({ atStart: false, atEnd: false });
+            mockElementFactoryService.create.mockImplementation((type) => {
+                if (type === ElementFactoryService.ELEMENT_TYPES.BLOCK_PARAGRAPH) {
+                    return ElementFactoryService.blockParagraph('');
+                }
+                return document.createElement('div');
+            });
+
+            caption.focus();
+            jest.spyOn(document, 'activeElement', 'get').mockReturnValue(caption);
+            DOMUtils.setCursorPosition(caption, 6);
+
+            const result = service.createNewElementAndSplitContent();
+
+            expect(result).toBe(true);
+            expect(caption.textContent).toBe('Hello ');
         });
     });
 

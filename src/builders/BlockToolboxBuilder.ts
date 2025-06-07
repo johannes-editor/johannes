@@ -96,6 +96,8 @@ export class BlockToolboxBuilder {
         list.append(new DropdownMenuListItemTitle(list, "More options"));
         list.append(new DropdownMenuListItem("duplicateOption" + Utils.generateUniqueId(), list, Commands.duplicateBlock, null, SVGIcon.create(Icons.Duplicate, Sizes.large).htmlElement, "Clone", "Ctrl+D"));
 
+        list.append(new DropdownMenuListItem("captionOption" + Utils.generateUniqueId(), list, Commands.toggleBlockCaption, null, SVGIcon.create(Icons.Callout, Sizes.large).htmlElement, "Caption"));
+
 
         const deleteItem = new DropdownMenuListItem("deleteOption" + Utils.generateUniqueId(), list, Commands.deleteBlock, null, SVGIcon.create(Icons.Trash, Sizes.large).htmlElement, "Delete", "Shift+Del");
         deleteItem.addCssClass("danger-option");

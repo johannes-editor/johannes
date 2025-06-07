@@ -61,10 +61,25 @@ figure figcaption[data-placeholder]:empty:before {
 }
 
 figure figcaption {
-    max-width: inherit;
-    width: fit-content;
-    display: inline-block;
+    max-width: 100%;
+    width: 100%;
+    display: block;
+    text-align: center;
     color: #84888d;
+    margin-top: 0.25rem;
+    box-sizing: border-box;
+}
+
+.block-caption[data-placeholder]:empty:before {
+    content: attr(data-placeholder) !important;
+    display: inline-block !important;
+}
+
+.block-caption {
+    width: 100%;
+    text-align: center;
+    color: #84888d;
+    box-sizing: border-box;
 }
 
 /** CSS reset */
@@ -255,8 +270,13 @@ p.johannes-content-element {
     max-width: 100%;
 }
 
+.block.with-caption {
+    flex-direction: column;
+}
+
 .block>*:not(.editor-only) {
     padding-left: 1.25rem;
+    box-sizing: border-box;
 }
 
 .block:hover .drag-handler {
@@ -1269,13 +1289,13 @@ td::placeholder {
 .block-toolbar-wrapper {
     width: 0;
     height: 0;
-    position: relative;
+    position: absolute;
+    top: 0;
+    right: 0;
     overflow: visible;
     margin: 0;
     padding: 0;
-    display: contents;
     display: block;
-
 }
 
 .block-toolbar {
@@ -1295,7 +1315,7 @@ td::placeholder {
     gap: 10px;
     padding: 5px;
     padding-left: 10px;
-    padding-right: 10px;
+    padding-right: 0;
     transition: visibility 0.2s;
 
     /* Position the toolbar outside of the block so it doesn't overlap content */

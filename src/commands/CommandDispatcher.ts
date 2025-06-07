@@ -263,6 +263,13 @@ export class CommandDispatcher {
                 this.blockOperationsService.execChangeCalloutBackground(block, value);
                 break;
 
+            case Commands.toggleBlockCaption:
+                if (!block) {
+                    block = DOMUtils.getCurrentActiveBlock() as HTMLElement;
+                }
+                this.blockOperationsService.toggleCaption(block as HTMLElement);
+                break;
+
             case Commands.removeColumn:
                 this.tableOperationsService.removeColumn();
                 break;

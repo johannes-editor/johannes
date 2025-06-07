@@ -274,7 +274,6 @@ export class BlockToolbox implements IBlockToolbox {
         const htmlElementWrapper = document.createElement("div");
 
         htmlElementWrapper.classList.add("block-toolbar-wrapper", "exclude-from-clone", CommonClasses.EditorOnly);
-        htmlElementWrapper.style.position = "relative";
 
         const htmlElement = document.createElement("div");
         htmlElement.classList.add("block-toolbar", "soft-box-shadow");

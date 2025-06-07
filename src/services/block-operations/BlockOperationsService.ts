@@ -693,6 +693,35 @@ export class BlockOperationsService implements IBlockOperationsService {
 
         this.memento.saveState();
 
+        const activeElement = document.activeElement as HTMLElement | null;
+
+        if (activeElement && (activeElement.tagName === 'FIGCAPTION' || activeElement.classList.contains('block-caption'))) {
+            const caption = activeElement;
+            const block = caption.closest('.block') as HTMLElement | null;
+
+            if (block) {
+                const { atEnd } = DOMUtils.getSelectionTextInfo(caption);
+
+                if (atEnd) {
+                    this.createDefaultBlock(block, "");
+                } else {
+                    const newParagraph = ElementFactoryService.blockParagraph();
+                    DOMUtils.insertAfter(newParagraph, block);
+
+                    const p = newParagraph.querySelector(`.${CommonClasses.ContentElement}`) as HTMLElement;
+                    const [, afterRange] = DOMUtils.splitContentAtCursorSelection(caption);
+                    const fragment = afterRange.cloneContents();
+                    p.appendChild(fragment);
+                    afterRange.deleteContents();
+                    DOMUtils.trimEmptyTextAndBrElements(p);
+                    DOMUtils.placeCursorAtStartOfEditableElement(p);
+                }
+
+                EventEmitter.emitDocChangedEvent();
+                return true;
+            }
+        }
+
         const contentType = DOMUtils.getContentTypeFromActiveElement();
 
         if (contentType == ContentTypes.Image) {
@@ -1228,6 +1257,66 @@ export class BlockOperationsService implements IBlockOperationsService {
         if (calloutDiv) {
             DOMUtils.removeClassesWithPrefix(calloutDiv as Element, "callout-background-");
             calloutDiv.classList.add(color);
+        }
+
+        EventEmitter.emitDocChangedEvent();
+    }
+
+    toggleCaption(block: HTMLElement): void {
+
+        this.memento.saveState();
+
+        const figure = block.querySelector('figure');
+        if (figure) {
+            if (figure.querySelector('.figure-content')) {
+                const existingCaption = figure.querySelector('figcaption');
+                if (existingCaption) {
+                    existingCaption.remove();
+                } else {
+                    const caption = document.createElement('figcaption');
+                    caption.setAttribute('data-placeholder', 'Type a caption');
+                    caption.setAttribute('contenteditable', 'true');
+                    caption.classList.add('editable', 'hide-turninto', 'hide-moreoptions', 'hide-inlineCode');
+                    figure.appendChild(caption);
+                }
+            } else {
+                const next = figure.nextElementSibling;
+                if (next && next.classList.contains('block-caption')) {
+                    next.remove();
+                } else {
+                    const caption = document.createElement('div');
+                    caption.classList.add('block-caption', 'editable', 'focusable', 'hide-turninto', 'hide-moreoptions', 'hide-inlineCode');
+                    caption.setAttribute('data-placeholder', 'Type a caption');
+                    caption.setAttribute('contenteditable', 'true');
+                    figure.insertAdjacentElement('afterend', caption);
+                }
+            }
+
+            if (block.querySelector('.block-caption')) {
+                block.classList.add('with-caption');
+            } else {
+                block.classList.remove('with-caption');
+            }
+
+            EventEmitter.emitDocChangedEvent();
+            return;
+        }
+
+        const existing = block.querySelector('.block-caption');
+        if (existing) {
+            existing.remove();
+        } else {
+            const caption = document.createElement('div');
+            caption.classList.add('block-caption', 'editable', 'focusable', 'hide-turninto', 'hide-moreoptions', 'hide-inlineCode');
+            caption.setAttribute('data-placeholder', 'Type a caption');
+            caption.setAttribute('contenteditable', 'true');
+            block.appendChild(caption);
+        }
+
+        if (block.querySelector('.block-caption')) {
+            block.classList.add('with-caption');
+        } else {
+            block.classList.remove('with-caption');
         }
 
         EventEmitter.emitDocChangedEvent();
