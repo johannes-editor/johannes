@@ -91,6 +91,7 @@ export class MathInputter extends BaseUIComponent {
         this.input?.addEventListener("input", () => this.updateFormula());
         this.done?.addEventListener(DefaultJSEvents.Click, (e) => {
             e.preventDefault();
+            this.updateFormula();
             this.hide();
         });
 
