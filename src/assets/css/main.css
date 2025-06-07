@@ -314,6 +314,14 @@ p.johannes-content-element {
     display: block;
 }
 
+/* Always show placeholders for callout and code block */
+.callout-text[data-placeholder]:empty:before,
+.code-block code[data-placeholder]:empty:before {
+    content: attr(data-placeholder);
+    color: #84888acd;
+    display: block;
+}
+
 #johannesEditor li.div[contenteditable="true"]:empty:hover:before {
     content: attr(data-placeholder);
     color: #84888acd;
