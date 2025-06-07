@@ -68,6 +68,7 @@ export class Builder {
         turnIntoBarList.append(new DropdownMenuListItem("turnIntoOptionBulletedList", turnIntoBarList, Commands.transformBlock, ElementFactoryService.ELEMENT_TYPES.BULLETED_LIST, SVGIcons.b_list.htmlElement, "Bulleted list", "Ctrl+."));
         turnIntoBarList.append(new DropdownMenuListItem("turnIntoOptionNumberedList", turnIntoBarList, Commands.transformBlock, ElementFactoryService.ELEMENT_TYPES.NUMBERED_LIST, SVGIcons.n_list.htmlElement, "Numbered list", "Ctrl+/"));
         turnIntoBarList.append(new DropdownMenuListItem("turnIntoOptionBlockCode", turnIntoBarList, Commands.transformBlock, ElementFactoryService.ELEMENT_TYPES.CODE, SVGIcons.code.htmlElement, "Block code"));
+        turnIntoBarList.append(new DropdownMenuListItem("turnIntoOptionFormula", turnIntoBarList, Commands.transformBlock, ElementFactoryService.ELEMENT_TYPES.MATH, SVGIcons.formula.htmlElement, "Formula"));
         turnIntoBarList.append(new DropdownMenuListItem("turnIntoOptionQuote", turnIntoBarList, Commands.transformBlock, ElementFactoryService.ELEMENT_TYPES.QUOTE, SVGIcons.quote.htmlElement, "Quote"));
         //turnIntoBarList.append(new DropdownMenuListItem("turnIntoOptionHeading1", turnIntoBarList, Commands.transformBlock, ElementFactoryService.ELEMENT_TYPES.HEADER_1, SVGIcons.head1.htmlElement, "Heading 1", "Ctrl+Alt+1"));
         turnIntoBarList.append(new DropdownMenuListItem("turnIntoOptionHeading2", turnIntoBarList, Commands.transformBlock, ElementFactoryService.ELEMENT_TYPES.HEADER_2, SVGIcons.head2.htmlElement, "Heading 2", "Ctrl+Alt+2"));
@@ -216,6 +217,7 @@ const SVGIcons: any = {
     b_list: new SVGIcon("icon-wordpress-bulleted-list", Sizes.large),
     n_list: new SVGIcon("icon-wordpress-numbered-list", Sizes.large),
     code: new SVGIcon("icon-wordpress-code-mark", Sizes.large),
+    formula: new SVGIcon("icon-wordpress-equation-mark", Sizes.large),
     quote: new SVGIcon("icon-wordpress-quote", Sizes.large),
     head1: new SVGIcon("icon-julia-head-1", Sizes.large),
     head2: new SVGIcon("icon-julia-head-2", Sizes.large),

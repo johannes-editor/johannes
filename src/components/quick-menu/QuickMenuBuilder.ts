@@ -19,6 +19,7 @@ export class QuickMenuBuilder {
             //new QuickMenuItem(basicBlocksSection, 'Table', 'Organize data in rows and columns.', 'icon-material-table', ElementFactoryService.ELEMENT_TYPES.TABLE, "table tr th"),
             new QuickMenuItem(basicBlocksSection, 'Callout', 'Emphasize key points with a callout box.', Icons.Callout, ElementFactoryService.ELEMENT_TYPES.CALLOUT, "callout note spotlight"),
             new QuickMenuItem(basicBlocksSection, 'Code', 'Include a code snippet.', 'icon-wordpress-code-mark', ElementFactoryService.ELEMENT_TYPES.CODE, "code script source markup"),
+            new QuickMenuItem(basicBlocksSection, 'Formula', 'Display a math expression.', 'icon-wordpress-equation-mark', ElementFactoryService.ELEMENT_TYPES.MATH, "formula math latex equation"),
             new QuickMenuItem(basicBlocksSection, 'Quote', 'Highlight text as a quote.', 'icon-wordpress-quote', ElementFactoryService.ELEMENT_TYPES.QUOTE, "quote blockquote citation quotation cite"),
             new QuickMenuItem(basicBlocksSection, 'Heading 2', 'Medium header for sections.', 'icon-julia-head-2', ElementFactoryService.ELEMENT_TYPES.HEADER_2, "header 2 heading 2 h2"),
             new QuickMenuItem(basicBlocksSection, 'Heading 3', 'Small header for subsections.', 'icon-julia-head-2', ElementFactoryService.ELEMENT_TYPES.HEADER_3, "header 3 heading 3 h3"),
