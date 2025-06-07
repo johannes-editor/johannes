@@ -441,6 +441,26 @@ p {
     padding-left: 10px;
 }
 
+#mathInputter {
+    z-index: 999999;
+    width: fit-content;
+    background-color: white;
+}
+
+#mathInputter .math-input-shell {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 20px;
+}
+
+#mathInputter .math-input {
+    border: 1px solid rgba(55, 53, 47, 0.16);
+    min-height: 1.5rem;
+    border-radius: 4px;
+    padding: 4px 6px;
+}
+
 
 .ctrl-active .johannes-content-element a {
     cursor: pointer;
@@ -1422,9 +1442,6 @@ pre code {
     min-height: 1.2em;
 }
 
-.math-render {
-    margin-top: 0.5rem;
-}
 
 
 
