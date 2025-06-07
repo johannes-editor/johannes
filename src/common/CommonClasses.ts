@@ -34,5 +34,7 @@ export enum CommonClasses {
     ShowMediaInputUpload =  "show-media-input-upload",
     ShowMediaInputEmbed =  "show-media-input-embed",
 
+    ShowMathInputOnClick = "show-math-input-on-click",
+
     BlockToolbarWrapper = "block-toolbar-wrapper"
 }

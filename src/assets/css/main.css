@@ -1424,6 +1424,20 @@ pre code {
     margin-top: 0.5rem;
 }
 
+.math-edit {
+    display: none;
+    gap: 0.5rem;
+    flex-direction: column;
+}
+
+.math-block.editing .math-edit {
+    display: flex;
+}
+
+.math-block.editing .content-placeholder {
+    display: none;
+}
+
 
 
 @keyframes shake {

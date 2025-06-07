@@ -460,19 +460,46 @@ export class ElementFactoryService implements IElementFactoryService {
 
     private static math(content: string): HTMLElement {
         const container = document.createElement('div');
-        container.classList.add("johannes-content-element", "math-block", "swittable", ToolboxOptions.IncludeBlockToolbarClass, ToolboxOptions.ExtraOptionsClass);
+        container.classList.add(
+            "johannes-content-element",
+            "math-block",
+            "swittable",
+            ToolboxOptions.IncludeBlockToolbarClass,
+            ToolboxOptions.ExtraOptionsClass
+        );
         container.setAttribute('data-content-type', ContentTypes.Math);
+
+        const placeholder = document.createElement('div');
+        placeholder.classList.add('content-placeholder', CommonClasses.ShowMathInputOnClick);
+
+        const icon = this.createIcon(Icons.Formula);
+        const placeholderText = document.createElement('span');
+        placeholderText.innerText = 'Write a formula';
+
+        placeholder.appendChild(icon);
+        placeholder.appendChild(placeholderText);
+
+        const editWrapper = document.createElement('div');
+        editWrapper.classList.add('math-edit', CommonClasses.EditorOnly);
 
         const input = document.createElement('div');
         input.classList.add('math-input', 'focusable', 'editable');
         input.contentEditable = 'true';
         input.setAttribute('data-placeholder', "\\text{Formula}");
-        input.textContent = content || "";
+        input.textContent = content || '';
+
+        const done = document.createElement('button');
+        done.classList.add('blue-button');
+        done.textContent = 'Done';
+
+        editWrapper.appendChild(input);
+        editWrapper.appendChild(done);
 
         const render = document.createElement('div');
         render.classList.add('math-render');
 
-        container.appendChild(input);
+        container.appendChild(placeholder);
+        container.appendChild(editWrapper);
         container.appendChild(render);
 
         const renderFormula = () => {
@@ -481,8 +508,32 @@ export class ElementFactoryService implements IElementFactoryService {
             } catch (e) {}
         };
 
+        const showInput = () => {
+            container.classList.add('editing');
+            setTimeout(() => input.focus(), 0);
+        };
+
+        const hideInput = () => {
+            container.classList.remove('editing');
+        };
+
+        placeholder.addEventListener('click', showInput);
+        container.addEventListener('click', (e) => {
+            if (e.target === container && !container.classList.contains('editing')) {
+                showInput();
+            }
+        });
+        done.addEventListener('click', (e) => {
+            e.preventDefault();
+            hideInput();
+        });
+
         input.addEventListener('input', renderFormula);
         renderFormula();
+
+        if (!content) {
+            showInput();
+        }
 
         return container;
     }
