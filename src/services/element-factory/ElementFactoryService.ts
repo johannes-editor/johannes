@@ -746,21 +746,23 @@ export class ElementFactoryService implements IElementFactoryService {
         return element;
     }
 
+    private static readonly INVISIBLE_CHAR = "\u200B";
+
     static initEditableContent(element: HTMLElement, content: string | null): void {
         if (content && content !== "") {
             element.textContent = content;
         } else {
-            element.innerHTML = "<br>";
+            element.innerHTML = ElementFactoryService.INVISIBLE_CHAR;
             element.setAttribute("data-empty", "true");
         }
 
         element.addEventListener("input", () => {
-            if (element.textContent === "") {
-                element.innerHTML = "<br>";
+            if (element.textContent === "" || element.textContent === ElementFactoryService.INVISIBLE_CHAR) {
+                element.innerHTML = ElementFactoryService.INVISIBLE_CHAR;
                 element.setAttribute("data-empty", "true");
             } else {
-                if (element.innerHTML.startsWith("<br>")) {
-                    element.innerHTML = element.innerHTML.replace(/^<br>/, "");
+                if (element.innerHTML.startsWith(ElementFactoryService.INVISIBLE_CHAR)) {
+                    element.innerHTML = element.innerHTML.replace(ElementFactoryService.INVISIBLE_CHAR, "");
                 }
                 element.removeAttribute("data-empty");
             }

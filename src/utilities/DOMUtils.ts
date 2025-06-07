@@ -633,6 +633,8 @@ export class DOMUtils {
             return;
         }
 
+        const INVISIBLE_CHAR = "\u200B";
+
         const content = element.innerHTML;
         const selection = window.getSelection();
 
@@ -657,7 +659,7 @@ export class DOMUtils {
             }
         }
 
-        if (content === '<br>') {
+        if (content === '<br>' || content === INVISIBLE_CHAR) {
             return;
         }
 
