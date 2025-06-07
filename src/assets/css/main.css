@@ -308,20 +308,33 @@ p.johannes-content-element {
     pointer-events: none;
 }
 
+#johannesEditor h1[data-placeholder] {
+    position: relative;
+}
+
 #johannesEditor h1[data-placeholder]:empty:before,
 #johannesEditor h1[data-placeholder][data-empty="true"]:before {
     content: attr(data-placeholder);
     color: #84888d !important;
-    display: block;
+    position: absolute;
+    left: 0;
+    pointer-events: none;
 }
 
 #johannesEditor h1[data-placeholder]:focus:before {}
 
 
+#johannesEditor *[contenteditable="true"]:not(h1) {
+    position: relative;
+}
+
 #johannesEditor *[contenteditable="true"]:not(h1):empty:before,
 #johannesEditor *[contenteditable="true"]:not(h1)[data-empty="true"]:before {
     content: attr(data-placeholder);
     color: #84888acd;
+    position: absolute;
+    left: 0;
+    pointer-events: none;
     display: none;
 }
 
@@ -339,7 +352,15 @@ p.johannes-content-element {
 #johannesEditor *[contenteditable="true"]:not(h1)[data-placeholder][data-empty="true"]:focus:before {
     content: attr(data-placeholder);
     color: #84888acd !important;
+    position: absolute;
+    left: 0;
+    pointer-events: none;
     display: block;
+}
+
+.callout-text[data-placeholder],
+.code-block code[data-placeholder] {
+    position: relative;
 }
 
 .callout-text[data-placeholder]:empty:before,
@@ -347,13 +368,23 @@ p.johannes-content-element {
 .code-block code[data-placeholder]:empty:before,
 .code-block code[data-placeholder][data-empty="true"]:before {
     content: attr(data-placeholder) !important;
+    position: absolute;
+    left: 0;
+    pointer-events: none;
     display: block !important;
+}
+
+#johannesEditor li.div[contenteditable="true"] {
+    position: relative;
 }
 
 #johannesEditor li.div[contenteditable="true"]:empty:hover:before,
 #johannesEditor li.div[contenteditable="true"][data-empty="true"]:hover:before {
     content: attr(data-placeholder);
     color: #84888acd;
+    position: absolute;
+    left: 0;
+    pointer-events: none;
     display: block;
 }
 
