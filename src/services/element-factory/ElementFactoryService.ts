@@ -495,6 +495,8 @@ export class ElementFactoryService implements IElementFactoryService {
             }
         };
 
+        (container as any).renderPreview = renderPreview;
+
         renderPreview();
 
         const inputter = MathInputter.getInstance();

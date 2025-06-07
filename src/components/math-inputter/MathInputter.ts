@@ -128,7 +128,8 @@ export class MathInputter extends BaseUIComponent {
             const container = clickedOnElement.closest(`.${CommonClasses.ContentElement}`) as HTMLElement;
             if (container) {
                 this.focusStack.push(container);
-                this.setTarget(container, () => {});
+                const render = (container as any).renderPreview || (() => {});
+                this.setTarget(container, render);
                 if (this.isVisible && this.currentTarget === container) {
                     this.hide();
                 } else {
