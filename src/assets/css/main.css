@@ -1426,6 +1426,12 @@ pre code {
     margin-top: 0.5rem;
 }
 
+.math-done-button {
+    cursor: pointer;
+    align-self: flex-start;
+    margin-top: 0.5rem;
+}
+
 
 
 @keyframes shake {
