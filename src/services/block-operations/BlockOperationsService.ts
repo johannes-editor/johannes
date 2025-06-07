@@ -1266,6 +1266,11 @@ export class BlockOperationsService implements IBlockOperationsService {
 
         this.memento.saveState();
 
+        const moreOptionsList = block.querySelector('.media-more-option-select') as HTMLElement | null;
+        if (moreOptionsList && window.getComputedStyle(moreOptionsList).display !== 'none') {
+            EventEmitter.emitCloseElementEvent(moreOptionsList.id);
+        }
+
         const figure = block.querySelector('figure');
         if (figure) {
             if (figure.querySelector('.figure-content')) {
