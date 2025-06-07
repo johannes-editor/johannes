@@ -1289,9 +1289,7 @@ td::placeholder {
 .block-toolbar-wrapper {
     width: 0;
     height: 0;
-    position: absolute;
-    top: 0;
-    right: 0;
+    position: relative;
     overflow: visible;
     margin: 0;
     padding: 0;
@@ -1312,10 +1310,10 @@ td::placeholder {
     align-items: center;
     padding: 0;
     margin: 0;
-    gap: 10px;
-    padding: 5px;
-    padding-left: 10px;
-    padding-right: 0;
+    gap: 0.625rem;
+    padding: 0.375rem;
+    padding-left: 0.625rem;
+    padding-right: 0.625rem;
     transition: visibility 0.2s;
 
     /* Position the toolbar outside of the block so it doesn't overlap content */
