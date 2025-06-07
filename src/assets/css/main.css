@@ -67,6 +67,7 @@ figure figcaption {
     text-align: center;
     color: #84888d;
     margin-top: 0.25rem;
+    box-sizing: border-box;
 }
 
 .block-caption[data-placeholder]:empty:before {
@@ -78,6 +79,7 @@ figure figcaption {
     width: 100%;
     text-align: center;
     color: #84888d;
+    box-sizing: border-box;
 }
 
 /** CSS reset */
@@ -274,6 +276,7 @@ p.johannes-content-element {
 
 .block>*:not(.editor-only) {
     padding-left: 1.25rem;
+    box-sizing: border-box;
 }
 
 .block:hover .drag-handler {
