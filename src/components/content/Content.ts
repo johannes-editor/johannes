@@ -290,12 +290,13 @@ export class Content extends BaseUIComponent {
                             command: Commands.deleteBlockAndFocusOnPrevious,
                         }
                     }));
-                } else if (target.tagName === 'FIGCAPTION' && target.textContent?.trim() === '') {
+                } else if ((target.tagName === 'FIGCAPTION' || target.classList.contains('block-caption')) && target.textContent?.trim() === '') {
 
                     event.stopImmediatePropagation();
-                    const parentFigure = target.closest('figure');
+                    const parentFigure = target.tagName === 'FIGCAPTION' ? target.closest('figure') : null;
+                    const focusTarget = parentFigure?.querySelector('img, iframe, pre, div') as HTMLElement || target.previousElementSibling as HTMLElement;
                     target.remove();
-                    (parentFigure?.querySelector('img, iframe, pre, div') as HTMLElement)?.focus();
+                    focusTarget?.focus();
 
                 } else if (target.closest(".johannes-content-element") && target.textContent?.trim() === '') {
 
@@ -337,12 +338,13 @@ export class Content extends BaseUIComponent {
                             command: Commands.deleteBlockAndFocusOnNext,
                         }
                     }));
-                } else if (target.tagName === 'FIGCAPTION' && target.textContent?.trim() === '') {
+                } else if ((target.tagName === 'FIGCAPTION' || target.classList.contains('block-caption')) && target.textContent?.trim() === '') {
 
                     event.stopImmediatePropagation();
-                    const parentFigure = target.closest('figure');
+                    const parentFigure = target.tagName === 'FIGCAPTION' ? target.closest('figure') : null;
+                    const focusTarget = parentFigure?.querySelector('img, iframe, pre, div') as HTMLElement || target.previousElementSibling as HTMLElement;
                     target.remove();
-                    (parentFigure?.querySelector('img, iframe, pre, div') as HTMLElement)?.focus();
+                    focusTarget?.focus();
 
                 } else if (target.classList.contains('johannes-content-element') && target.textContent?.trim() === '') {
                     event.stopImmediatePropagation();

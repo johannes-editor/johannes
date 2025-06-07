@@ -1239,15 +1239,28 @@ export class BlockOperationsService implements IBlockOperationsService {
 
         const figure = block.querySelector('figure');
         if (figure) {
-            const existingCaption = figure.querySelector('figcaption');
-            if (existingCaption) {
-                existingCaption.remove();
+            if (figure.querySelector('.figure-content')) {
+                const existingCaption = figure.querySelector('figcaption');
+                if (existingCaption) {
+                    existingCaption.remove();
+                } else {
+                    const caption = document.createElement('figcaption');
+                    caption.setAttribute('data-placeholder', 'Type a caption');
+                    caption.setAttribute('contenteditable', 'true');
+                    caption.classList.add('editable', 'hide-turninto', 'hide-moreoptions', 'hide-inlineCode');
+                    figure.appendChild(caption);
+                }
             } else {
-                const caption = document.createElement('figcaption');
-                caption.setAttribute('data-placeholder', 'Type a caption');
-                caption.setAttribute('contenteditable', 'true');
-                caption.classList.add('editable', 'hide-turninto', 'hide-moreoptions', 'hide-inlineCode');
-                figure.appendChild(caption);
+                const next = figure.nextElementSibling;
+                if (next && next.classList.contains('block-caption')) {
+                    next.remove();
+                } else {
+                    const caption = document.createElement('div');
+                    caption.classList.add('block-caption', 'editable', 'focusable', 'hide-turninto', 'hide-moreoptions', 'hide-inlineCode');
+                    caption.setAttribute('data-placeholder', 'Type a caption');
+                    caption.setAttribute('contenteditable', 'true');
+                    figure.insertAdjacentElement('afterend', caption);
+                }
             }
 
             EventEmitter.emitDocChangedEvent();

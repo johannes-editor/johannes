@@ -61,10 +61,12 @@ figure figcaption[data-placeholder]:empty:before {
 }
 
 figure figcaption {
-    max-width: inherit;
-    width: fit-content;
-    display: inline-block;
+    max-width: 100%;
+    width: 100%;
+    display: block;
+    text-align: center;
     color: #84888d;
+    margin-top: 0.25rem;
 }
 
 .block-caption[data-placeholder]:empty:before {
