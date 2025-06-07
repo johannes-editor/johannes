@@ -1232,4 +1232,39 @@ export class BlockOperationsService implements IBlockOperationsService {
 
         EventEmitter.emitDocChangedEvent();
     }
+
+    toggleCaption(block: HTMLElement): void {
+
+        this.memento.saveState();
+
+        const figure = block.querySelector('figure');
+        if (figure) {
+            const existingCaption = figure.querySelector('figcaption');
+            if (existingCaption) {
+                existingCaption.remove();
+            } else {
+                const caption = document.createElement('figcaption');
+                caption.setAttribute('data-placeholder', 'Type a caption');
+                caption.setAttribute('contenteditable', 'true');
+                caption.classList.add('editable', 'hide-turninto', 'hide-moreoptions', 'hide-inlineCode');
+                figure.appendChild(caption);
+            }
+
+            EventEmitter.emitDocChangedEvent();
+            return;
+        }
+
+        const existing = block.querySelector('.block-caption');
+        if (existing) {
+            existing.remove();
+        } else {
+            const caption = document.createElement('div');
+            caption.classList.add('block-caption', 'editable', 'focusable', 'hide-turninto', 'hide-moreoptions', 'hide-inlineCode');
+            caption.setAttribute('data-placeholder', 'Type a caption');
+            caption.setAttribute('contenteditable', 'true');
+            block.appendChild(caption);
+        }
+
+        EventEmitter.emitDocChangedEvent();
+    }
 }

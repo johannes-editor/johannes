@@ -290,6 +290,13 @@ export class Content extends BaseUIComponent {
                             command: Commands.deleteBlockAndFocusOnPrevious,
                         }
                     }));
+                } else if (target.tagName === 'FIGCAPTION' && target.textContent?.trim() === '') {
+
+                    event.stopImmediatePropagation();
+                    const parentFigure = target.closest('figure');
+                    target.remove();
+                    (parentFigure?.querySelector('img, iframe, pre, div') as HTMLElement)?.focus();
+
                 } else if (target.closest(".johannes-content-element") && target.textContent?.trim() === '') {
 
                     event.stopImmediatePropagation();
@@ -330,6 +337,13 @@ export class Content extends BaseUIComponent {
                             command: Commands.deleteBlockAndFocusOnNext,
                         }
                     }));
+                } else if (target.tagName === 'FIGCAPTION' && target.textContent?.trim() === '') {
+
+                    event.stopImmediatePropagation();
+                    const parentFigure = target.closest('figure');
+                    target.remove();
+                    (parentFigure?.querySelector('img, iframe, pre, div') as HTMLElement)?.focus();
+
                 } else if (target.classList.contains('johannes-content-element') && target.textContent?.trim() === '') {
                     event.stopImmediatePropagation();
 

@@ -67,6 +67,17 @@ figure figcaption {
     color: #84888d;
 }
 
+.block-caption[data-placeholder]:empty:before {
+    content: attr(data-placeholder) !important;
+    display: inline-block !important;
+}
+
+.block-caption {
+    width: 100%;
+    text-align: center;
+    color: #84888d;
+}
+
 /** CSS reset */
 .button-reset {
     border: none;

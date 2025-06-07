@@ -52,5 +52,7 @@ export enum Commands {
 
 
 
-    changeCodeBlockLanguage = "changeCodeBlockLanguage"
+    changeCodeBlockLanguage = "changeCodeBlockLanguage",
+
+    toggleBlockCaption = "toggleBlockCaption"
 }
