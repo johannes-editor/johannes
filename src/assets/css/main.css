@@ -445,6 +445,7 @@ p {
     z-index: 999999;
     width: fit-content;
     background-color: white;
+    min-width: 16rem;
 }
 
 #mathInputter .math-input-shell {
