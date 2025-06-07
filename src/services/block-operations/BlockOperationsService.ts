@@ -693,6 +693,35 @@ export class BlockOperationsService implements IBlockOperationsService {
 
         this.memento.saveState();
 
+        const activeElement = document.activeElement as HTMLElement | null;
+
+        if (activeElement && (activeElement.tagName === 'FIGCAPTION' || activeElement.classList.contains('block-caption'))) {
+            const caption = activeElement;
+            const block = caption.closest('.block') as HTMLElement | null;
+
+            if (block) {
+                const { atEnd } = DOMUtils.getSelectionTextInfo(caption);
+
+                if (atEnd) {
+                    this.createDefaultBlock(block, "");
+                } else {
+                    const newParagraph = ElementFactoryService.blockParagraph();
+                    DOMUtils.insertAfter(newParagraph, block);
+
+                    const p = newParagraph.querySelector(`.${CommonClasses.ContentElement}`) as HTMLElement;
+                    const [, afterRange] = DOMUtils.splitContentAtCursorSelection(caption);
+                    const fragment = afterRange.cloneContents();
+                    p.appendChild(fragment);
+                    afterRange.deleteContents();
+                    DOMUtils.trimEmptyTextAndBrElements(p);
+                    DOMUtils.placeCursorAtStartOfEditableElement(p);
+                }
+
+                EventEmitter.emitDocChangedEvent();
+                return true;
+            }
+        }
+
         const contentType = DOMUtils.getContentTypeFromActiveElement();
 
         if (contentType == ContentTypes.Image) {
