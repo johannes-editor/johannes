@@ -1305,7 +1305,7 @@ td::placeholder {
     gap: 10px;
     padding: 5px;
     padding-left: 10px;
-    padding-right: 10px;
+    padding-right: 0;
     transition: visibility 0.2s;
 
     /* Position the toolbar outside of the block so it doesn't overlap content */
