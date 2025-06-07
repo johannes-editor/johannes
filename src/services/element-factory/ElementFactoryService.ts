@@ -514,6 +514,9 @@ export class ElementFactoryService implements IElementFactoryService {
             }
         });
 
+        // show input right after creation so user can type immediately
+        setTimeout(openInput, 0);
+
         return container;
     }
 

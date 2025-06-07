@@ -15,6 +15,15 @@ export class MathInputter extends BaseUIComponent {
     input!: HTMLDivElement;
     done!: HTMLButtonElement;
 
+    private ensureInputElements() {
+        if (!this.input) {
+            this.input = this.htmlElement.querySelector('.math-input') as HTMLDivElement;
+        }
+        if (!this.done) {
+            this.done = this.htmlElement.querySelector('button') as HTMLButtonElement;
+        }
+    }
+
     private static instance: MathInputter;
 
     private constructor() {
@@ -70,10 +79,12 @@ export class MathInputter extends BaseUIComponent {
     setTarget(target: HTMLElement, renderCallback: () => void) {
         this.currentTarget = target;
         this.renderCallback = renderCallback;
+        this.ensureInputElements();
         this.input.textContent = target.dataset.formula || "";
     }
 
     attachEvents(): void {
+        this.ensureInputElements();
         document.addEventListener(DefaultJSEvents.Keydown, this.handleKeydown.bind(this), true);
         document.addEventListener(DefaultJSEvents.Click, this.handleClick.bind(this));
 
@@ -134,6 +145,7 @@ export class MathInputter extends BaseUIComponent {
     }
 
     show(): void {
+        this.ensureInputElements();
         const lastFocused = this.focusStack.peek();
         if (lastFocused) {
             const rect = lastFocused.getBoundingClientRect();
