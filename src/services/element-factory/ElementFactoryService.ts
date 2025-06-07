@@ -4,6 +4,7 @@ import { Utils } from "@/utilities/Utils";
 import { Icons } from "@/common/Icons";
 import { ToolboxOptions } from "@/components/block-toolbox/ToolboxOptions";
 import { CommonClasses } from "@/common/CommonClasses";
+import { MathInputter } from "@/components/math-inputter/MathInputter";
 import hljs from 'highlight.js';
 import katex from 'katex';
 
@@ -472,68 +473,46 @@ export class ElementFactoryService implements IElementFactoryService {
         const placeholder = document.createElement('div');
         placeholder.classList.add('content-placeholder', CommonClasses.ShowMathInputOnClick);
 
-        const icon = this.createIcon(Icons.Formula);
-        const placeholderText = document.createElement('span');
-        placeholderText.innerText = 'Write a formula';
-
-        placeholder.appendChild(icon);
-        placeholder.appendChild(placeholderText);
-
-        const editWrapper = document.createElement('div');
-        editWrapper.classList.add('math-edit', CommonClasses.EditorOnly);
-
-        const input = document.createElement('div');
-        input.classList.add('math-input', 'focusable', 'editable');
-        input.contentEditable = 'true';
-        input.setAttribute('data-placeholder', "\\text{Formula}");
-        input.textContent = content || '';
-
-        const done = document.createElement('button');
-        done.classList.add('blue-button');
-        done.textContent = 'Done';
-
-        editWrapper.appendChild(input);
-        editWrapper.appendChild(done);
-
-        const render = document.createElement('div');
-        render.classList.add('math-render');
-
         container.appendChild(placeholder);
-        container.appendChild(editWrapper);
-        container.appendChild(render);
+        container.dataset.formula = content || '';
 
-        const renderFormula = () => {
-            try {
-                katex.render(input.textContent || '', render, { throwOnError: false });
-            } catch (e) {}
+        const renderPreview = () => {
+            const formula = container.dataset.formula || '';
+            placeholder.innerHTML = '';
+            if (formula) {
+                try {
+                    katex.render(formula, placeholder, { throwOnError: false });
+                } catch (e) {
+                    placeholder.textContent = formula;
+                }
+            } else {
+                const icon = this.createIcon(Icons.Formula);
+                const text = document.createElement('span');
+                text.innerText = 'Write a formula';
+                placeholder.appendChild(icon);
+                placeholder.appendChild(text);
+            }
         };
 
-        const showInput = () => {
-            container.classList.add('editing');
-            setTimeout(() => input.focus(), 0);
+        renderPreview();
+
+        const inputter = MathInputter.getInstance();
+
+        const openInput = () => {
+            inputter.setTarget(container, renderPreview);
+            if (inputter.isVisible) {
+                inputter.hide();
+            } else {
+                inputter.show();
+            }
         };
 
-        const hideInput = () => {
-            container.classList.remove('editing');
-        };
-
-        placeholder.addEventListener('click', showInput);
+        placeholder.addEventListener('click', openInput);
         container.addEventListener('click', (e) => {
-            if (e.target === container && !container.classList.contains('editing')) {
-                showInput();
+            if (e.target === container) {
+                openInput();
             }
         });
-        done.addEventListener('click', (e) => {
-            e.preventDefault();
-            hideInput();
-        });
-
-        input.addEventListener('input', renderFormula);
-        renderFormula();
-
-        if (!content) {
-            showInput();
-        }
 
         return container;
     }
