@@ -268,6 +268,10 @@ p.johannes-content-element {
     max-width: 100%;
 }
 
+.block.with-caption {
+    flex-direction: column;
+}
+
 .block>*:not(.editor-only) {
     padding-left: 1.25rem;
 }

@@ -1263,6 +1263,12 @@ export class BlockOperationsService implements IBlockOperationsService {
                 }
             }
 
+            if (block.querySelector('.block-caption')) {
+                block.classList.add('with-caption');
+            } else {
+                block.classList.remove('with-caption');
+            }
+
             EventEmitter.emitDocChangedEvent();
             return;
         }
@@ -1276,6 +1282,12 @@ export class BlockOperationsService implements IBlockOperationsService {
             caption.setAttribute('data-placeholder', 'Type a caption');
             caption.setAttribute('contenteditable', 'true');
             block.appendChild(caption);
+        }
+
+        if (block.querySelector('.block-caption')) {
+            block.classList.add('with-caption');
+        } else {
+            block.classList.remove('with-caption');
         }
 
         EventEmitter.emitDocChangedEvent();
