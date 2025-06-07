@@ -15,6 +15,19 @@ export class Utils {
         }).join("");
     }
 
+    static debounce<T extends (...args: any[]) => void>(func: T, wait: number) {
+        let timeout: ReturnType<typeof setTimeout> | null = null;
+        return (...args: Parameters<T>) => {
+            if (timeout) {
+                clearTimeout(timeout);
+            }
+            timeout = setTimeout(() => {
+                timeout = null;
+                func(...args);
+            }, wait);
+        };
+    }
+
     static isEventFromContentWrapper(event: Event): boolean {
         const target = event.target;
         const contentWrapper = document.querySelector('#johannesEditor .content-wrapper');
