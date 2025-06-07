@@ -13,5 +13,6 @@ export enum ContentTypes {
     Table = "table",
     Image = "image",
     Script = "script",
+    Math = "math",
     Iframe = "iframe"
 }

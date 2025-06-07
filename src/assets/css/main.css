@@ -1411,6 +1411,19 @@ pre code {
 
 }
 
+.math-block {
+    display: flex;
+    flex-direction: column;
+}
+
+.math-input {
+    min-height: 1.2em;
+}
+
+.math-render {
+    margin-top: 0.5rem;
+}
+
 
 
 @keyframes shake {

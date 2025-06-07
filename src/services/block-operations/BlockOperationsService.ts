@@ -496,6 +496,16 @@ export class BlockOperationsService implements IBlockOperationsService {
                 break;
             }
 
+            case ElementFactoryService.ELEMENT_TYPES.MATH: {
+                newContentBlock = this.elementFactoryService.create(ElementFactoryService.ELEMENT_TYPES.MATH);
+                const input = newContentBlock.querySelector('.math-input');
+                if (input) {
+                    (input as HTMLElement).textContent = content || '';
+                    (input as HTMLElement).dispatchEvent(new Event('input'));
+                }
+                break;
+            }
+
             case ElementFactoryService.ELEMENT_TYPES.QUOTE: {
                 newContentBlock = this.elementFactoryService.create(ElementFactoryService.ELEMENT_TYPES.QUOTE);
 

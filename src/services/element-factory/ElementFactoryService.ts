@@ -5,6 +5,7 @@ import { Icons } from "@/common/Icons";
 import { ToolboxOptions } from "@/components/block-toolbox/ToolboxOptions";
 import { CommonClasses } from "@/common/CommonClasses";
 import hljs from 'highlight.js';
+import katex from 'katex';
 
 interface ElementCreator {
     (content: string | null): HTMLElement;
@@ -26,6 +27,7 @@ export class ElementFactoryService implements IElementFactoryService {
         BLOCK_HEADER_5: "block-h5",
         BLOCK_HEADER_6: "block-h6",
         BLOCK_CODE: "block-code",
+        BLOCK_MATH: "block-math",
         BLOCK_PRE: "block-pre",
         BLOCK_BLOCKQUOTE: "block-blockquote",
 
@@ -36,6 +38,7 @@ export class ElementFactoryService implements IElementFactoryService {
         CHECKBOX_ITEM: "checkboxItem",
         LIST_ITEM: "listItem",
         CODE: "code",
+        MATH: "math",
         QUOTE: "blockquote",
         BULLETED_LIST: "ul",
         NUMBERED_LIST: "ol",
@@ -75,6 +78,7 @@ export class ElementFactoryService implements IElementFactoryService {
         this.register(ElementFactoryService.ELEMENT_TYPES.BLOCK_HEADER_5, ElementFactoryService.blockHeadingCreator(5));
         this.register(ElementFactoryService.ELEMENT_TYPES.BLOCK_HEADER_6, ElementFactoryService.blockHeadingCreator(6));
         this.register(ElementFactoryService.ELEMENT_TYPES.BLOCK_CODE, ElementFactoryService.blockCodeCreator());
+        this.register(ElementFactoryService.ELEMENT_TYPES.BLOCK_MATH, ElementFactoryService.blockMathCreator());
         this.register(ElementFactoryService.ELEMENT_TYPES.BLOCK_PRE, ElementFactoryService.blockCodeCreator());
         this.register(ElementFactoryService.ELEMENT_TYPES.BLOCK_BLOCKQUOTE, ElementFactoryService.blockBlockquoteCreator());
         this.register(ElementFactoryService.ELEMENT_TYPES.BLOCK_BULLETED_LIST, ElementFactoryService.blockUlCreator());
@@ -83,6 +87,7 @@ export class ElementFactoryService implements IElementFactoryService {
         this.register(ElementFactoryService.ELEMENT_TYPES.CHECKBOX_ITEM, ElementFactoryService.checkboxItemCreator());
         this.register(ElementFactoryService.ELEMENT_TYPES.LIST_ITEM, ElementFactoryService.listItemCreator());
         this.register(ElementFactoryService.ELEMENT_TYPES.CODE, ElementFactoryService.codeCreator());
+        this.register(ElementFactoryService.ELEMENT_TYPES.MATH, ElementFactoryService.mathCreator());
         this.register(ElementFactoryService.ELEMENT_TYPES.QUOTE, ElementFactoryService.quoteCreator());
         this.register(ElementFactoryService.ELEMENT_TYPES.CHECK_LIST, ElementFactoryService.checkListCreator());
         this.register(ElementFactoryService.ELEMENT_TYPES.BULLETED_LIST, ElementFactoryService.bulletedListCreator());
@@ -155,6 +160,13 @@ export class ElementFactoryService implements IElementFactoryService {
 
     }
 
+    private static blockMathCreator(): ElementCreator {
+        return content => {
+            return ElementFactoryService.blockMath(content || "");
+        };
+
+    }
+
     private static blockBlockquoteCreator(): ElementCreator {
         return content => {
             return ElementFactoryService.blockBlockquote(content || "");
@@ -211,6 +223,12 @@ export class ElementFactoryService implements IElementFactoryService {
     private static codeCreator(): ElementCreator {
         return content => {
             return ElementFactoryService.code(content || "");
+        };
+    }
+
+    private static mathCreator(): ElementCreator {
+        return content => {
+            return ElementFactoryService.math(content || "");
         };
     }
 
@@ -440,6 +458,35 @@ export class ElementFactoryService implements IElementFactoryService {
         return container;
     }
 
+    private static math(content: string): HTMLElement {
+        const container = document.createElement('div');
+        container.classList.add("johannes-content-element", "math-block", "swittable", ToolboxOptions.IncludeBlockToolbarClass, ToolboxOptions.ExtraOptionsClass);
+        container.setAttribute('data-content-type', ContentTypes.Math);
+
+        const input = document.createElement('div');
+        input.classList.add('math-input', 'focusable', 'editable');
+        input.contentEditable = 'true';
+        input.setAttribute('data-placeholder', "\\text{Formula}");
+        input.textContent = content || "";
+
+        const render = document.createElement('div');
+        render.classList.add('math-render');
+
+        container.appendChild(input);
+        container.appendChild(render);
+
+        const renderFormula = () => {
+            try {
+                katex.render(input.textContent || '', render, { throwOnError: false });
+            } catch (e) {}
+        };
+
+        input.addEventListener('input', renderFormula);
+        renderFormula();
+
+        return container;
+    }
+
     private static quote(content: string): HTMLElement {
 
         const contentElement = document.createElement("div");
@@ -588,6 +635,18 @@ export class ElementFactoryService implements IElementFactoryService {
     static blockCode(content: string) {
         let newDiv = document.createElement('div');
         let newElement = ElementFactoryService.code(content);
+
+        newDiv.id = `b-${Utils.generateUniqueId()}`;
+        newDiv.appendChild(newElement);
+        newDiv.classList.add('block');
+        newDiv.classList.add('deletable');
+
+        return newDiv;
+    }
+
+    static blockMath(content: string) {
+        let newDiv = document.createElement('div');
+        let newElement = ElementFactoryService.math(content);
 
         newDiv.id = `b-${Utils.generateUniqueId()}`;
         newDiv.appendChild(newElement);
