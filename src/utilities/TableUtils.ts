@@ -16,7 +16,7 @@ export class TableUtils {
             cell.contentEditable = "true";
             cell.setAttribute("data-placeholder", "Enter text");
             cell.classList.add("editable");
-            ElementFactoryService.initEditableContent(cell, null);
+            ElementFactoryService.initEditableContent(cell, ElementFactoryService.INVISIBLE_CHAR);
             affectedCells.push(cell);
         }
 
@@ -34,7 +34,7 @@ export class TableUtils {
             cell.contentEditable = "true";
             cell.setAttribute("data-placeholder", "cell");
             cell.classList.add("editable");
-            ElementFactoryService.initEditableContent(cell, null);
+            ElementFactoryService.initEditableContent(cell, ElementFactoryService.INVISIBLE_CHAR);
             affectedCells.push(cell);
         }
 

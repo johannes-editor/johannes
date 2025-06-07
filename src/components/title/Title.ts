@@ -19,7 +19,7 @@ export class Title extends BaseUIComponent {
         const h1 = document.createElement("h1");
         h1.setAttribute("contentEditable", "true");
         h1.setAttribute("data-placeholder", "Untitled");
-        ElementFactoryService.initEditableContent(h1, this.props.value || null);
+        ElementFactoryService.initEditableContent(h1, this.props.value || ElementFactoryService.INVISIBLE_CHAR);
 
 
         htmlElement.appendChild(h1);

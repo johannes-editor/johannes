@@ -9,7 +9,7 @@ import hljs from 'highlight.js';
 import katex from 'katex';
 
 interface ElementCreator {
-    (content: string | null): HTMLElement;
+    (content: string): HTMLElement;
 }
 
 export class ElementFactoryService implements IElementFactoryService {
@@ -404,7 +404,7 @@ export class ElementFactoryService implements IElementFactoryService {
     }
 
 
-    static paragraph(content: string | null = null): HTMLElement {
+    static paragraph(content: string = ElementFactoryService.INVISIBLE_CHAR): HTMLElement {
         const p = document.createElement('p');
 
         p.contentEditable = "true";
@@ -417,7 +417,7 @@ export class ElementFactoryService implements IElementFactoryService {
         return p;
     }
 
-    private static heading(level: number, content: string | null = null): HTMLElement {
+    private static heading(level: number, content: string = ElementFactoryService.INVISIBLE_CHAR): HTMLElement {
         const h = document.createElement(`h${level}`);
 
         h.contentEditable = "true";
@@ -562,7 +562,7 @@ export class ElementFactoryService implements IElementFactoryService {
         return element;
     }
 
-    private static checkboxItem(content: string): HTMLElement {
+    private static checkboxItem(content: string = ElementFactoryService.INVISIBLE_CHAR): HTMLElement {
 
         const id = Utils.generateUniqueId();
 
@@ -587,7 +587,7 @@ export class ElementFactoryService implements IElementFactoryService {
         return element;
     }
 
-    private static listItem_2(content: string | null = null): HTMLElement {
+    private static listItem_2(content: string = ElementFactoryService.INVISIBLE_CHAR): HTMLElement {
 
         let initialItem = document.createElement("li");
 
@@ -607,7 +607,7 @@ export class ElementFactoryService implements IElementFactoryService {
     }
 
 
-    static blockParagraph(content: string | null = null) {
+    static blockParagraph(content: string = ElementFactoryService.INVISIBLE_CHAR) {
         let newDiv = document.createElement('div');
         let newElement = ElementFactoryService.paragraph(content);
 
@@ -619,7 +619,7 @@ export class ElementFactoryService implements IElementFactoryService {
         return newDiv;
     }
 
-    static blockSeparator(content: string | null = null) {
+    static blockSeparator(content: string = "") {
         let newDiv = document.createElement('div');
         let newElement = ElementFactoryService.separator();
 
@@ -648,7 +648,7 @@ export class ElementFactoryService implements IElementFactoryService {
 
 
 
-    static blockHeading(level: number, content: string | null = null) {
+    static blockHeading(level: number, content: string = ElementFactoryService.INVISIBLE_CHAR) {
         let newDiv = document.createElement('div');
         let newElement = ElementFactoryService.heading(level, content);
 
@@ -746,10 +746,10 @@ export class ElementFactoryService implements IElementFactoryService {
         return element;
     }
 
-    private static readonly INVISIBLE_CHAR = "\u200B";
+    static readonly INVISIBLE_CHAR = "\u200B";
 
-    static initEditableContent(element: HTMLElement, content: string | null): void {
-        if (content && content !== "") {
+    static initEditableContent(element: HTMLElement, content: string = ElementFactoryService.INVISIBLE_CHAR): void {
+        if (content && content !== ElementFactoryService.INVISIBLE_CHAR) {
             element.textContent = content;
         } else {
             element.innerHTML = ElementFactoryService.INVISIBLE_CHAR;
