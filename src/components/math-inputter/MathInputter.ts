@@ -125,15 +125,15 @@ export class MathInputter extends BaseUIComponent {
         if (clickedOnElement) {
             event.preventDefault();
             event.stopImmediatePropagation();
-            this.focusStack.push(clickedOnElement);
-            if (this.isVisible && this.currentTarget === clickedOnElement.closest(`.${CommonClasses.ContentElement}`)) {
-                this.hide();
-            } else {
-                const container = clickedOnElement.closest(`.${CommonClasses.ContentElement}`) as HTMLElement;
-                if (container) {
-                    this.setTarget(container, () => {});
+            const container = clickedOnElement.closest(`.${CommonClasses.ContentElement}`) as HTMLElement;
+            if (container) {
+                this.focusStack.push(container);
+                this.setTarget(container, () => {});
+                if (this.isVisible && this.currentTarget === container) {
+                    this.hide();
+                } else {
+                    this.show();
                 }
-                this.show();
             }
         }
     }
@@ -146,15 +146,16 @@ export class MathInputter extends BaseUIComponent {
 
     show(): void {
         this.ensureInputElements();
+        super.show();
         const lastFocused = this.focusStack.peek();
         if (lastFocused) {
             const rect = lastFocused.getBoundingClientRect();
-            const left = rect.left + window.scrollX;
+            const targetMidpoint = rect.left + window.scrollX + rect.width / 2;
+            const left = targetMidpoint - this.htmlElement.offsetWidth / 2;
             const top = rect.bottom + window.scrollY + 10;
             this.htmlElement.style.left = `${left}px`;
             this.htmlElement.style.top = `${top}px`;
         }
-        super.show();
         setTimeout(() => this.input.focus(), 0);
     }
 }

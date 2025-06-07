@@ -466,7 +466,8 @@ export class ElementFactoryService implements IElementFactoryService {
             "math-block",
             "swittable",
             ToolboxOptions.IncludeBlockToolbarClass,
-            ToolboxOptions.ExtraOptionsClass
+            ToolboxOptions.ExtraOptionsClass,
+            CommonClasses.ShowMathInputOnClick
         );
         container.setAttribute('data-content-type', ContentTypes.Math);
 
@@ -498,24 +499,14 @@ export class ElementFactoryService implements IElementFactoryService {
 
         const inputter = MathInputter.getInstance();
 
-        const openInput = () => {
+        const showAfterCreate = () => {
             inputter.setTarget(container, renderPreview);
-            if (inputter.isVisible) {
-                inputter.hide();
-            } else {
-                inputter.show();
-            }
+            inputter.focusStack.push(container);
+            inputter.show();
         };
 
-        placeholder.addEventListener('click', openInput);
-        container.addEventListener('click', (e) => {
-            if (e.target === container) {
-                openInput();
-            }
-        });
-
         // show input right after creation so user can type immediately
-        setTimeout(openInput, 0);
+        setTimeout(showAfterCreate, 0);
 
         return container;
     }
