@@ -1279,13 +1279,13 @@ td::placeholder {
 .block-toolbar-wrapper {
     width: 0;
     height: 0;
-    position: relative;
+    position: absolute;
+    top: 0;
+    right: 0;
     overflow: visible;
     margin: 0;
     padding: 0;
-    display: contents;
     display: block;
-
 }
 
 .block-toolbar {
