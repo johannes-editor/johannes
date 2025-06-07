@@ -319,6 +319,10 @@ export class Toolbar extends FloatingToolbarBase {
             this.initialRect = null;
             return;
         } else if (hasContent && !isSelecting) {
+
+            this.hideTurnInto();
+            this.hideMoreOptions();
+
             if (!this.isVisible) {
 
                 if (!this.canShowFloatingToolbar()) {
@@ -433,9 +437,9 @@ export class Toolbar extends FloatingToolbarBase {
             return;
         };
 
-        this.changeToolbarPositionToBeClosedToSelection();
         this.hideTurnInto();
         this.hideMoreOptions();
+        this.changeToolbarPositionToBeClosedToSelection();
 
     }
 
