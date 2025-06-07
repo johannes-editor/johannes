@@ -99,6 +99,7 @@ export class Memento implements IMemento {
         }
 
         this.debouncedSaveState();
+        DOMUtils.removeEmptyListItems();
       }
     });
   }
