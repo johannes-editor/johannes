@@ -6,6 +6,7 @@ import { ToolboxOptions } from "@/components/block-toolbox/ToolboxOptions";
 import { CommonClasses } from "@/common/CommonClasses";
 import hljs from 'highlight.js';
 import katex from 'katex';
+import { DOMUtils } from "@/utilities/DOMUtils";
 
 interface ElementCreator {
     (content: string | null): HTMLElement;
@@ -460,19 +461,40 @@ export class ElementFactoryService implements IElementFactoryService {
 
     private static math(content: string): HTMLElement {
         const container = document.createElement('div');
-        container.classList.add("johannes-content-element", "math-block", "swittable", ToolboxOptions.IncludeBlockToolbarClass, ToolboxOptions.ExtraOptionsClass);
+        container.classList.add(
+            "johannes-content-element",
+            "math-block",
+            "swittable",
+            ToolboxOptions.IncludeBlockToolbarClass,
+            ToolboxOptions.ExtraOptionsClass
+        );
         container.setAttribute('data-content-type', ContentTypes.Math);
+
+        const placeholder = document.createElement('div');
+        placeholder.classList.add('content-placeholder');
+        const placeholderIcon = this.createIcon('icon-wordpress-equation-mark');
+        const placeholderText = document.createElement('span');
+        placeholderText.classList.add('no-selection');
+        placeholderText.innerText = 'Formula';
+        placeholder.appendChild(placeholderIcon);
+        placeholder.appendChild(placeholderText);
 
         const input = document.createElement('div');
         input.classList.add('math-input', 'focusable', 'editable');
         input.contentEditable = 'true';
         input.setAttribute('data-placeholder', "\\text{Formula}");
-        input.textContent = content || "";
+        input.textContent = content || '';
+
+        const doneButton = document.createElement('button');
+        doneButton.classList.add('button-reset', 'math-done-button');
+        doneButton.textContent = 'Done';
 
         const render = document.createElement('div');
         render.classList.add('math-render');
 
+        container.appendChild(placeholder);
         container.appendChild(input);
+        container.appendChild(doneButton);
         container.appendChild(render);
 
         const renderFormula = () => {
@@ -481,8 +503,59 @@ export class ElementFactoryService implements IElementFactoryService {
             } catch (e) {}
         };
 
+        const openEditor = () => {
+            placeholder.style.display = 'none';
+            input.style.display = 'block';
+            doneButton.style.display = 'inline-block';
+            render.style.display = 'block';
+            input.focus();
+            DOMUtils.placeCursorAtEndOfEditableElement(input);
+        };
+
+        const closeEditor = () => {
+            input.style.display = 'none';
+            doneButton.style.display = 'none';
+            render.style.display = 'block';
+            if (input.textContent && input.textContent.trim() !== '') {
+                placeholder.style.display = 'none';
+            } else {
+                placeholder.style.display = 'block';
+            }
+            renderFormula();
+        };
+
+        placeholder.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openEditor();
+        });
+
+        container.addEventListener('click', () => {
+            if (input.style.display === 'none') {
+                openEditor();
+            }
+        });
+
+        doneButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeEditor();
+        });
+
         input.addEventListener('input', renderFormula);
-        renderFormula();
+
+        if (content && content.trim() !== '') {
+            placeholder.style.display = 'none';
+            input.style.display = 'none';
+            doneButton.style.display = 'none';
+            render.style.display = 'block';
+            renderFormula();
+        } else {
+            input.style.display = 'none';
+            doneButton.style.display = 'none';
+            render.style.display = 'none';
+            placeholder.style.display = 'block';
+            // open editor automatically when creating new block
+            setTimeout(openEditor);
+        }
 
         return container;
     }
