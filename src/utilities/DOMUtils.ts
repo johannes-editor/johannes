@@ -629,6 +629,10 @@ export class DOMUtils {
     }
 
     static sanitizeContentEditable(element: HTMLElement): void {
+        if (element.getAttribute("data-empty") === "true") {
+            return;
+        }
+
         const content = element.innerHTML;
         const selection = window.getSelection();
 
@@ -651,6 +655,10 @@ export class DOMUtils {
                 shouldRestoreCaret = true;
                 caretPos = element.textContent?.length ?? 0;
             }
+        }
+
+        if (content === '<br>') {
+            return;
         }
 
         if (content.endsWith('<br>')) {

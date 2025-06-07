@@ -1,5 +1,6 @@
 import { BaseUIComponent } from "../common/BaseUIComponent";
 import { FloatingToolbarCssClass } from "../floating-toolbar/base/FloatingToolbarCssClass";
+import { ElementFactoryService } from "../../services/element-factory/ElementFactoryService";
 
 export class Title extends BaseUIComponent {
 
@@ -18,10 +19,8 @@ export class Title extends BaseUIComponent {
         const h1 = document.createElement("h1");
         h1.setAttribute("contentEditable", "true");
         h1.setAttribute("data-placeholder", "Untitled");
+        ElementFactoryService.initEditableContent(h1, this.props.value || null);
 
-        if (this.props.value) {
-            h1.textContent = this.props.value;
-        }
 
         htmlElement.appendChild(h1);
 

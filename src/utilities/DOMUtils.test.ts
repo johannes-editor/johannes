@@ -585,6 +585,13 @@ describe("DOMUtils.sanitizeContentEditable", () => {
 
         window.getSelection = originalGetSelection;
     });
+
+    test("should keep <br> when element is empty and marked", () => {
+        editable.innerHTML = "<br>";
+        editable.setAttribute("data-empty", "true");
+        expect(() => DOMUtils.sanitizeContentEditable(editable)).not.toThrow();
+        expect(editable.innerHTML).toBe("<br>");
+    });
 });
 
 

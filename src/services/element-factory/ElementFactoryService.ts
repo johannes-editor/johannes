@@ -377,6 +377,7 @@ export class ElementFactoryService implements IElementFactoryService {
             textArea.setAttribute("data-placeholder", "Type something...");
             textArea.contentEditable = "true";
             textArea.classList.add("callout-text", "editable", "focusable");
+            ElementFactoryService.initEditableContent(textArea, content);
 
             calloutWrapper.appendChild(textArea);
             johannesCallout.appendChild(calloutWrapper);
@@ -406,11 +407,12 @@ export class ElementFactoryService implements IElementFactoryService {
     static paragraph(content: string | null = null): HTMLElement {
         const p = document.createElement('p');
 
-        p.innerText = content || "";
         p.contentEditable = "true";
         p.setAttribute('data-content-type', ContentTypes.Paragraph);
         p.classList.add("johannes-content-element", "swittable", "focusable", "key-trigger", "editable");
         p.setAttribute('data-placeholder', 'Start typing...');
+
+        ElementFactoryService.initEditableContent(p, content);
 
         return p;
     }
@@ -418,11 +420,12 @@ export class ElementFactoryService implements IElementFactoryService {
     private static heading(level: number, content: string | null = null): HTMLElement {
         const h = document.createElement(`h${level}`);
 
-        h.innerText = content || "";
         h.contentEditable = "true";
         h.setAttribute('data-content-type', `h${level}`);
         h.classList.add("johannes-content-element", "swittable", "focusable", "focus", "key-trigger", "editable");
         h.setAttribute('data-placeholder', `Heading ${level}`);
+
+        ElementFactoryService.initEditableContent(h, content);
 
         return h;
     }
@@ -440,8 +443,8 @@ export class ElementFactoryService implements IElementFactoryService {
         const code = document.createElement('code');
         code.contentEditable = "true";
         code.setAttribute("data-placeholder", "/* Code snippet */");
-        code.textContent = content || "";
         code.classList.add('johannes-code', "focusable", "hljs", "language-plaintext", "editable");
+        ElementFactoryService.initEditableContent(code, content);
         code.setAttribute("spellCheck", "false");
 
         pre.appendChild(code);
@@ -520,9 +523,9 @@ export class ElementFactoryService implements IElementFactoryService {
 
         const blockquote = document.createElement("blockquote");
         blockquote.classList.add("focusable", "editable");
-        blockquote.textContent = content || "";
         blockquote.contentEditable = "true";
         blockquote.setAttribute("data-placeholder", ElementFactoryService.getRandomQuote());
+        ElementFactoryService.initEditableContent(blockquote, content);
 
         contentElement.appendChild(blockquote);
 
@@ -571,9 +574,9 @@ export class ElementFactoryService implements IElementFactoryService {
         checkbox.setAttribute('type', 'checkbox');
 
         let span = document.createElement('div');
-        span.textContent = content;
         span.setAttribute('data-placeholder', 'To-do');
         span.contentEditable = "true";
+        ElementFactoryService.initEditableContent(span, content);
         span.setAttribute("for", id);
 
         span.classList.add("focusable", "editable", "focus");
@@ -595,11 +598,10 @@ export class ElementFactoryService implements IElementFactoryService {
         div.classList.add("focusable", "editable", "focus", "key-trigger");
         div.contentEditable = "true";
         div.setAttribute('data-placeholder', 'Item');
+        ElementFactoryService.initEditableContent(div, content);
 
         initialItem.appendChild(div);
 
-
-        div.innerText = content || "";
 
         return initialItem;
     }
@@ -742,5 +744,26 @@ export class ElementFactoryService implements IElementFactoryService {
         element.innerHTML = `<svg width="1.375rem" height="1.375rem" fill="currentColor"><use href="#${iconId}"></use></svg>`;
 
         return element;
+    }
+
+    static initEditableContent(element: HTMLElement, content: string | null): void {
+        if (content && content !== "") {
+            element.textContent = content;
+        } else {
+            element.innerHTML = "<br>";
+            element.setAttribute("data-empty", "true");
+        }
+
+        element.addEventListener("input", () => {
+            if (element.textContent === "") {
+                element.innerHTML = "<br>";
+                element.setAttribute("data-empty", "true");
+            } else {
+                if (element.innerHTML.startsWith("<br>")) {
+                    element.innerHTML = element.innerHTML.replace(/^<br>/, "");
+                }
+                element.removeAttribute("data-empty");
+            }
+        });
     }
 }
