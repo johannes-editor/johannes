@@ -432,7 +432,7 @@ export class ElementFactoryService implements IElementFactoryService {
         container.classList.add("johannes-content-element", "ignore-events");
 
         const codeBlock = document.createElement("div");
-        codeBlock.classList.add("code-block", "ignore-quick-menu", "ignore-text-floating-toolbar");
+        codeBlock.classList.add("code-block", "ignore-quick-menu", CommonClasses.IgnoreTextFloatingToolbar);
 
         const pre = document.createElement('pre');
         pre.classList.add(ToolboxOptions.IncludeBlockToolbarClass, ToolboxOptions.LanguageSelectionToolClass, ToolboxOptions.ExtraOptionsClass);

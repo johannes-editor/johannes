@@ -10,7 +10,7 @@ import { ButtonIDs } from "@/core/ButtonIDs";
 import { KeyboardKeys } from "@/common/KeyboardKeys";
 import { Utils } from "@/utilities/Utils";
 import { FloatingToolbarCssClass } from "../base/FloatingToolbarCssClass";
-import { CommonCssClass } from "@/components/common/CommonCssClass";
+import { CommonClasses } from "@/common/CommonClasses";
 
 /**
  * Floating toolbar component for text context operations.
@@ -134,7 +134,7 @@ export class Toolbar extends FloatingToolbarBase {
         if (!selection.rangeCount) return;
 
         const range = selection.getRangeAt(0);
-        const blockElements = range.cloneContents().querySelectorAll(".".concat(CommonCssClass.Block ));
+        const blockElements = range.cloneContents().querySelectorAll(".".concat(CommonClasses.Block ));
 
         if (!this.moreTextOptions) {
             this.moreTextOptions = document.querySelector("#moreTextOptionButton");
@@ -429,7 +429,7 @@ export class Toolbar extends FloatingToolbarBase {
             return;
         }
 
-        if (DOMUtils.findClosestAncestorOfActiveElementByClass("title")) {
+        if (DOMUtils.findClosestAncestorOfActiveElementByClass(CommonClasses.IgnoreTextFloatingToolbar)) {
             return;
         };
 

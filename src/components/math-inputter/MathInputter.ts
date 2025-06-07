@@ -47,7 +47,7 @@ export class MathInputter extends BaseUIComponent {
     init(): HTMLElement {
         const htmlElement = document.createElement("div");
         htmlElement.id = this.props.id;
-        htmlElement.classList.add("dependent-box", "soft-box-shadow");
+        htmlElement.classList.add("dependent-box", "soft-box-shadow", CommonClasses.IgnoreTextFloatingToolbar);
         htmlElement.style.position = "absolute";
         htmlElement.style.display = "none";
         htmlElement.style.zIndex = ZIndex.ExtremelyImportant;

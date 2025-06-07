@@ -36,5 +36,6 @@ export enum CommonClasses {
 
     ShowMathInputOnClick = "show-math-input-on-click",
 
-    BlockToolbarWrapper = "block-toolbar-wrapper"
+    BlockToolbarWrapper = "block-toolbar-wrapper",
+    IgnoreTextFloatingToolbar = "ignore-text-floating-toolbar"
 }
