@@ -607,6 +607,13 @@ describe("DOMUtils.trimEmptyTextAndBrElements", () => {
         DOMUtils.trimEmptyTextAndBrElements(div);
         expect(div.innerHTML).toBe("Hello");
     });
+
+    test("should replace empty text node with <br>", () => {
+        const div = document.createElement("div");
+        div.appendChild(document.createTextNode(""));
+        DOMUtils.trimEmptyTextAndBrElements(div);
+        expect(div.innerHTML).toBe("<br>");
+    });
 });
 
 describe("DOMUtils.rearrangeContentAfterSplit", () => {

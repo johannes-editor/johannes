@@ -168,6 +168,11 @@ export class DOMUtils {
 
         if (!element.hasChildNodes()) {
             element.appendChild(document.createElement('br'));
+        } else if (element.childNodes.length === 1 && isEmptyTextOrBr(element.firstChild!)) {
+            if (element.firstChild!.nodeType === Node.TEXT_NODE) {
+                element.removeChild(element.firstChild!);
+                element.appendChild(document.createElement('br'));
+            }
         }
     }
 
