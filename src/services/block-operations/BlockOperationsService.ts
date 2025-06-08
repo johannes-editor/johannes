@@ -451,48 +451,58 @@ export class BlockOperationsService implements IBlockOperationsService {
 
             case ElementFactoryService.ELEMENT_TYPES.HEADER_1: {
                 newContentBlock = this.elementFactoryService.create(ElementFactoryService.ELEMENT_TYPES.HEADER_1);
-                newContentBlock.innerText = content;
+                if (content) {
+                    newContentBlock.textContent = content;
+                }
                 break;
             }
 
             case ElementFactoryService.ELEMENT_TYPES.HEADER_2: {
                 newContentBlock = this.elementFactoryService.create(ElementFactoryService.ELEMENT_TYPES.HEADER_2);
-                newContentBlock.innerText = content;
+                if (content) {
+                    newContentBlock.textContent = content;
+                }
                 break;
             }
 
             case ElementFactoryService.ELEMENT_TYPES.HEADER_3: {
                 newContentBlock = this.elementFactoryService.create(ElementFactoryService.ELEMENT_TYPES.HEADER_3);
-                newContentBlock.innerText = content;
+                if (content) {
+                    newContentBlock.textContent = content;
+                }
                 break;
             }
 
             case ElementFactoryService.ELEMENT_TYPES.HEADER_4: {
                 newContentBlock = this.elementFactoryService.create(ElementFactoryService.ELEMENT_TYPES.HEADER_4);
-                newContentBlock.innerText = content;
+                if (content) {
+                    newContentBlock.textContent = content;
+                }
                 break;
             }
 
             case ElementFactoryService.ELEMENT_TYPES.HEADER_5: {
                 newContentBlock = this.elementFactoryService.create(ElementFactoryService.ELEMENT_TYPES.HEADER_5);
-                newContentBlock.innerText = content;
+                if (content) {
+                    newContentBlock.textContent = content;
+                }
                 break;
             }
 
             case ElementFactoryService.ELEMENT_TYPES.HEADER_6: {
                 newContentBlock = this.elementFactoryService.create(ElementFactoryService.ELEMENT_TYPES.HEADER_6);
-                newContentBlock.innerText = content;
+                if (content) {
+                    newContentBlock.textContent = content;
+                }
                 break;
             }
 
             case ElementFactoryService.ELEMENT_TYPES.CODE: {
                 newContentBlock = this.elementFactoryService.create(ElementFactoryService.ELEMENT_TYPES.CODE);
                 const code = newContentBlock.querySelector("code");
-
-                if (code) {
-                    code.innerText = content;
+                if (code && content) {
+                    code.textContent = content;
                 }
-
                 break;
             }
 
@@ -511,15 +521,10 @@ export class BlockOperationsService implements IBlockOperationsService {
 
                 const quote = newContentBlock.querySelector("blockquote");
 
-                if (quote) {
-                    quote.innerText = content;
+                if (quote && content) {
+                    quote.textContent = content;
                 }
 
-                break;
-            }
-
-            case ElementFactoryService.ELEMENT_TYPES.BULLETED_LIST: {
-                newContentBlock = this.elementFactoryService.create(ElementFactoryService.ELEMENT_TYPES.BULLETED_LIST, content);
                 break;
             }
 
@@ -596,7 +601,7 @@ export class BlockOperationsService implements IBlockOperationsService {
 
                 const callout = newContentBlock.querySelector(".callout-text");
                 const editableContent = DOMUtils.querySelectorIncludingSelf(contentElement, '[contenteditable="true"]');
-                if (callout && editableContent) {
+                if (callout && editableContent && editableContent.innerHTML.trim() !== "") {
                     callout.innerHTML = editableContent.innerHTML;
                 }
                 break;
@@ -1282,6 +1287,7 @@ export class BlockOperationsService implements IBlockOperationsService {
                     caption.setAttribute('data-placeholder', 'Type a caption');
                     caption.setAttribute('contenteditable', 'true');
                     caption.classList.add('editable', 'hide-turninto', 'hide-moreoptions', 'hide-inlineCode');
+                    caption.innerHTML = '<br>';
                     figure.appendChild(caption);
                     DOMUtils.placeCursorAtStartOfEditableElement(caption);
                 }
@@ -1294,6 +1300,7 @@ export class BlockOperationsService implements IBlockOperationsService {
                     caption.classList.add('block-caption', 'editable', 'focusable', 'hide-turninto', 'hide-moreoptions', 'hide-inlineCode');
                     caption.setAttribute('data-placeholder', 'Type a caption');
                     caption.setAttribute('contenteditable', 'true');
+                    caption.innerHTML = '<br>';
                     figure.insertAdjacentElement('afterend', caption);
                     DOMUtils.placeCursorAtStartOfEditableElement(caption);
                 }
@@ -1317,6 +1324,7 @@ export class BlockOperationsService implements IBlockOperationsService {
             caption.classList.add('block-caption', 'editable', 'focusable', 'hide-turninto', 'hide-moreoptions', 'hide-inlineCode');
             caption.setAttribute('data-placeholder', 'Type a caption');
             caption.setAttribute('contenteditable', 'true');
+            caption.innerHTML = '<br>';
             block.appendChild(caption);
             DOMUtils.placeCursorAtStartOfEditableElement(caption);
         }

@@ -226,6 +226,8 @@ export class DOMUtils {
         beforeCaretRange.setStartBefore(newNode);
         beforeCaretRange.deleteContents();
 
+        DOMUtils.trimEmptyTextAndBrElements(newNode);
+
         selection.removeAllRanges();
         selection.selectAllChildren(newNode);
         selection.collapseToStart();

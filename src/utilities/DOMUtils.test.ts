@@ -627,6 +627,7 @@ describe("DOMUtils.rearrangeContentAfterSplit", () => {
         DOMUtils.rearrangeContentAfterSplit(current, clone);
 
         expect(current.innerHTML).toBe("<br>");
+        expect(clone.innerHTML).toBe("<br>");
     });
 });
 

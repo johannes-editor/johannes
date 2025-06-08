@@ -21,6 +21,8 @@ export class Title extends BaseUIComponent {
 
         if (this.props.value) {
             h1.textContent = this.props.value;
+        } else {
+            h1.innerHTML = "<br>";
         }
 
         htmlElement.appendChild(h1);
