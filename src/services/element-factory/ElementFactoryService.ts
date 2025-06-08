@@ -753,18 +753,21 @@ export class ElementFactoryService implements IElementFactoryService {
         if (content && content !== ElementFactoryService.INVISIBLE_CHAR) {
             element.textContent = content;
         } else {
-            element.innerHTML = ElementFactoryService.INVISIBLE_CHAR;
+            element.textContent = ElementFactoryService.INVISIBLE_CHAR;
             element.setAttribute("data-empty", "true");
         }
 
         element.addEventListener("input", () => {
-            if (element.textContent === "" || element.textContent === ElementFactoryService.INVISIBLE_CHAR) {
-                element.innerHTML = ElementFactoryService.INVISIBLE_CHAR;
+            const txt = element.textContent ?? "";
+
+            if (txt === "" || txt === ElementFactoryService.INVISIBLE_CHAR) {
+                element.textContent = ElementFactoryService.INVISIBLE_CHAR;
                 element.setAttribute("data-empty", "true");
                 DOMUtils.placeCursorAtStartOfEditableElement(element);
             } else {
-                if (element.textContent?.startsWith(ElementFactoryService.INVISIBLE_CHAR)) {
-                    element.textContent = element.textContent.replace(ElementFactoryService.INVISIBLE_CHAR, "");
+                const firstChild = element.firstChild;
+                if (firstChild && firstChild.nodeType === Node.TEXT_NODE && firstChild.textContent?.startsWith(ElementFactoryService.INVISIBLE_CHAR)) {
+                    firstChild.textContent = firstChild.textContent.slice(1);
                     DOMUtils.placeCursorAtEndOfEditableElement(element);
                 }
                 element.removeAttribute("data-empty");
