@@ -283,6 +283,73 @@ describe('BlockOperationsService.createNewElementAndSplitContent', () => {
         });
     });
 
+    describe('Paragraph behavior', () => {
+        test('pressing enter at end of paragraph creates new paragraph', () => {
+            const block = ElementFactoryService.blockParagraph('Hello');
+            document.body.appendChild(block);
+
+            mockElementFactoryService.create.mockImplementation((type) => {
+                if (type === ElementFactoryService.ELEMENT_TYPES.BLOCK_PARAGRAPH) {
+                    return ElementFactoryService.blockParagraph('');
+                }
+                return document.createElement('div');
+            });
+
+            jest.spyOn(DOMUtils, 'getContentTypeFromActiveElement').mockReturnValue(ContentTypes.Paragraph);
+            jest.spyOn(DOMUtils, 'findClosestAncestorOfActiveElementByClass').mockImplementation((selector) => {
+                if (selector === 'block') return block;
+                return null;
+            });
+            jest.spyOn(DOMUtils, 'getSelectionTextInfo').mockReturnValue({ atStart: false, atEnd: true });
+
+            const p = block.querySelector('p') as HTMLElement;
+            p.focus();
+            jest.spyOn(document, 'activeElement', 'get').mockReturnValue(p);
+
+            const result = service.createNewElementAndSplitContent();
+
+            expect(result).toBe(true);
+
+            const blocks = document.querySelectorAll('.block');
+            expect(blocks.length).toBe(2);
+            expect((blocks[0].querySelector('p') as HTMLElement).textContent).toBe('Hello');
+            expect((blocks[1].querySelector('p') as HTMLElement).textContent).toBe('');
+        });
+
+        test('pressing enter in the middle of paragraph moves text', () => {
+            const block = ElementFactoryService.blockParagraph('Hello world');
+            document.body.appendChild(block);
+
+            mockElementFactoryService.create.mockImplementation((type) => {
+                if (type === ElementFactoryService.ELEMENT_TYPES.BLOCK_PARAGRAPH) {
+                    return ElementFactoryService.blockParagraph('');
+                }
+                return document.createElement('div');
+            });
+
+            const cloneSpy = jest.spyOn(DOMUtils, 'cloneAndInsertAfter');
+            const rearrangeSpy = jest.spyOn(DOMUtils, 'rearrangeContentAfterSplit');
+
+            jest.spyOn(DOMUtils, 'getContentTypeFromActiveElement').mockReturnValue(ContentTypes.Paragraph);
+            jest.spyOn(DOMUtils, 'findClosestAncestorOfActiveElementByClass').mockImplementation((selector) => {
+                if (selector === 'block') return block;
+                return null;
+            });
+            jest.spyOn(DOMUtils, 'getSelectionTextInfo').mockReturnValue({ atStart: false, atEnd: false });
+
+            const p = block.querySelector('p') as HTMLElement;
+            p.focus();
+            DOMUtils.setCursorPosition(p, 6);
+            jest.spyOn(document, 'activeElement', 'get').mockReturnValue(p);
+
+            const result = service.createNewElementAndSplitContent();
+
+            expect(result).toBe(true);
+            expect(cloneSpy).toHaveBeenCalledWith(block);
+            expect(rearrangeSpy).toHaveBeenCalled();
+        });
+    });
+
     describe('Caption behavior', () => {
         test('pressing enter at end of figcaption creates new paragraph', () => {
             const block = document.createElement('div');

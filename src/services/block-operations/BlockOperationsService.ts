@@ -823,22 +823,27 @@ export class BlockOperationsService implements IBlockOperationsService {
             const currentBlock = DOMUtils.findClosestAncestorOfActiveElementByClass("block");
 
             if (currentBlock) {
-                const clonedBlock = DOMUtils.cloneAndInsertAfter(currentBlock);
+                const contentCurrent = currentBlock.querySelector('.focusable') as HTMLElement | null;
+                const atEnd = contentCurrent ? DOMUtils.getSelectionTextInfo(contentCurrent).atEnd : false;
 
-                if (clonedBlock) {
-                    const contentCurrent = currentBlock.querySelector(".focusable") as Node;
-                    const contentClone = clonedBlock.querySelector(".focusable") as Node;
-                    DOMUtils.rearrangeContentAfterSplit(contentCurrent, contentClone);
+                if (atEnd) {
+                    this.createDefaultBlock(currentBlock, "");
+                } else {
+                    const clonedBlock = DOMUtils.cloneAndInsertAfter(currentBlock);
 
-                    DOMUtils.trimEmptyTextAndBrElements(contentCurrent);
-                    DOMUtils.trimEmptyTextAndBrElements(contentClone);
-                    this.transformBlock(ContentTypes.Paragraph, clonedBlock);
+                    if (clonedBlock) {
+                        const contentCurrent = currentBlock.querySelector(".focusable") as Node;
+                        const contentClone = clonedBlock.querySelector(".focusable") as Node;
+                        DOMUtils.rearrangeContentAfterSplit(contentCurrent, contentClone);
 
+                        DOMUtils.trimEmptyTextAndBrElements(contentCurrent);
+                        DOMUtils.trimEmptyTextAndBrElements(contentClone);
+                        this.transformBlock(ContentTypes.Paragraph, clonedBlock);
+
+                        const focusable = (clonedBlock as HTMLElement).querySelector(".focusable") as HTMLElement;
+                        DOMUtils.placeCursorAtStartOfEditableElement(focusable as HTMLElement);
+                    }
                 }
-
-                const focusable = (clonedBlock as HTMLElement).querySelector(".focusable") as HTMLElement;
-                DOMUtils.placeCursorAtStartOfEditableElement(focusable as HTMLElement);
-
             }
         }
 
