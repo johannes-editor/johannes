@@ -528,6 +528,11 @@ export class BlockOperationsService implements IBlockOperationsService {
                 break;
             }
 
+            case ElementFactoryService.ELEMENT_TYPES.BULLETED_LIST: {
+                newContentBlock = this.elementFactoryService.create(ElementFactoryService.ELEMENT_TYPES.BULLETED_LIST, content);
+                break;
+            }
+
             case ElementFactoryService.ELEMENT_TYPES.NUMBERED_LIST: {
                 newContentBlock = this.elementFactoryService.create(ElementFactoryService.ELEMENT_TYPES.NUMBERED_LIST, content);
                 break;
