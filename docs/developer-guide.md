@@ -11,6 +11,8 @@ Use `npm test` to execute unit tests.
 
 ## Building
 
-`npm run build` generates a production bundle in the `dist/` directory. The
-GitHub Pages workflow runs this command automatically before deploying the
-contents of the `demo/` folder.
+`npm run build` generates a production bundle in the `dist/` directory. Running
+this command also copies the bundle into the `demo/` folder so GitHub Pages
+serves the latest build without keeping duplicate bundles.
+The workflow runs this command automatically before deploying the contents of
+`demo/`.
