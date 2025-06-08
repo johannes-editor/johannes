@@ -52,11 +52,11 @@ export class EditableNavigation implements IEditableNavigation {
             if (currentEditable && currentEditable.isContentEditable) {
                 if (this.shouldSwitchEditable(currentEditable, event.key as Directions)) {
 
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+
                     const nextEditable = this.findNextEditable(currentEditable, event.key as Directions);
                     if (nextEditable) {
-
-                        event.preventDefault();
-                        event.stopImmediatePropagation();
 
                         if (event.key == Directions.ArrowUp || event.key == Directions.ArrowDown) {
                             const refRect = EditableNavigation.getCaretRect();
