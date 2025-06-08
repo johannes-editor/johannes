@@ -1,5 +1,6 @@
 import { Directions } from "@/common/Directions";
 import { TableScopes } from "@/services/table-operations/TableScopes";
+import { DOMUtils } from "@/utilities/DOMUtils";
 
 export class TableUtils {
 
@@ -16,6 +17,7 @@ export class TableUtils {
             cell.setAttribute("data-placeholder", "Enter text");
             cell.classList.add("editable");
             cell.innerHTML = "<br>";
+            DOMUtils.updatePlaceholderVisibility(cell);
             affectedCells.push(cell);
         }
 
@@ -34,6 +36,7 @@ export class TableUtils {
             cell.setAttribute("data-placeholder", "cell");
             cell.classList.add("editable");
             cell.innerHTML = "<br>";
+            DOMUtils.updatePlaceholderVisibility(cell);
             affectedCells.push(cell);
         }
 

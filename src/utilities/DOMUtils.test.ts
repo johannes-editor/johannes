@@ -537,10 +537,12 @@ describe("DOMUtils.sanitizeContentEditable", () => {
         expect(editable.innerHTML).toBe("Hello<br>World");
     });
 
-    test("should keep <br> when content only contains <br>", () => {
+    test("should keep <br> when content only contains <br> and set data-empty", () => {
+        editable.setAttribute("data-placeholder", "text");
         editable.innerHTML = "<br>";
         DOMUtils.sanitizeContentEditable(editable);
         expect(editable.innerHTML).toBe("<br>");
+        expect(editable.getAttribute("data-empty")).toBe("true");
     });
 
     test("should restore caret when selection is at the end and content ends with <br>", () => {
@@ -594,25 +596,31 @@ describe("DOMUtils.sanitizeContentEditable", () => {
 });
 
 describe("DOMUtils.trimEmptyTextAndBrElements", () => {
-    test("should keep single <br> when element only has <br>", () => {
+    test("should keep single <br> when element only has <br> and set data-empty", () => {
         const div = document.createElement("div");
+        div.setAttribute("data-placeholder", "text");
         div.innerHTML = "<br>";
         DOMUtils.trimEmptyTextAndBrElements(div);
         expect(div.innerHTML).toBe("<br>");
+        expect(div.getAttribute("data-empty")).toBe("true");
     });
 
     test("should remove leading and trailing <br> when text is present", () => {
         const div = document.createElement("div");
+        div.setAttribute("data-placeholder", "text");
         div.innerHTML = "<br>Hello<br>";
         DOMUtils.trimEmptyTextAndBrElements(div);
         expect(div.innerHTML).toBe("Hello");
+        expect(div.hasAttribute("data-empty")).toBe(false);
     });
 
-    test("should replace empty text node with <br>", () => {
+    test("should replace empty text node with <br> and set data-empty", () => {
         const div = document.createElement("div");
+        div.setAttribute("data-placeholder", "text");
         div.appendChild(document.createTextNode(""));
         DOMUtils.trimEmptyTextAndBrElements(div);
         expect(div.innerHTML).toBe("<br>");
+        expect(div.getAttribute("data-empty")).toBe("true");
     });
 });
 

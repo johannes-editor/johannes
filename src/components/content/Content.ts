@@ -409,23 +409,15 @@ export class Content extends BaseUIComponent {
 
     reRenderPlaceholder() {
         document.addEventListener(DefaultJSEvents.Input, function (event: Event) {
-            if (event.target instanceof HTMLElement) {
-                const editableElement = event.target;
+            if (!(event.target instanceof HTMLElement)) return;
+            const editableElement = event.target;
 
-                if (!Utils.isEventFromContentWrapper(event)) {
-                    return;
-                }
+            if (!Utils.isEventFromContentWrapper(event)) {
+                return;
+            }
 
-                if (editableElement.isContentEditable) {
-                    if (editableElement.hasAttribute('data-placeholder')) {
-                        const customPlaceholder = editableElement.getAttribute('data-placeholder');
-
-                        if (editableElement.textContent?.trim() === '') {
-                            editableElement.setAttribute('data-placeholder', customPlaceholder || '');
-                            editableElement.textContent = '';
-                        }
-                    }
-                }
+            if (editableElement.isContentEditable && editableElement.hasAttribute('data-placeholder')) {
+                DOMUtils.updatePlaceholderVisibility(editableElement);
             }
         });
     }

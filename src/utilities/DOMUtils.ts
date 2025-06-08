@@ -174,6 +174,10 @@ export class DOMUtils {
                 element.appendChild(document.createElement('br'));
             }
         }
+
+        if (element instanceof HTMLElement) {
+            DOMUtils.updatePlaceholderVisibility(element);
+        }
     }
 
     static rearrangeContentAfterSplit(currentNode: Node, newNode: Node): void {
@@ -615,6 +619,19 @@ export class DOMUtils {
         classesToRemove.forEach(cls => element.classList.remove(cls));
     }
 
+    static updatePlaceholderVisibility(element: HTMLElement): void {
+        if (!element.hasAttribute('data-placeholder')) {
+            return;
+        }
+        const content = element.innerHTML.replace(/\u200B/g, '').trim();
+        const isEmpty = content === '' || content === '<br>';
+        if (isEmpty) {
+            element.setAttribute('data-empty', 'true');
+        } else {
+            element.removeAttribute('data-empty');
+        }
+    }
+
     static isTargetDescendantOfSelector(event: Event, selector: string): boolean {
         let target: HTMLElement | null = null;
 
@@ -695,6 +712,8 @@ export class DOMUtils {
             selection.removeAllRanges();
             selection.addRange(range);
         }
+
+        DOMUtils.updatePlaceholderVisibility(element);
     }
 
     static getTextNodesIn(node: Node): Text[] {

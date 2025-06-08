@@ -1,6 +1,7 @@
 import { ContentTypes } from "@/common/ContentTypes";
 import { IElementFactoryService } from "./IElementFactoryService";
 import { Utils } from "@/utilities/Utils";
+import { DOMUtils } from "@/utilities/DOMUtils";
 import { Icons } from "@/common/Icons";
 import { ToolboxOptions } from "@/components/block-toolbox/ToolboxOptions";
 import { CommonClasses } from "@/common/CommonClasses";
@@ -381,6 +382,7 @@ export class ElementFactoryService implements IElementFactoryService {
                 textArea.textContent = content;
             } else {
                 textArea.innerHTML = "<br>";
+                DOMUtils.updatePlaceholderVisibility(textArea);
             }
 
             calloutWrapper.appendChild(textArea);
@@ -415,6 +417,7 @@ export class ElementFactoryService implements IElementFactoryService {
             p.textContent = content;
         } else {
             p.innerHTML = "<br>";
+            DOMUtils.updatePlaceholderVisibility(p);
         }
         p.contentEditable = "true";
         p.setAttribute('data-content-type', ContentTypes.Paragraph);
@@ -431,6 +434,7 @@ export class ElementFactoryService implements IElementFactoryService {
             h.textContent = content;
         } else {
             h.innerHTML = "<br>";
+            DOMUtils.updatePlaceholderVisibility(h);
         }
         h.contentEditable = "true";
         h.setAttribute('data-content-type', `h${level}`);
@@ -457,6 +461,7 @@ export class ElementFactoryService implements IElementFactoryService {
             code.textContent = content;
         } else {
             code.innerHTML = "<br>";
+            DOMUtils.updatePlaceholderVisibility(code);
         }
         code.classList.add('johannes-code', "focusable", "hljs", "language-plaintext", "editable");
         code.setAttribute("spellCheck", "false");
@@ -541,6 +546,7 @@ export class ElementFactoryService implements IElementFactoryService {
             blockquote.textContent = content;
         } else {
             blockquote.innerHTML = "<br>";
+            DOMUtils.updatePlaceholderVisibility(blockquote);
         }
         blockquote.contentEditable = "true";
         blockquote.setAttribute("data-placeholder", ElementFactoryService.getRandomQuote());
@@ -596,6 +602,7 @@ export class ElementFactoryService implements IElementFactoryService {
             span.textContent = content;
         } else {
             span.innerHTML = "<br>";
+            DOMUtils.updatePlaceholderVisibility(span);
         }
         span.setAttribute('data-placeholder', 'To-do');
         span.contentEditable = "true";
@@ -628,6 +635,7 @@ export class ElementFactoryService implements IElementFactoryService {
             div.textContent = content;
         } else {
             div.innerHTML = "<br>";
+            DOMUtils.updatePlaceholderVisibility(div);
         }
 
         return initialItem;

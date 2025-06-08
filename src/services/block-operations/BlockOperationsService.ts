@@ -1295,6 +1295,7 @@ export class BlockOperationsService implements IBlockOperationsService {
                     caption.setAttribute('contenteditable', 'true');
                     caption.classList.add('editable', 'hide-turninto', 'hide-moreoptions', 'hide-inlineCode');
                     caption.innerHTML = '<br>';
+                    DOMUtils.updatePlaceholderVisibility(caption);
                     figure.appendChild(caption);
                     DOMUtils.placeCursorAtStartOfEditableElement(caption);
                 }
@@ -1308,6 +1309,7 @@ export class BlockOperationsService implements IBlockOperationsService {
                     caption.setAttribute('data-placeholder', 'Type a caption');
                     caption.setAttribute('contenteditable', 'true');
                     caption.innerHTML = '<br>';
+                    DOMUtils.updatePlaceholderVisibility(caption);
                     figure.insertAdjacentElement('afterend', caption);
                     DOMUtils.placeCursorAtStartOfEditableElement(caption);
                 }
@@ -1332,6 +1334,7 @@ export class BlockOperationsService implements IBlockOperationsService {
             caption.setAttribute('data-placeholder', 'Type a caption');
             caption.setAttribute('contenteditable', 'true');
             caption.innerHTML = '<br>';
+            DOMUtils.updatePlaceholderVisibility(caption);
             block.appendChild(caption);
             DOMUtils.placeCursorAtStartOfEditableElement(caption);
         }
