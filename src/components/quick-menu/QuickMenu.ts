@@ -284,7 +284,9 @@ export class QuickMenu extends BaseUIComponent implements IQuickMenu {
 
             if (!this.isVisible && value.endsWith('/')) {
 
-                const block = DOMUtils.findClosestAncestorOfActiveElementByClass("block");
+                const block =
+                    DOMUtils.findClosestAncestorOfActiveElementByClass("block") ||
+                    DOMUtils.findClosestAncestorOfActiveElementByClass("callout");
 
                 if (block) {
                     const currentCell = target.closest(".ignore-quick-menu") as HTMLTableCellElement;
@@ -311,6 +313,29 @@ export class QuickMenu extends BaseUIComponent implements IQuickMenu {
         });
 
         document.addEventListener(DefaultJSEvents.Keydown, (event: KeyboardEvent) => {
+            if (event.key !== '/') {
+                return;
+            }
+
+            if (!Utils.isEventFromContentWrapper(event)) {
+                return;
+            }
+
+            const target = event.target as HTMLElement;
+            const block =
+                DOMUtils.findClosestAncestorOfActiveElementByClass("block") ||
+                DOMUtils.findClosestAncestorOfActiveElementByClass("callout");
+
+            if (block) {
+                const currentCell = target.closest(".ignore-quick-menu") as HTMLTableCellElement;
+                if (!currentCell && !this.isVisible) {
+                    this.filterInput = '';
+                    this.show();
+                }
+            }
+        });
+
+        document.addEventListener(DefaultJSEvents.Keydown, (event: KeyboardEvent) => {
 
             if (
                 event.key !== KeyboardKeys.ArrowLeft &&
@@ -325,7 +350,9 @@ export class QuickMenu extends BaseUIComponent implements IQuickMenu {
                 return;
             }
 
-            const block = DOMUtils.findClosestAncestorOfActiveElementByClass("block");
+            const block =
+                DOMUtils.findClosestAncestorOfActiveElementByClass("block") ||
+                DOMUtils.findClosestAncestorOfActiveElementByClass("callout");
 
             if (this.isVisible && event.key === KeyboardKeys.ArrowLeft && !event.ctrlKey && !event.shiftKey && !event.altKey) {
                 event.preventDefault();

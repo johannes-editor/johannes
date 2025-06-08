@@ -629,6 +629,12 @@ export class DOMUtils {
     }
 
     static sanitizeContentEditable(element: HTMLElement): void {
+        if (element.getAttribute("data-empty") === "true") {
+            return;
+        }
+
+        const INVISIBLE_CHAR = "\u200B";
+
         const content = element.innerHTML;
         const selection = window.getSelection();
 
@@ -651,6 +657,10 @@ export class DOMUtils {
                 shouldRestoreCaret = true;
                 caretPos = element.textContent?.length ?? 0;
             }
+        }
+
+        if (content === '<br>' || content === INVISIBLE_CHAR) {
+            return;
         }
 
         if (content.endsWith('<br>')) {
