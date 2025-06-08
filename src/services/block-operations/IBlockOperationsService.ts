@@ -17,6 +17,7 @@ export interface IBlockOperationsService extends ICommand {
     execMergeWithPreviousBlock(): void;
     execMergeWithNextBlock(): void;
     execChangeCalloutBackground(block: HTMLElement, color: string): void;
+    toggleCaption(block: HTMLElement): void;
     createDefaultBlock(eventParagraph: Element | null, text: string | null): HTMLElement;
 
     

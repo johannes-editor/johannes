@@ -80,7 +80,8 @@ export class CommandDispatcher {
      * @param {CustomEvent<ICommandEventDetail>} event - The event object containing details about the command.
      */
     private handleCommandEvent = (event: CustomEvent<ICommandEventDetail>): void => {
-        const { command, showUI, value, targetBlockType, block, scope } = event.detail;
+        const { command, showUI, value, targetBlockType, scope } = event.detail;
+        let block = event.detail.block;
 
         switch (command) {
 
