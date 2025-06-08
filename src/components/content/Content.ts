@@ -421,9 +421,31 @@ export class Content extends BaseUIComponent {
             }
         };
 
+        const hideOnKeydown = (event: KeyboardEvent) => {
+            if (!(event.target instanceof HTMLElement)) return;
+            const editableElement = event.target;
+
+            if (!Utils.isEventFromContentWrapper(event)) {
+                return;
+            }
+
+            if (
+                editableElement.isContentEditable &&
+                editableElement.hasAttribute('data-placeholder') &&
+                editableElement.hasAttribute('data-empty') &&
+                event.key.length === 1 &&
+                !event.ctrlKey &&
+                !event.metaKey &&
+                !event.altKey
+            ) {
+                editableElement.removeAttribute('data-empty');
+            }
+        };
+
         document.addEventListener(DefaultJSEvents.Input, updateIfEditable);
         document.addEventListener(DefaultJSEvents.Focusin, updateIfEditable);
         document.addEventListener(DefaultJSEvents.Mouseover, updateIfEditable);
+        document.addEventListener(DefaultJSEvents.Keydown, hideOnKeydown);
     }
 
     static getInstance(): Content {
