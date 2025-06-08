@@ -186,6 +186,7 @@ export class DOMUtils {
         const afterCaretRange = range.cloneRange();
         afterCaretRange.setEndAfter(currentNode);
         afterCaretRange.deleteContents();
+        DOMUtils.trimEmptyTextAndBrElements(currentNode);
 
         const mapNodeToNewNode = (node: Node): Node | null => {
             const path: number[] = [];

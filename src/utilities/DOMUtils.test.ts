@@ -609,6 +609,27 @@ describe("DOMUtils.trimEmptyTextAndBrElements", () => {
     });
 });
 
+describe("DOMUtils.rearrangeContentAfterSplit", () => {
+    test("should keep placeholder <br> in original element when splitting an empty element", () => {
+        const current = document.createElement("p");
+        current.innerHTML = "<br>";
+        const clone = current.cloneNode(true) as HTMLElement;
+        document.body.appendChild(current);
+        document.body.appendChild(clone);
+
+        const range = document.createRange();
+        range.setStart(current, 0);
+        range.setEnd(current, 0);
+        const sel = window.getSelection()!;
+        sel.removeAllRanges();
+        sel.addRange(range);
+
+        DOMUtils.rearrangeContentAfterSplit(current, clone);
+
+        expect(current.innerHTML).toBe("<br>");
+    });
+});
+
 
 describe("DOMUtils.querySelectorIncludingSelf", () => {
 
