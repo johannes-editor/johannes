@@ -404,6 +404,10 @@ export class Content extends BaseUIComponent {
 
         if (target instanceof HTMLElement && target.contentEditable === "true") {
             DOMUtils.sanitizeContentEditable(target);
+            const block = target.closest('.block');
+            if (block) {
+                DOMUtils.removeExtraEmptyContentElements(block as HTMLElement);
+            }
         }
     }
 
