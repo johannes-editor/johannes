@@ -296,7 +296,8 @@ p.johannes-content-element {
     box-sizing: border-box;
 }
 
-.block:hover .drag-handler {
+.block:hover .drag-handler,
+.block:focus-within .drag-handler {
     visibility: visible;
     vertical-align: top;
     justify-content: start;
