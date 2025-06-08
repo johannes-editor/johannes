@@ -1518,3 +1518,42 @@ describe("DOMUtils.getCurrentActiveBlock", () => {
         expect(block).toBeNull();
     });
 });
+
+describe("DOMUtils.removeEmptyListItems", () => {
+    beforeEach(() => {
+        document.body.innerHTML = "";
+    });
+
+    test("should remove list items without text", () => {
+        const ul = document.createElement("ul");
+        const li1 = document.createElement("li");
+        li1.textContent = "Item";
+        const li2 = document.createElement("li");
+        li2.innerHTML = "<br>";
+
+        ul.appendChild(li1);
+        ul.appendChild(li2);
+        document.body.appendChild(ul);
+
+        DOMUtils.removeEmptyListItems(document.body);
+
+        expect(ul.querySelectorAll("li").length).toBe(1);
+        expect(ul.querySelector("li")?.textContent).toBe("Item");
+    });
+
+    test("should remove list items with empty focusable element", () => {
+        const ul = document.createElement("ul");
+        const li = document.createElement("li");
+        const div = document.createElement("div");
+        div.classList.add("focusable");
+        div.contentEditable = "true";
+        div.innerHTML = "<br>";
+        li.appendChild(div);
+        ul.appendChild(li);
+        document.body.appendChild(ul);
+
+        DOMUtils.removeEmptyListItems(document.body);
+
+        expect(ul.querySelectorAll("li").length).toBe(0);
+    });
+});

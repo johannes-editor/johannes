@@ -1058,4 +1058,15 @@ export class DOMUtils {
 
         return postRange.toString().trim() === '';
     }
+
+    static removeEmptyListItems(parent: ParentNode = document): void {
+        const listItems = parent.querySelectorAll('li');
+
+        listItems.forEach(li => {
+            DOMUtils.trimEmptyTextAndBrElements(li);
+            if (!DOMUtils.hasTextContent(li)) {
+                li.remove();
+            }
+        });
+    }
 }
