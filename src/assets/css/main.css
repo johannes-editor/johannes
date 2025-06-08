@@ -317,7 +317,7 @@ p.johannes-content-element {
     content: attr(data-placeholder);
     color: #84888d !important;
     position: absolute;
-    left: 0;
+    left: 1.2rem;
     pointer-events: none;
 }
 
@@ -333,7 +333,7 @@ p.johannes-content-element {
     content: attr(data-placeholder);
     color: #84888acd;
     position: absolute;
-    left: 0;
+    left: 1.25rem;
     pointer-events: none;
     display: none;
 }
@@ -369,7 +369,7 @@ p.johannes-content-element {
 .code-block code[data-placeholder][data-empty="true"]:before {
     content: attr(data-placeholder) !important;
     position: absolute;
-    left: 0;
+    left: 1.25rem;
     pointer-events: none;
     display: block !important;
 }
@@ -383,7 +383,7 @@ p.johannes-content-element {
     content: attr(data-placeholder);
     color: #84888acd;
     position: absolute;
-    left: 0;
+    left: 1.25rem;
     pointer-events: none;
     display: block;
 }

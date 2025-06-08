@@ -5,6 +5,7 @@ import { Icons } from "@/common/Icons";
 import { ToolboxOptions } from "@/components/block-toolbox/ToolboxOptions";
 import { CommonClasses } from "@/common/CommonClasses";
 import { MathInputter } from "@/components/math-inputter/MathInputter";
+import { DOMUtils } from "@/utilities/DOMUtils";
 import hljs from 'highlight.js';
 import katex from 'katex';
 
@@ -760,9 +761,11 @@ export class ElementFactoryService implements IElementFactoryService {
             if (element.textContent === "" || element.textContent === ElementFactoryService.INVISIBLE_CHAR) {
                 element.innerHTML = ElementFactoryService.INVISIBLE_CHAR;
                 element.setAttribute("data-empty", "true");
+                DOMUtils.placeCursorAtStartOfEditableElement(element);
             } else {
-                if (element.innerHTML.startsWith(ElementFactoryService.INVISIBLE_CHAR)) {
-                    element.innerHTML = element.innerHTML.replace(ElementFactoryService.INVISIBLE_CHAR, "");
+                if (element.textContent?.startsWith(ElementFactoryService.INVISIBLE_CHAR)) {
+                    element.textContent = element.textContent.replace(ElementFactoryService.INVISIBLE_CHAR, "");
+                    DOMUtils.placeCursorAtEndOfEditableElement(element);
                 }
                 element.removeAttribute("data-empty");
             }
