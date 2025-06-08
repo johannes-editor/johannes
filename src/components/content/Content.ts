@@ -445,6 +445,7 @@ export class Content extends BaseUIComponent {
         document.addEventListener(DefaultJSEvents.Input, updateIfEditable);
         document.addEventListener(DefaultJSEvents.Focusin, updateIfEditable);
         document.addEventListener(DefaultJSEvents.Mouseover, updateIfEditable);
+        document.addEventListener(DefaultJSEvents.Keyup, updateIfEditable);
         document.addEventListener(DefaultJSEvents.Keydown, hideOnKeydown);
     }
 
