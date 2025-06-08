@@ -754,7 +754,6 @@ export class BlockOperationsService implements IBlockOperationsService {
                     const contentCurrent = currentItem.querySelector(".focusable") as Node;
                     const contentClone = clone.querySelector(".focusable") as Node;
         
-                    DOMUtils.trimEmptyTextAndBrElements(contentClone);
                     DOMUtils.rearrangeContentAfterSplit(contentCurrent, contentClone);
                     DOMUtils.trimEmptyTextAndBrElements(contentCurrent);
                     DOMUtils.trimEmptyTextAndBrElements(contentClone);
