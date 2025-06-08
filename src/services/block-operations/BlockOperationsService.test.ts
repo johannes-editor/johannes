@@ -289,9 +289,11 @@ describe('BlockOperationsService.createNewElementAndSplitContent', () => {
             block.className = 'block deletable';
 
             const figure = document.createElement('figure');
-            figure.className = 'figure-content';
+            const figContent = document.createElement('div');
+            figContent.className = 'figure-content';
             const img = document.createElement('img');
-            figure.appendChild(img);
+            figContent.appendChild(img);
+            figure.appendChild(figContent);
             const caption = document.createElement('figcaption');
             caption.className = 'editable';
             caption.contentEditable = 'true';
@@ -323,9 +325,11 @@ describe('BlockOperationsService.createNewElementAndSplitContent', () => {
             block.className = 'block deletable';
 
             const figure = document.createElement('figure');
-            figure.className = 'figure-content';
+            const figContent = document.createElement('div');
+            figContent.className = 'figure-content';
             const img = document.createElement('img');
-            figure.appendChild(img);
+            figContent.appendChild(img);
+            figure.appendChild(figContent);
             const caption = document.createElement('figcaption');
             caption.className = 'editable';
             caption.contentEditable = 'true';
@@ -367,6 +371,56 @@ describe('BlockOperationsService.createNewElementAndSplitContent', () => {
             service.deleteTheCurrentElementAndTheDraggableBlockIfEmpty(content);
 
             expect(document.body.contains(block)).toBe(false);
+        });
+    });
+
+    describe('toggleCaption', () => {
+        test('should add caption for image blocks', () => {
+            const block = document.createElement('div');
+            block.className = 'block deletable';
+
+            const content = document.createElement('div');
+            content.className = 'johannes-content-element';
+            content.setAttribute('data-content-type', ContentTypes.Image);
+
+            const figure = document.createElement('figure');
+            const figContent = document.createElement('div');
+            figContent.className = 'figure-content';
+            const img = document.createElement('img');
+            figContent.appendChild(img);
+            figure.appendChild(figContent);
+
+            content.appendChild(figure);
+            block.appendChild(content);
+            document.body.appendChild(block);
+
+            service.toggleCaption(block);
+
+            const caption = block.querySelector('figcaption');
+            expect(caption).not.toBeNull();
+        });
+
+        test('should not add caption for non-image blocks', () => {
+            const block = document.createElement('div');
+            block.className = 'block deletable';
+
+            const content = document.createElement('div');
+            content.className = 'johannes-content-element';
+            content.setAttribute('data-content-type', ContentTypes.Iframe);
+
+            const figure = document.createElement('figure');
+            figure.className = 'embed-container';
+            const iframe = document.createElement('iframe');
+            figure.appendChild(iframe);
+
+            content.appendChild(figure);
+            block.appendChild(content);
+            document.body.appendChild(block);
+
+            service.toggleCaption(block);
+
+            const caption = block.querySelector('figcaption, .block-caption');
+            expect(caption).toBeNull();
         });
     });
 
