@@ -888,11 +888,19 @@ export class BlockOperationsService implements IBlockOperationsService {
         this.memento.saveState();
         const newBlock = this.elementFactoryService.create(ElementFactoryService.ELEMENT_TYPES.BLOCK_PARAGRAPH, text || "");
 
+        let contentElement = document.querySelector("#johannesEditor .content");
+        if (!contentElement) {
+            const wrapper = document.querySelector("#johannesEditor .content-wrapper");
+            contentElement = document.createElement('div');
+            contentElement.classList.add('content');
+            wrapper?.appendChild(contentElement);
+        }
+
         if (eventParagraph && eventParagraph.closest('.block')) {
             const sibling = eventParagraph.closest('.block')!;
             sibling.insertAdjacentElement('afterend', newBlock);
-        } else {
-            document.querySelector("#johannesEditor .content")!.appendChild(newBlock);
+        } else if (contentElement) {
+            contentElement.appendChild(newBlock);
         }
 
         const focusable = newBlock.querySelector('.johannes-content-element') as HTMLElement;

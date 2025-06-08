@@ -84,7 +84,14 @@ export class Content extends BaseUIComponent {
         const selection = document.getSelection();
 
         if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
-            if (this.contentWrapper && this.contentWrapper.getAttribute("contenteditable") !== "true") {
+            const range = selection.getRangeAt(0);
+            const title = document.querySelector('#johannesEditor .title');
+            const intersectsTitle = title &&
+                (range.intersectsNode(title) ||
+                 title.contains(range.startContainer) ||
+                 title.contains(range.endContainer));
+
+            if (!intersectsTitle && this.contentWrapper && this.contentWrapper.getAttribute("contenteditable") !== "true") {
                 const anchorNode = selection.anchorNode;
                 const anchorOffset = selection.anchorOffset;
                 const focusNode = selection.focusNode;
