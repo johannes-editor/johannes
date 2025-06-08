@@ -1518,3 +1518,27 @@ describe("DOMUtils.getCurrentActiveBlock", () => {
         expect(block).toBeNull();
     });
 });
+
+describe("DOMUtils.removeExtraEmptyContentElements", () => {
+    test("should remove empty additional content elements", () => {
+        const block = document.createElement("div");
+        block.className = "block";
+
+        const first = document.createElement("p");
+        first.className = "johannes-content-element";
+        first.setAttribute("contenteditable", "true");
+        first.textContent = "Hello";
+
+        const second = document.createElement("p");
+        second.className = "johannes-content-element";
+        second.setAttribute("contenteditable", "true");
+        second.innerHTML = "<br>";
+
+        block.appendChild(first);
+        block.appendChild(second);
+
+        DOMUtils.removeExtraEmptyContentElements(block);
+
+        expect(block.querySelectorAll(".johannes-content-element").length).toBe(1);
+    });
+});

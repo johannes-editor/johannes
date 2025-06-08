@@ -1,4 +1,5 @@
 import { Utils } from "./Utils";
+import { CommonClasses } from "@/common/CommonClasses";
 
 const START_MARKER_ID = 'caret-start-marker';
 const END_MARKER_ID = 'caret-end-marker';
@@ -630,6 +631,18 @@ export class DOMUtils {
         } else {
             element.removeAttribute('data-empty');
         }
+    }
+
+    static removeExtraEmptyContentElements(block: HTMLElement): void {
+        const contentElements = block.querySelectorAll(`.${CommonClasses.ContentElement}`);
+        contentElements.forEach((el, index) => {
+            if (index === 0) return;
+            const html = (el as HTMLElement).innerHTML.replace(/\u200B/g, '').trim();
+            const text = (el as HTMLElement).textContent?.trim() || '';
+            if (html === '' || html === '<br>' || text === '') {
+                el.remove();
+            }
+        });
     }
 
     static isTargetDescendantOfSelector(event: Event, selector: string): boolean {
