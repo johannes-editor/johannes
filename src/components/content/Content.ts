@@ -408,26 +408,44 @@ export class Content extends BaseUIComponent {
     }
 
     reRenderPlaceholder() {
-        document.addEventListener(DefaultJSEvents.Input, function (event: Event) {
-            if (event.target instanceof HTMLElement) {
-                const editableElement = event.target;
+        const updateIfEditable = (event: Event) => {
+            if (!(event.target instanceof HTMLElement)) return;
+            const editableElement = event.target;
 
-                if (!Utils.isEventFromContentWrapper(event)) {
-                    return;
-                }
-
-                if (editableElement.isContentEditable) {
-                    if (editableElement.hasAttribute('data-placeholder')) {
-                        const customPlaceholder = editableElement.getAttribute('data-placeholder');
-
-                        if (editableElement.textContent?.trim() === '') {
-                            editableElement.setAttribute('data-placeholder', customPlaceholder || '');
-                            editableElement.textContent = '';
-                        }
-                    }
-                }
+            if (!Utils.isEventFromContentWrapper(event)) {
+                return;
             }
-        });
+
+            if (editableElement.isContentEditable && editableElement.hasAttribute('data-placeholder')) {
+                DOMUtils.updatePlaceholderVisibility(editableElement);
+            }
+        };
+
+        const hideOnKeydown = (event: KeyboardEvent) => {
+            if (!(event.target instanceof HTMLElement)) return;
+            const editableElement = event.target;
+
+            if (!Utils.isEventFromContentWrapper(event)) {
+                return;
+            }
+
+            if (
+                editableElement.isContentEditable &&
+                editableElement.hasAttribute('data-placeholder') &&
+                editableElement.hasAttribute('data-empty') &&
+                event.key.length === 1 &&
+                !event.ctrlKey &&
+                !event.metaKey &&
+                !event.altKey
+            ) {
+                editableElement.removeAttribute('data-empty');
+            }
+        };
+
+        document.addEventListener(DefaultJSEvents.Input, updateIfEditable);
+        document.addEventListener(DefaultJSEvents.Focusin, updateIfEditable);
+        document.addEventListener(DefaultJSEvents.Mouseover, updateIfEditable);
+        document.addEventListener(DefaultJSEvents.Keydown, hideOnKeydown);
     }
 
     static getInstance(): Content {

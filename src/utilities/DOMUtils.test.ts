@@ -537,6 +537,14 @@ describe("DOMUtils.sanitizeContentEditable", () => {
         expect(editable.innerHTML).toBe("Hello<br>World");
     });
 
+    test("should keep <br> when content only contains <br> and set data-empty", () => {
+        editable.setAttribute("data-placeholder", "text");
+        editable.innerHTML = "<br>";
+        DOMUtils.sanitizeContentEditable(editable);
+        expect(editable.innerHTML).toBe("<br>");
+        expect(editable.getAttribute("data-empty")).toBe("true");
+    });
+
     test("should restore caret when selection is at the end and content ends with <br>", () => {
         editable.innerHTML = "Hello<br>";
         const textNode = editable.firstChild!;
@@ -584,6 +592,57 @@ describe("DOMUtils.sanitizeContentEditable", () => {
         expect(editable.innerHTML).toBe("Hello<br>");
 
         window.getSelection = originalGetSelection;
+    });
+});
+
+describe("DOMUtils.trimEmptyTextAndBrElements", () => {
+    test("should keep single <br> when element only has <br> and set data-empty", () => {
+        const div = document.createElement("div");
+        div.setAttribute("data-placeholder", "text");
+        div.innerHTML = "<br>";
+        DOMUtils.trimEmptyTextAndBrElements(div);
+        expect(div.innerHTML).toBe("<br>");
+        expect(div.getAttribute("data-empty")).toBe("true");
+    });
+
+    test("should remove leading and trailing <br> when text is present", () => {
+        const div = document.createElement("div");
+        div.setAttribute("data-placeholder", "text");
+        div.innerHTML = "<br>Hello<br>";
+        DOMUtils.trimEmptyTextAndBrElements(div);
+        expect(div.innerHTML).toBe("Hello");
+        expect(div.hasAttribute("data-empty")).toBe(false);
+    });
+
+    test("should replace empty text node with <br> and set data-empty", () => {
+        const div = document.createElement("div");
+        div.setAttribute("data-placeholder", "text");
+        div.appendChild(document.createTextNode(""));
+        DOMUtils.trimEmptyTextAndBrElements(div);
+        expect(div.innerHTML).toBe("<br>");
+        expect(div.getAttribute("data-empty")).toBe("true");
+    });
+});
+
+describe("DOMUtils.rearrangeContentAfterSplit", () => {
+    test("should keep placeholder <br> in original element when splitting an empty element", () => {
+        const current = document.createElement("p");
+        current.innerHTML = "<br>";
+        const clone = current.cloneNode(true) as HTMLElement;
+        document.body.appendChild(current);
+        document.body.appendChild(clone);
+
+        const range = document.createRange();
+        range.setStart(current, 0);
+        range.setEnd(current, 0);
+        const sel = window.getSelection()!;
+        sel.removeAllRanges();
+        sel.addRange(range);
+
+        DOMUtils.rearrangeContentAfterSplit(current, clone);
+
+        expect(current.innerHTML).toBe("<br>");
+        expect(clone.innerHTML).toBe("<br>");
     });
 });
 

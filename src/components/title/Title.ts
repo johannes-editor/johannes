@@ -1,5 +1,6 @@
 import { BaseUIComponent } from "../common/BaseUIComponent";
 import { FloatingToolbarCssClass } from "../floating-toolbar/base/FloatingToolbarCssClass";
+import { DOMUtils } from "@/utilities/DOMUtils";
 
 export class Title extends BaseUIComponent {
 
@@ -21,6 +22,9 @@ export class Title extends BaseUIComponent {
 
         if (this.props.value) {
             h1.textContent = this.props.value;
+        } else {
+            h1.innerHTML = "<br>";
+            DOMUtils.updatePlaceholderVisibility(h1);
         }
 
         htmlElement.appendChild(h1);

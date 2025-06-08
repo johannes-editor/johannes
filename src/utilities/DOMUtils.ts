@@ -158,12 +158,25 @@ export class DOMUtils {
             return false;
         };
 
-        while (element.firstChild && isEmptyTextOrBr(element.firstChild)) {
+        while (element.firstChild && isEmptyTextOrBr(element.firstChild) && element.childNodes.length > 1) {
             element.removeChild(element.firstChild);
         }
 
-        while (element.lastChild && isEmptyTextOrBr(element.lastChild)) {
+        while (element.lastChild && isEmptyTextOrBr(element.lastChild) && element.childNodes.length > 1) {
             element.removeChild(element.lastChild);
+        }
+
+        if (!element.hasChildNodes()) {
+            element.appendChild(document.createElement('br'));
+        } else if (element.childNodes.length === 1 && isEmptyTextOrBr(element.firstChild!)) {
+            if (element.firstChild!.nodeType === Node.TEXT_NODE) {
+                element.removeChild(element.firstChild!);
+                element.appendChild(document.createElement('br'));
+            }
+        }
+
+        if (element instanceof HTMLElement) {
+            DOMUtils.updatePlaceholderVisibility(element);
         }
     }
 
@@ -182,6 +195,7 @@ export class DOMUtils {
         const afterCaretRange = range.cloneRange();
         afterCaretRange.setEndAfter(currentNode);
         afterCaretRange.deleteContents();
+        DOMUtils.trimEmptyTextAndBrElements(currentNode);
 
         const mapNodeToNewNode = (node: Node): Node | null => {
             const path: number[] = [];
@@ -220,6 +234,8 @@ export class DOMUtils {
         const beforeCaretRange = newRange.cloneRange();
         beforeCaretRange.setStartBefore(newNode);
         beforeCaretRange.deleteContents();
+
+        DOMUtils.trimEmptyTextAndBrElements(newNode);
 
         selection.removeAllRanges();
         selection.selectAllChildren(newNode);
@@ -603,6 +619,19 @@ export class DOMUtils {
         classesToRemove.forEach(cls => element.classList.remove(cls));
     }
 
+    static updatePlaceholderVisibility(element: HTMLElement): void {
+        if (!element.hasAttribute('data-placeholder')) {
+            return;
+        }
+        const content = element.innerHTML.replace(/\u200B/g, '').trim();
+        const isEmpty = content === '' || content === '<br>';
+        if (isEmpty) {
+            element.setAttribute('data-empty', 'true');
+        } else {
+            element.removeAttribute('data-empty');
+        }
+    }
+
     static isTargetDescendantOfSelector(event: Event, selector: string): boolean {
         let target: HTMLElement | null = null;
 
@@ -647,16 +676,21 @@ export class DOMUtils {
                 range.endContainer === lastTextNode &&
                 range.endOffset === lastTextNode.length;
 
-            if (rangeEndsAtContentEnd && content.endsWith("<br>")) {
+            const hasText = (element.textContent ?? "").trim().length > 0;
+
+            if (rangeEndsAtContentEnd && hasText && content.endsWith("<br>")) {
                 shouldRestoreCaret = true;
                 caretPos = element.textContent?.length ?? 0;
             }
         }
 
         if (content.endsWith('<br>')) {
-            const lastChild = element.lastChild;
-            if (lastChild && lastChild.nodeName === 'BR') {
-                element.removeChild(lastChild);
+            const hasText = (element.textContent ?? "").trim().length > 0;
+            if (hasText) {
+                const lastChild = element.lastChild;
+                if (lastChild && lastChild.nodeName === 'BR') {
+                    element.removeChild(lastChild);
+                }
             }
         }
 
@@ -678,6 +712,8 @@ export class DOMUtils {
             selection.removeAllRanges();
             selection.addRange(range);
         }
+
+        DOMUtils.updatePlaceholderVisibility(element);
     }
 
     static getTextNodesIn(node: Node): Text[] {
