@@ -756,6 +756,8 @@ export class BlockOperationsService implements IBlockOperationsService {
         
                     DOMUtils.trimEmptyTextAndBrElements(contentClone);
                     DOMUtils.rearrangeContentAfterSplit(contentCurrent, contentClone);
+                    DOMUtils.trimEmptyTextAndBrElements(contentCurrent);
+                    DOMUtils.trimEmptyTextAndBrElements(contentClone);
                 }
             } else {
                 const isLastItem = currentItem === allListItems[allListItems.length - 1];
@@ -824,6 +826,7 @@ export class BlockOperationsService implements IBlockOperationsService {
                     const contentClone = clonedBlock.querySelector(".focusable") as Node;
                     DOMUtils.rearrangeContentAfterSplit(contentCurrent, contentClone);
 
+                    DOMUtils.trimEmptyTextAndBrElements(contentCurrent);
                     DOMUtils.trimEmptyTextAndBrElements(contentClone);
                     this.transformBlock(ContentTypes.Paragraph, clonedBlock);
 
