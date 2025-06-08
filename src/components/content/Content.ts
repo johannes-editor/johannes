@@ -408,7 +408,7 @@ export class Content extends BaseUIComponent {
     }
 
     reRenderPlaceholder() {
-        document.addEventListener(DefaultJSEvents.Input, function (event: Event) {
+        const updateIfEditable = (event: Event) => {
             if (!(event.target instanceof HTMLElement)) return;
             const editableElement = event.target;
 
@@ -419,7 +419,11 @@ export class Content extends BaseUIComponent {
             if (editableElement.isContentEditable && editableElement.hasAttribute('data-placeholder')) {
                 DOMUtils.updatePlaceholderVisibility(editableElement);
             }
-        });
+        };
+
+        document.addEventListener(DefaultJSEvents.Input, updateIfEditable);
+        document.addEventListener(DefaultJSEvents.Focusin, updateIfEditable);
+        document.addEventListener(DefaultJSEvents.Mouseover, updateIfEditable);
     }
 
     static getInstance(): Content {
