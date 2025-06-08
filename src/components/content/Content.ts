@@ -102,6 +102,9 @@ export class Content extends BaseUIComponent {
             }
         } else if (this.contentWrapper &&
             this.contentWrapper.getAttribute("contenteditable") === "true") {
+            // Remove editing capabilities as soon as the selection collapses
+            this.contentWrapper.removeAttribute("contenteditable");
+            // Fallback removal in case focus leaves the editor with attribute still set
             setTimeout(() => {
                 if (!Content.isFocusInsideEditor()) {
                     this.contentWrapper?.removeAttribute("contenteditable");
