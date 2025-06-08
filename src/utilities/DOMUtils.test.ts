@@ -537,6 +537,12 @@ describe("DOMUtils.sanitizeContentEditable", () => {
         expect(editable.innerHTML).toBe("Hello<br>World");
     });
 
+    test("should keep <br> when content only contains <br>", () => {
+        editable.innerHTML = "<br>";
+        DOMUtils.sanitizeContentEditable(editable);
+        expect(editable.innerHTML).toBe("<br>");
+    });
+
     test("should restore caret when selection is at the end and content ends with <br>", () => {
         editable.innerHTML = "Hello<br>";
         const textNode = editable.firstChild!;
@@ -584,6 +590,22 @@ describe("DOMUtils.sanitizeContentEditable", () => {
         expect(editable.innerHTML).toBe("Hello<br>");
 
         window.getSelection = originalGetSelection;
+    });
+});
+
+describe("DOMUtils.trimEmptyTextAndBrElements", () => {
+    test("should keep single <br> when element only has <br>", () => {
+        const div = document.createElement("div");
+        div.innerHTML = "<br>";
+        DOMUtils.trimEmptyTextAndBrElements(div);
+        expect(div.innerHTML).toBe("<br>");
+    });
+
+    test("should remove leading and trailing <br> when text is present", () => {
+        const div = document.createElement("div");
+        div.innerHTML = "<br>Hello<br>";
+        DOMUtils.trimEmptyTextAndBrElements(div);
+        expect(div.innerHTML).toBe("Hello");
     });
 });
 

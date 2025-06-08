@@ -15,6 +15,7 @@ export class TableUtils {
             cell.contentEditable = "true";
             cell.setAttribute("data-placeholder", "Enter text");
             cell.classList.add("editable");
+            cell.innerHTML = "<br>";
             affectedCells.push(cell);
         }
 
@@ -32,6 +33,7 @@ export class TableUtils {
             cell.contentEditable = "true";
             cell.setAttribute("data-placeholder", "cell");
             cell.classList.add("editable");
+            cell.innerHTML = "<br>";
             affectedCells.push(cell);
         }
 

@@ -158,12 +158,16 @@ export class DOMUtils {
             return false;
         };
 
-        while (element.firstChild && isEmptyTextOrBr(element.firstChild)) {
+        while (element.firstChild && isEmptyTextOrBr(element.firstChild) && element.childNodes.length > 1) {
             element.removeChild(element.firstChild);
         }
 
-        while (element.lastChild && isEmptyTextOrBr(element.lastChild)) {
+        while (element.lastChild && isEmptyTextOrBr(element.lastChild) && element.childNodes.length > 1) {
             element.removeChild(element.lastChild);
+        }
+
+        if (!element.hasChildNodes()) {
+            element.appendChild(document.createElement('br'));
         }
     }
 
@@ -647,16 +651,21 @@ export class DOMUtils {
                 range.endContainer === lastTextNode &&
                 range.endOffset === lastTextNode.length;
 
-            if (rangeEndsAtContentEnd && content.endsWith("<br>")) {
+            const hasText = (element.textContent ?? "").trim().length > 0;
+
+            if (rangeEndsAtContentEnd && hasText && content.endsWith("<br>")) {
                 shouldRestoreCaret = true;
                 caretPos = element.textContent?.length ?? 0;
             }
         }
 
         if (content.endsWith('<br>')) {
-            const lastChild = element.lastChild;
-            if (lastChild && lastChild.nodeName === 'BR') {
-                element.removeChild(lastChild);
+            const hasText = (element.textContent ?? "").trim().length > 0;
+            if (hasText) {
+                const lastChild = element.lastChild;
+                if (lastChild && lastChild.nodeName === 'BR') {
+                    element.removeChild(lastChild);
+                }
             }
         }
 

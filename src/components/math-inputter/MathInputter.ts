@@ -56,6 +56,7 @@ export class MathInputter extends BaseUIComponent {
         input.classList.add("math-input", "focusable", "editable");
         input.contentEditable = "true";
         input.setAttribute("data-placeholder", "\\text{Formula}");
+        input.innerHTML = "<br>";
 
         const button = document.createElement("button");
         button.classList.add("blue-button");

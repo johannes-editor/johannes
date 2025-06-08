@@ -377,6 +377,11 @@ export class ElementFactoryService implements IElementFactoryService {
             textArea.setAttribute("data-placeholder", "Type something...");
             textArea.contentEditable = "true";
             textArea.classList.add("callout-text", "editable", "focusable");
+            if (content && content !== "") {
+                textArea.textContent = content;
+            } else {
+                textArea.innerHTML = "<br>";
+            }
 
             calloutWrapper.appendChild(textArea);
             johannesCallout.appendChild(calloutWrapper);
@@ -406,7 +411,11 @@ export class ElementFactoryService implements IElementFactoryService {
     static paragraph(content: string | null = null): HTMLElement {
         const p = document.createElement('p');
 
-        p.innerText = content || "";
+        if (content && content !== "") {
+            p.textContent = content;
+        } else {
+            p.innerHTML = "<br>";
+        }
         p.contentEditable = "true";
         p.setAttribute('data-content-type', ContentTypes.Paragraph);
         p.classList.add("johannes-content-element", "swittable", "focusable", "key-trigger", "editable");
@@ -418,7 +427,11 @@ export class ElementFactoryService implements IElementFactoryService {
     private static heading(level: number, content: string | null = null): HTMLElement {
         const h = document.createElement(`h${level}`);
 
-        h.innerText = content || "";
+        if (content && content !== "") {
+            h.textContent = content;
+        } else {
+            h.innerHTML = "<br>";
+        }
         h.contentEditable = "true";
         h.setAttribute('data-content-type', `h${level}`);
         h.classList.add("johannes-content-element", "swittable", "focusable", "focus", "key-trigger", "editable");
@@ -440,7 +453,11 @@ export class ElementFactoryService implements IElementFactoryService {
         const code = document.createElement('code');
         code.contentEditable = "true";
         code.setAttribute("data-placeholder", "/* Code snippet */");
-        code.textContent = content || "";
+        if (content && content !== "") {
+            code.textContent = content;
+        } else {
+            code.innerHTML = "<br>";
+        }
         code.classList.add('johannes-code', "focusable", "hljs", "language-plaintext", "editable");
         code.setAttribute("spellCheck", "false");
 
@@ -520,7 +537,11 @@ export class ElementFactoryService implements IElementFactoryService {
 
         const blockquote = document.createElement("blockquote");
         blockquote.classList.add("focusable", "editable");
-        blockquote.textContent = content || "";
+        if (content && content !== "") {
+            blockquote.textContent = content;
+        } else {
+            blockquote.innerHTML = "<br>";
+        }
         blockquote.contentEditable = "true";
         blockquote.setAttribute("data-placeholder", ElementFactoryService.getRandomQuote());
 
@@ -571,7 +592,11 @@ export class ElementFactoryService implements IElementFactoryService {
         checkbox.setAttribute('type', 'checkbox');
 
         let span = document.createElement('div');
-        span.textContent = content;
+        if (content && content !== "") {
+            span.textContent = content;
+        } else {
+            span.innerHTML = "<br>";
+        }
         span.setAttribute('data-placeholder', 'To-do');
         span.contentEditable = "true";
         span.setAttribute("for", id);
@@ -599,7 +624,11 @@ export class ElementFactoryService implements IElementFactoryService {
         initialItem.appendChild(div);
 
 
-        div.innerText = content || "";
+        if (content && content !== "") {
+            div.textContent = content;
+        } else {
+            div.innerHTML = "<br>";
+        }
 
         return initialItem;
     }
