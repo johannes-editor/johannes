@@ -317,7 +317,7 @@ p.johannes-content-element {
     content: attr(data-placeholder);
     color: #84888d !important;
     position: absolute;
-    left: 1.2rem;
+    left: 0;
     pointer-events: none;
 }
 
@@ -343,6 +343,11 @@ p.johannes-content-element {
     left: 1.25rem;
 }
 
+#johannesEditor .block > *[contenteditable="true"]:not(h1)[data-placeholder]:focus:before,
+#johannesEditor .block > *[contenteditable="true"]:not(h1)[data-placeholder][data-empty="true"]:focus:before {
+    left: 1.25rem;
+}
+
 #johannesEditor *[contenteditable="true"]:not(h1):empty:hover:before,
 #johannesEditor *[contenteditable="true"]:not(h1)[data-empty="true"]:hover:before {
     display: block;
@@ -358,7 +363,6 @@ p.johannes-content-element {
     content: attr(data-placeholder);
     color: #84888acd !important;
     position: absolute;
-    left: 0;
     pointer-events: none;
     display: block;
 }

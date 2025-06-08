@@ -284,7 +284,9 @@ export class QuickMenu extends BaseUIComponent implements IQuickMenu {
 
             if (!this.isVisible && value.endsWith('/')) {
 
-                const block = DOMUtils.findClosestAncestorOfActiveElementByClass("block");
+                const block =
+                    DOMUtils.findClosestAncestorOfActiveElementByClass("block") ||
+                    DOMUtils.findClosestAncestorOfActiveElementByClass("callout");
 
                 if (block) {
                     const currentCell = target.closest(".ignore-quick-menu") as HTMLTableCellElement;
@@ -325,7 +327,9 @@ export class QuickMenu extends BaseUIComponent implements IQuickMenu {
                 return;
             }
 
-            const block = DOMUtils.findClosestAncestorOfActiveElementByClass("block");
+            const block =
+                DOMUtils.findClosestAncestorOfActiveElementByClass("block") ||
+                DOMUtils.findClosestAncestorOfActiveElementByClass("callout");
 
             if (this.isVisible && event.key === KeyboardKeys.ArrowLeft && !event.ctrlKey && !event.shiftKey && !event.altKey) {
                 event.preventDefault();
