@@ -416,8 +416,12 @@ export class Content extends BaseUIComponent {
                 return;
             }
 
-            if (editableElement.isContentEditable && editableElement.hasAttribute('data-placeholder')) {
-                DOMUtils.updatePlaceholderVisibility(editableElement);
+            const placeholderElement = editableElement.hasAttribute('data-placeholder')
+                ? editableElement
+                : editableElement.closest('[data-placeholder]');
+
+            if (placeholderElement instanceof HTMLElement && placeholderElement.isContentEditable) {
+                DOMUtils.updatePlaceholderVisibility(placeholderElement);
             }
         };
 
@@ -429,16 +433,20 @@ export class Content extends BaseUIComponent {
                 return;
             }
 
+            const placeholderElement = editableElement.hasAttribute('data-placeholder')
+                ? editableElement
+                : editableElement.closest('[data-placeholder]');
+
             if (
-                editableElement.isContentEditable &&
-                editableElement.hasAttribute('data-placeholder') &&
-                editableElement.hasAttribute('data-empty') &&
+                placeholderElement instanceof HTMLElement &&
+                placeholderElement.isContentEditable &&
+                placeholderElement.hasAttribute('data-empty') &&
                 event.key.length === 1 &&
                 !event.ctrlKey &&
                 !event.metaKey &&
                 !event.altKey
             ) {
-                editableElement.removeAttribute('data-empty');
+                placeholderElement.removeAttribute('data-empty');
             }
         };
 
