@@ -53,6 +53,19 @@
     white-space: pre-wrap !important;
 }
 
+/* ensure placeholder overlays do not push content */
+[data-placeholder][data-empty] {
+    position: relative;
+}
+
+[data-placeholder][data-empty]::before {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    pointer-events: none;
+}
+
 
 figure figcaption[data-placeholder]:empty:before,
 figure figcaption[data-placeholder][data-empty]:before {
