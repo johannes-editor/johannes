@@ -48,6 +48,7 @@ document.addEventListener('DOMContentLoaded', function () {
     CommandDispatcher.getInstance().listen();
     EditableNavigation.getInstance().listen();
     BlockToolbox.getInstance().listen();
+    TableListeners.getInstance();
     ImageAlt.getInstance().listen();
 
     document.dispatchEvent(new Event("TextEditorLoaded"));
