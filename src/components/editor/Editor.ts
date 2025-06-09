@@ -16,6 +16,7 @@ import { InputLinkBoxWrapper } from "../floating-toolbar/base/link-box/InputLink
 import { DefaultJSEvents } from '@/common/DefaultJSEvents';
 import { Utils } from "@/utilities/Utils";
 import { DOMUtils } from "@/utilities/DOMUtils";
+import { TitleBuilder } from "../../builders/TitleBuilder";
 
 export class Editor extends BaseUIComponent {
 
@@ -34,6 +35,7 @@ export class Editor extends BaseUIComponent {
     private mathInputter: MathInputter;
     private inputLinkBoxWrapper: InputLinkBoxWrapper;
     private blockOperationsService: IBlockOperationsService;
+    private structureObserver: MutationObserver | null = null;
 
     private constructor(
         elementFactoryService: IElementFactoryService,
@@ -80,6 +82,7 @@ export class Editor extends BaseUIComponent {
         this.mathInputter = mathInputter;
 
         this.attachEvents();
+        this.monitorStructure();
 
         Editor.instance = this;
 
@@ -194,6 +197,41 @@ export class Editor extends BaseUIComponent {
         
 
         this.attachDragHandler();
+    }
+
+    private monitorStructure(): void {
+        const wrapper = document.querySelector('#johannesEditor .content-wrapper');
+        if (!wrapper) return;
+
+        this.structureObserver = new MutationObserver(() => {
+            this.ensureInitialStructure();
+        });
+
+        this.structureObserver.observe(wrapper, { childList: true, subtree: true });
+
+        this.ensureInitialStructure();
+    }
+
+    private ensureInitialStructure(): void {
+        const wrapper = document.querySelector('#johannesEditor .content-wrapper');
+        if (!wrapper) return;
+
+        let title = wrapper.querySelector('.title');
+        if (!title && window.editorConfig?.enableTitle !== false) {
+            title = TitleBuilder.build().htmlElement;
+            wrapper.prepend(title);
+        }
+
+        let content = wrapper.querySelector('.content') as HTMLElement | null;
+        if (!content) {
+            content = document.createElement('div');
+            content.classList.add('content');
+            wrapper.appendChild(content);
+        }
+
+        if (!content.querySelector('.block')) {
+            content.appendChild(ElementFactoryService.blockParagraph());
+        }
     }
 
     static handlePasteEvent(event: ClipboardEvent, blockOperationsService: IBlockOperationsService) {
