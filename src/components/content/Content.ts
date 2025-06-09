@@ -84,11 +84,15 @@ export class Content extends BaseUIComponent {
         const selection = document.getSelection();
 
         if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
+            const range = selection.getRangeAt(0).cloneRange();
+            const title = document.querySelector('#johannesEditor .title');
+
+            // Prevent turning the wrapper editable when the selection includes the title
+            if (title && range.intersectsNode(title)) {
+                return;
+            }
+
             if (this.contentWrapper && this.contentWrapper.getAttribute("contenteditable") !== "true") {
-                const anchorNode = selection.anchorNode;
-                const anchorOffset = selection.anchorOffset;
-                const focusNode = selection.focusNode;
-                const focusOffset = selection.focusOffset;
 
                 this.contentWrapper.setAttribute("contenteditable", "true");
 
@@ -96,7 +100,7 @@ export class Content extends BaseUIComponent {
                     const newSelection = document.getSelection();
                     if (newSelection) {
                         newSelection.removeAllRanges();
-                        newSelection.setBaseAndExtent(anchorNode!, anchorOffset, focusNode!, focusOffset);
+                        newSelection.addRange(range);
                     }
                 }, 0);
             }
@@ -235,6 +239,8 @@ export class Content extends BaseUIComponent {
             if (DOMUtils.isEventTargetDescendantOf(event, ".ignore-events") && event.key !== 'Tab') {
                 return;
             }
+
+
 
             if (event.ctrlKey || event.shiftKey || event.altKey) {
                 return;

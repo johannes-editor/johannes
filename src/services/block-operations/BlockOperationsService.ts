@@ -22,6 +22,17 @@ export class BlockOperationsService implements IBlockOperationsService {
     private memento: IMemento;
     private focusStack: IFocusStack;
 
+    private getOrCreateContentElement(): HTMLElement {
+        let contentElement = document.querySelector('#johannesEditor .content') as HTMLElement | null;
+        if (!contentElement) {
+            const wrapper = document.querySelector('#johannesEditor .content-wrapper');
+            contentElement = document.createElement('div');
+            contentElement.classList.add('content');
+            wrapper?.appendChild(contentElement);
+        }
+        return contentElement as HTMLElement;
+    }
+
     private constructor(
         elementFactoryService: IElementFactoryService,
         focusStack: IFocusStack,
@@ -45,7 +56,7 @@ export class BlockOperationsService implements IBlockOperationsService {
         if (previousBlock) {
             previousBlock.insertAdjacentElement('afterend', block);
         } else {
-            document.querySelector("#johannesEditor .content")!.appendChild(block);
+            this.getOrCreateContentElement().appendChild(block);
         }
 
         return block;
@@ -869,7 +880,7 @@ export class BlockOperationsService implements IBlockOperationsService {
             p.innerHTML = clonedTitle?.innerHTML || "";
         }
 
-        const content = document.querySelector("#johannesEditor .content");
+        const content = this.getOrCreateContentElement();
 
         if (content) {
             content.prepend(newBlock);
@@ -888,11 +899,13 @@ export class BlockOperationsService implements IBlockOperationsService {
         this.memento.saveState();
         const newBlock = this.elementFactoryService.create(ElementFactoryService.ELEMENT_TYPES.BLOCK_PARAGRAPH, text || "");
 
+        const contentElement = this.getOrCreateContentElement();
+
         if (eventParagraph && eventParagraph.closest('.block')) {
             const sibling = eventParagraph.closest('.block')!;
             sibling.insertAdjacentElement('afterend', newBlock);
-        } else {
-            document.querySelector("#johannesEditor .content")!.appendChild(newBlock);
+        } else if (contentElement) {
+            contentElement.appendChild(newBlock);
         }
 
         const focusable = newBlock.querySelector('.johannes-content-element') as HTMLElement;

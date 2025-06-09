@@ -1,5 +1,9 @@
 import { DOMUtils } from '@/utilities/DOMUtils';
 import { Editor } from './Editor';
+import { EditorBuilder } from '@/builders/EditorBuilder';
+import { DependencyContainer } from '@/core/DependencyContainer';
+import { ElementFactoryService } from '@/services/element-factory/ElementFactoryService';
+import { registerEditorDependenciesForTests } from '../../../tests/helpers/registerEditorDependencies';
 import { IBlockOperationsService } from '@/services/block-operations/IBlockOperationsService';
 import { Utils } from '@/utilities/Utils';
 
@@ -224,5 +228,30 @@ describe('Editor.handlePasteEvent', () => {
         Editor.handlePasteEvent(clipboardEvent, blockOperationsService);
 
         expect(insertTextAtCursor).toHaveBeenCalledWith('bold');
+    });
+});
+
+describe('Editor structure monitoring', () => {
+    let editor: Editor;
+    beforeEach(() => {
+        document.body.innerHTML = '<div id="johannesEditor"></div>';
+        registerEditorDependenciesForTests();
+        DependencyContainer.Instance.register('IElementFactoryService', () => ElementFactoryService.getInstance());
+        editor = EditorBuilder.build();
+    });
+
+    test('recreates title and first paragraph when removed', (done) => {
+        const wrapper = document.querySelector('#johannesEditor .content-wrapper') as HTMLElement;
+        const title = wrapper.querySelector('.title') as HTMLElement;
+        const first = wrapper.querySelector('.content .block') as HTMLElement;
+
+        title.remove();
+        first.remove();
+
+        setTimeout(() => {
+            expect(wrapper.querySelector('.title')).not.toBeNull();
+            expect(wrapper.querySelector('.content .block')).not.toBeNull();
+            done();
+        }, 0);
     });
 });
