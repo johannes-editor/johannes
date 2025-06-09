@@ -114,9 +114,9 @@ export class Toolbar extends FloatingToolbarBase implements ITableContextFloatin
     private handleMouseUp(event: MouseEvent) {
         if (this.selectedCells.length > 0 && this.selectionFlag) {
             const contentWrapper = document.querySelector('#johannesEditor .content-wrapper');
-            const focusedInsideWrapper = this.actualFocusedCell && contentWrapper?.contains(this.actualFocusedCell);
+            const cellInsideWrapper = this.selectedCells.some(cell => contentWrapper?.contains(cell));
 
-            if (!Utils.isEventFromContentWrapper(event) && !focusedInsideWrapper) {
+            if (!cellInsideWrapper) {
                 return;
             }
 

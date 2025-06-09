@@ -1,4 +1,5 @@
 import { Toolbar } from "./Toolbar";
+import { SelectionModes } from "./SelectionMode";
 import { DependencyContainer } from "@/core/DependencyContainer";
 
 class MockFocusStack {
@@ -64,6 +65,27 @@ describe("TableContextFloatingToolbar", () => {
         (toolbar as any).handleMouseDown(mousedown);
         (toolbar as any).handleMouseUp(mouseupOutside);
 
+        expect(toolbar.isVisible).toBe(true);
+    });
+
+    test("shows toolbar when multiple cells are selected by dragging", () => {
+        const cell1 = document.getElementById("cell1") as HTMLTableCellElement;
+        const cell2 = document.getElementById("cell2") as HTMLTableCellElement;
+
+        const mousedown = new MouseEvent("mousedown", { bubbles: true });
+        Object.defineProperty(mousedown, 'target', { value: cell1 });
+        (toolbar as any).handleMouseDown(mousedown);
+
+        (toolbar as any).selectionMode = SelectionModes.Cell;
+        const mousemove = new MouseEvent("mousemove", { bubbles: true });
+        Object.defineProperty(mousemove, 'target', { value: cell2 });
+        (toolbar as any).handleMouseMove(mousemove);
+
+        const mouseup = new MouseEvent("mouseup", { bubbles: true });
+        Object.defineProperty(mouseup, 'target', { value: cell2 });
+        (toolbar as any).handleMouseUp(mouseup);
+
+        expect((toolbar as any).selectedCells.length).toBe(2);
         expect(toolbar.isVisible).toBe(true);
     });
 });
