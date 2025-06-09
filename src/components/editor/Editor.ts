@@ -246,14 +246,6 @@ export class Editor extends BaseUIComponent {
             }
         });
 
-        // Remove duplicate empty blocks leaving only one
-        const blocks = content.querySelectorAll('.block');
-        if (blocks.length > 1) {
-            const empties = Array.from(blocks).filter(b => (b.textContent || '').trim() === '');
-            if (empties.length === blocks.length) {
-                empties.slice(1).forEach(b => b.remove());
-            }
-        }
     }
 
     static handlePasteEvent(event: ClipboardEvent, blockOperationsService: IBlockOperationsService) {
