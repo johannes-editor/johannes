@@ -239,6 +239,31 @@ export class Content extends BaseUIComponent {
                 return;
             }
 
+            if ((event.key === KeyboardKeys.Backspace || event.key === KeyboardKeys.Delete)) {
+                const selection = document.getSelection();
+                const title = document.querySelector('#johannesEditor .title');
+                if (selection && selection.rangeCount > 0 && !selection.isCollapsed && title) {
+                    const range = selection.getRangeAt(0);
+                    const intersectsTitle = range.intersectsNode(title) ||
+                        title.contains(range.startContainer) ||
+                        title.contains(range.endContainer);
+                    if (intersectsTitle) {
+                        event.preventDefault();
+                        const content = document.querySelector('#johannesEditor .content') as HTMLElement | null;
+                        content?.querySelectorAll('.block').forEach(b => b.remove());
+                        const h1 = title.querySelector('h1');
+                        if (h1) {
+                            const newRange = document.createRange();
+                            newRange.selectNodeContents(h1);
+                            newRange.collapse(false);
+                            selection.removeAllRanges();
+                            selection.addRange(newRange);
+                        }
+                        return;
+                    }
+                }
+            }
+
             if (event.ctrlKey || event.shiftKey || event.altKey) {
                 return;
             }
