@@ -16,7 +16,7 @@ export class QuickMenuBuilder {
             new QuickMenuItem(basicBlocksSection, 'Text', 'Start writing in plain text.', 'icon-material-format', ElementFactoryService.ELEMENT_TYPES.PARAGRAPH, "paragraph text p"),
             new QuickMenuItem(basicBlocksSection, 'Bulleted list', 'Organize items with bullet points.', 'icon-wordpress-bulleted-list', ElementFactoryService.ELEMENT_TYPES.BULLETED_LIST, "bulleted list unordered list ul"),
             new QuickMenuItem(basicBlocksSection, 'Numbered list', 'List items in a numbered format.', 'icon-wordpress-numbered-list', ElementFactoryService.ELEMENT_TYPES.NUMBERED_LIST, "numbered list number list sequential list ol enumerated list ordered list"),
-            //new QuickMenuItem(basicBlocksSection, 'Table', 'Organize data in rows and columns.', 'icon-material-table', ElementFactoryService.ELEMENT_TYPES.TABLE, "table tr th"),
+            new QuickMenuItem(basicBlocksSection, 'Table', 'Organize data in rows and columns.', 'icon-material-table', ElementFactoryService.ELEMENT_TYPES.TABLE, "table tr th"),
             new QuickMenuItem(basicBlocksSection, 'Callout', 'Emphasize key points with a callout box.', Icons.Callout, ElementFactoryService.ELEMENT_TYPES.CALLOUT, "callout note spotlight"),
             new QuickMenuItem(basicBlocksSection, 'Code', 'Include a code snippet.', 'icon-wordpress-code-mark', ElementFactoryService.ELEMENT_TYPES.CODE, "code script source markup"),
             new QuickMenuItem(basicBlocksSection, 'Formula', 'Display a math expression.', 'icon-wordpress-equation-mark', ElementFactoryService.ELEMENT_TYPES.MATH, "formula math latex equation"),
