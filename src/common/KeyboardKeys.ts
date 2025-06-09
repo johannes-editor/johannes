@@ -10,5 +10,7 @@ export enum KeyboardKeys {
     ArrowRight = "ArrowRight",
     ArrowLeft = "ArrowLeft",
     ArrowDown = "ArrowDown",
-    ArrowUp = "ArrowUp"
+    ArrowUp = "ArrowUp",
+    Slash = "/"
 }
+

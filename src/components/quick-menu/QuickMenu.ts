@@ -311,6 +311,35 @@ export class QuickMenu extends BaseUIComponent implements IQuickMenu {
         });
 
         document.addEventListener(DefaultJSEvents.Keydown, (event: KeyboardEvent) => {
+            if (event.key !== KeyboardKeys.Slash || this.isVisible) {
+                return;
+            }
+
+            if (!Utils.isEventFromContentWrapper(event)) {
+                return;
+            }
+
+            const target = event.target as HTMLElement;
+
+            if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target.isContentEditable)) {
+                return;
+            }
+
+            const block = DOMUtils.findClosestAncestorOfActiveElementByClass("block");
+
+            if (block) {
+                const currentCell = target.closest(".ignore-quick-menu") as HTMLTableCellElement;
+
+                if (currentCell) {
+                    return;
+                }
+
+                this.filterInput = '';
+                this.show();
+            }
+        });
+
+        document.addEventListener(DefaultJSEvents.Keydown, (event: KeyboardEvent) => {
 
             if (
                 event.key !== KeyboardKeys.ArrowLeft &&
