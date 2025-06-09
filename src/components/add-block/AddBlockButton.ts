@@ -34,10 +34,21 @@ export class AddBlockButton extends BaseUIComponent {
 
     attachEvents(): void {
 
-        this.htmlElement.addEventListener("click", () => {
-
+        // Use pointerdown to capture the active element before the button gains
+        // focus. This allows inserting the new block relative to the currently
+        // focused block rather than always appending at the end of the content.
+        this.htmlElement.addEventListener("pointerdown", (event) => {
+            event.preventDefault();
             //TODO: Use command dispatcher
             this.blockOperationsService.execCommand(Commands.createDefaultBlock, false);
+        });
+
+        // Fallback for keyboard interaction
+        this.htmlElement.addEventListener("keydown", (event: KeyboardEvent) => {
+            if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                this.blockOperationsService.execCommand(Commands.createDefaultBlock, false);
+            }
         });
     }
 
