@@ -229,8 +229,30 @@ export class Editor extends BaseUIComponent {
             wrapper.appendChild(content);
         }
 
+        // Move any stray blocks directly under the wrapper back into the content container
+        wrapper.querySelectorAll(':scope > .block').forEach(block => {
+            content!.appendChild(block);
+        });
+
         if (!content.querySelector('.block')) {
             content.appendChild(ElementFactoryService.blockParagraph());
+        }
+
+        // Ensure every block has an editable content element
+        content.querySelectorAll('.block').forEach(block => {
+            const editable = block.querySelector('.johannes-content-element') as HTMLElement | null;
+            if (editable && editable.getAttribute('contenteditable') !== 'true') {
+                editable.setAttribute('contenteditable', 'true');
+            }
+        });
+
+        // Remove duplicate empty blocks leaving only one
+        const blocks = content.querySelectorAll('.block');
+        if (blocks.length > 1) {
+            const empties = Array.from(blocks).filter(b => (b.textContent || '').trim() === '');
+            if (empties.length === blocks.length) {
+                empties.slice(1).forEach(b => b.remove());
+            }
         }
     }
 

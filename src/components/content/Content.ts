@@ -85,6 +85,13 @@ export class Content extends BaseUIComponent {
 
         if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
             const range = selection.getRangeAt(0).cloneRange();
+            const title = document.querySelector('#johannesEditor .title');
+
+            // Prevent turning the wrapper editable when the selection includes the title
+            if (title && range.intersectsNode(title)) {
+                return;
+            }
+
             if (this.contentWrapper && this.contentWrapper.getAttribute("contenteditable") !== "true") {
 
                 this.contentWrapper.setAttribute("contenteditable", "true");
