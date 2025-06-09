@@ -761,74 +761,42 @@ export class BlockOperationsService implements IBlockOperationsService {
             const parentBlock = currentItem?.closest(".block");
             const listElement = parentBlock?.querySelector("ul, ol");
             const allListItems = listElement?.querySelectorAll(".list-item");
-        
+
             if (!currentItem || !parentBlock || !listElement || !allListItems) return false;
-        
+
+            const focusable = currentItem.querySelector(".focusable") as HTMLElement | null;
+            const { atEnd } = focusable ? DOMUtils.getSelectionTextInfo(focusable) : { atEnd: false };
+
             if (DOMUtils.hasTextContent(currentItem)) {
-                const clone = DOMUtils.cloneAndInsertAfter(currentItem);
-                if (clone) {
-                    const contentCurrent = currentItem.querySelector(".focusable") as Node;
-                    const contentClone = clone.querySelector(".focusable") as Node;
-        
-                    DOMUtils.rearrangeContentAfterSplit(contentCurrent, contentClone);
-                    DOMUtils.trimEmptyTextAndBrElements(contentCurrent);
-                    DOMUtils.trimEmptyTextAndBrElements(contentClone);
+                if (atEnd) {
+                    const newItem = this.elementFactoryService.create(ElementFactoryService.ELEMENT_TYPES.LIST_ITEM, "");
+                    DOMUtils.insertAfter(newItem, currentItem);
+                    const newFocusable = newItem.querySelector('.focusable') as HTMLElement;
+                    DOMUtils.placeCursorAtStartOfEditableElement(newFocusable);
+                } else {
+                    const clone = DOMUtils.cloneAndInsertAfter(currentItem);
+                    if (clone) {
+                        const contentCurrent = currentItem.querySelector(".focusable") as Node;
+                        const contentClone = clone.querySelector(".focusable") as Node;
+
+                        DOMUtils.rearrangeContentAfterSplit(contentCurrent, contentClone);
+                        DOMUtils.trimEmptyTextAndBrElements(contentCurrent);
+                        DOMUtils.trimEmptyTextAndBrElements(contentClone);
+                        const focusableClone = clone.querySelector('.focusable') as HTMLElement;
+                        DOMUtils.placeCursorAtStartOfEditableElement(focusableClone);
+                    }
                 }
             } else {
-                const isLastItem = currentItem === allListItems[allListItems.length - 1];
-                
-                if (isLastItem) {
-                    const newParagraph = ElementFactoryService.blockParagraph();
-                    DOMUtils.insertAfter(newParagraph, parentBlock);
-                    
-                    currentItem.remove();
-                    if (allListItems.length === 1) {
-                        parentBlock.remove();
-                    }
-        
-                    const focusable = newParagraph.querySelector("p") as HTMLElement;
-                    DOMUtils.placeCursorAtStartOfEditableElement(focusable);
-                } else {
-                    const newListBlock = parentBlock.cloneNode(false) as HTMLElement;
-                    const newListElement = listElement.cloneNode(false) as HTMLElement;
-                
-                    const dragHandler = parentBlock.querySelector(".drag-handler-wrapper")?.cloneNode(true);
-                    if (dragHandler) {
-                        newListBlock.appendChild(dragHandler);
-                    }
-                
-                    newListBlock.appendChild(newListElement);
-                
-                    const itemsAfter = Array.from(allListItems).slice(
-                        Array.from(allListItems).indexOf(currentItem) + 1
-                    );
-                
-                    itemsAfter.forEach(item => {
-                        newListElement.appendChild(item);
-                    });
-                
-                    const hasItemsAfter = newListElement.querySelectorAll(".list-item").length > 0;
-                    if (hasItemsAfter) {
-                        DOMUtils.insertAfter(newListBlock, parentBlock);
-                    }
-                
-                    currentItem.remove();
-                
-                    const remainingItems = listElement.querySelectorAll(".list-item");
-                    if (remainingItems.length === 0) {
-                        parentBlock.remove();
-                    }
-                
-                    const newListItems = newListElement.querySelectorAll(".list-item");
-                    if (newListItems.length === 0 && newListBlock.isConnected) {
-                        newListBlock.remove();
-                    }
-                
-                    const firstItemInNewList = newListElement.querySelector(".list-item .focusable") as HTMLElement;
-                    if (firstItemInNewList) {
-                        DOMUtils.placeCursorAtStartOfEditableElement(firstItemInNewList);
-                    }
+                const newParagraph = ElementFactoryService.blockParagraph();
+                DOMUtils.insertAfter(newParagraph, parentBlock);
+
+                currentItem.remove();
+                if (allListItems.length === 1) {
+                    parentBlock.remove();
                 }
+
+                const p = newParagraph.querySelector('p') as HTMLElement;
+                DOMUtils.placeCursorAtStartOfEditableElement(p);
             }
         } else {
             const currentBlock = DOMUtils.findClosestAncestorOfActiveElementByClass("block");
