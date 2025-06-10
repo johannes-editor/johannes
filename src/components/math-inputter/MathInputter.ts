@@ -140,7 +140,8 @@ export class MathInputter extends BaseUIComponent {
     private hideOnExternalClick(event: MouseEvent) {
         const mathInputter = DOMUtils.findClickedElementOrAncestorById(event, this.id);
         const clickedOnElement = DOMUtils.findClickedElementOrAncestorByClass(event, CommonClasses.ShowMathInputOnClick);
-        if (!mathInputter && !clickedOnElement && this.isVisible) {
+        const clickedInlineMath = DOMUtils.findClickedElementOrAncestorByClass(event, 'inline-math');
+        if (!mathInputter && !clickedOnElement && !clickedInlineMath && this.isVisible) {
             this.hide();
         }
     }
