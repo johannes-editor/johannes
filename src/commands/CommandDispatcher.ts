@@ -116,6 +116,10 @@ export class CommandDispatcher {
                 this.textOperationsService.execInlineCode();
                 break;
 
+            case Commands.insertInlineFormula:
+                this.textOperationsService.execInlineFormula();
+                break;
+
             case Commands.toggleItalic:
                 this.textOperationsService.execItalic();
                 break;

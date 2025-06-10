@@ -1492,6 +1492,11 @@ pre code {
     min-height: 1.2em;
 }
 
+.inline-math {
+    display: inline-block;
+    min-height: 1.2em;
+}
+
 
 
 
