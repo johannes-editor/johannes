@@ -251,7 +251,8 @@ export class Content extends BaseUIComponent {
                 event.preventDefault();
 
                 const tableController = (event.target as Element).closest(".table-controller");
-                if (tableController) {
+                const insideList = (event.target as Element).closest(".list");
+                if (tableController && !insideList) {
                     const activeCell = (event.target as Element).closest("td, th") as HTMLTableCellElement;
                     const table = tableController.querySelector("table") as HTMLTableElement;
                     if (activeCell) {
