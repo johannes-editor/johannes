@@ -385,9 +385,10 @@ export class TextOperationsService implements ITextOperationsService {
         };
 
         (container as any).renderPreview = renderPreview;
-        renderPreview();
 
         range.insertNode(container);
+
+        renderPreview();
 
         const parent = container.closest('[contenteditable="true"]');
         if (parent) {
