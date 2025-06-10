@@ -380,7 +380,7 @@ export class TextOperationsService implements ITextOperationsService {
                     container.textContent = formula;
                 }
             } else {
-                container.textContent = 'f(x)';
+                container.textContent = '';
             }
         };
 

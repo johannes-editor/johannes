@@ -7,6 +7,7 @@ import { KeyboardKeys } from "@/common/KeyboardKeys";
 import { DOMUtils } from "@/utilities/DOMUtils";
 import { CommonClasses } from "@/common/CommonClasses";
 import { Utils } from "@/utilities/Utils";
+import { EventEmitter } from "@/commands/EventEmitter";
 
 export class MathInputter extends BaseUIComponent {
 
@@ -86,10 +87,10 @@ export class MathInputter extends BaseUIComponent {
     attachEvents(): void {
         this.ensureInputElements();
         document.addEventListener(DefaultJSEvents.Keydown, this.handleKeydown.bind(this), true);
-        document.addEventListener(DefaultJSEvents.Click, this.handleClick.bind(this));
+        document.addEventListener(DefaultJSEvents.Mousedown, this.handleClick.bind(this));
         document.addEventListener(DefaultJSEvents.SelectionChange, this.handleSelectionChange.bind(this));
 
-        this.input?.addEventListener("input", () => this.updateFormula());
+        this.input?.addEventListener(DefaultJSEvents.Input, () => this.updateFormula());
         this.done?.addEventListener(DefaultJSEvents.Click, (e) => {
             e.preventDefault();
             this.updateFormula();
@@ -182,5 +183,43 @@ export class MathInputter extends BaseUIComponent {
             this.htmlElement.style.top = `${top}px`;
         }
         setTimeout(() => this.input.focus(), 0);
+    }
+
+    hide() {
+        this.updateFormula();
+        if (this.currentTarget) {
+            const formula = this.currentTarget.dataset.formula || "";
+            if (!formula.trim()) {
+                const container = this.currentTarget;
+                const parent = container.parentElement;
+                if (parent) {
+                    if (container.previousSibling &&
+                        container.previousSibling.nodeType === Node.TEXT_NODE &&
+                        (container.previousSibling as Text).data === '\u200B') {
+                        parent.removeChild(container.previousSibling);
+                    }
+                    if (container.nextSibling &&
+                        container.nextSibling.nodeType === Node.TEXT_NODE &&
+                        (container.nextSibling as Text).data === '\u200B') {
+                        parent.removeChild(container.nextSibling);
+                    }
+                    const range = document.createRange();
+                    range.setStartAfter(container);
+                    range.collapse(true);
+                    const selection = window.getSelection();
+                    selection?.removeAllRanges();
+                    selection?.addRange(range);
+                    parent.removeChild(container);
+                    DOMUtils.trimEmptyTextAndBrElements(parent);
+                    (parent as HTMLElement).normalize();
+                    DOMUtils.mergeInlineElements(parent as HTMLElement);
+                } else {
+                    container.remove();
+                }
+                this.currentTarget = undefined;
+                EventEmitter.emitDocChangedEvent();
+            }
+        }
+        super.hide();
     }
 }
