@@ -283,17 +283,50 @@ export class Editor extends BaseUIComponent {
                         Editor.insertTextAtCursor(blocks[0].text);
                     }
     
-                    blocks.slice(1).forEach(block => {
-                        if (block.type === "ul" || block.type === "ol") {
-                            const first = block.items?.[0]?.text;
-                            const newBlock = blockOperationsService.insertBlock("block-" + block.type, first || "", null);
-    
-                            block.items?.slice(1).forEach(item => {
-                                blockOperationsService.insertLiIntoListBlock(item.text || "", newBlock);
-                            });
-    
+                    let nextEmptyBlock: HTMLElement | null = null;
+                    if (target?.tagName.toLowerCase() === 'h1') {
+                        const wrapper = target.closest('.content-wrapper');
+                        const content = wrapper?.querySelector('.content');
+                        const maybeNext = content?.querySelector('.block') as HTMLElement | null;
+                        if (maybeNext) {
+                            const contentEl = maybeNext.querySelector('.johannes-content-element') as HTMLElement | null;
+                            if (contentEl && (contentEl.textContent || '').trim() === '') {
+                                nextEmptyBlock = maybeNext;
+                            }
+                        }
+                    }
+
+                    blocks.slice(1).forEach((block, index) => {
+                        if (index === 0 && nextEmptyBlock) {
+                            const contentEl = nextEmptyBlock.querySelector('.johannes-content-element') as HTMLElement | null;
+                            if (!contentEl) return;
+
+                            if (block.type === 'ul' || block.type === 'ol') {
+                                contentEl.textContent = block.items?.[0]?.text || '';
+                                DOMUtils.updatePlaceholderVisibility(contentEl);
+                                blockOperationsService.transformBlock(block.type, nextEmptyBlock);
+                                block.items?.slice(1).forEach(item => {
+                                    blockOperationsService.insertLiIntoListBlock(item.text || '', nextEmptyBlock);
+                                });
+                            } else {
+                                contentEl.textContent = block.text || '';
+                                DOMUtils.updatePlaceholderVisibility(contentEl);
+                                if (block.type !== 'p') {
+                                    blockOperationsService.transformBlock(block.type, nextEmptyBlock);
+                                }
+                            }
                         } else {
-                            blockOperationsService.insertBlock("block-" + block.type, block.text || "", null);
+                            if (block.type === "ul" || block.type === "ol") {
+                                const first = block.items?.[0]?.text;
+                                const newBlock = blockOperationsService.insertBlock("block-" + block.type, first || "", null);
+
+                                block.items?.slice(1).forEach(item => {
+                                    blockOperationsService.insertLiIntoListBlock(item.text || "", newBlock);
+                                });
+
+                            } else {
+                                blockOperationsService.insertBlock("block-" + block.type, block.text || "", null);
+                            }
                         }
                     });
                 }

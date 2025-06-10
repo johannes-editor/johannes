@@ -135,7 +135,7 @@ describe('Editor.handlePasteEvent', () => {
         jest.clearAllMocks();
     });
 
-    function createPasteEvent(html = '', text = ''): Event {
+    function createPasteEvent(html = '', text = '', customTarget?: HTMLElement): Event {
         const clipboardData = {
             getData: (type: string) => {
                 if (type === 'text/html') return html;
@@ -150,7 +150,7 @@ describe('Editor.handlePasteEvent', () => {
             value: clipboardData,
         });
     
-        const target = document.createElement('div');
+        const target = customTarget || document.createElement('div');
         target.setAttribute('contenteditable', 'true');
     
         Object.defineProperty(event, 'target', {
@@ -178,6 +178,42 @@ describe('Editor.handlePasteEvent', () => {
 
         expect(insertTextAtCursor).toHaveBeenCalledWith('First');
         expect(blockOperationsService.insertBlock).toHaveBeenCalledWith('block-p', 'Second', null);
+    });
+
+    test('uses next empty paragraph when pasting into title', () => {
+        const html = '<p>First</p><p>Second</p><p>Third</p>';
+
+        const wrapper = document.createElement('div');
+        wrapper.classList.add('content-wrapper');
+
+        const h1 = document.createElement('h1');
+        h1.setAttribute('contenteditable', 'true');
+        const title = document.createElement('div');
+        title.classList.add('title');
+        title.appendChild(h1);
+        wrapper.appendChild(title);
+
+        const content = document.createElement('div');
+        content.classList.add('content');
+        const p = document.createElement('p');
+        p.setAttribute('contenteditable', 'true');
+        p.classList.add('johannes-content-element');
+        p.innerHTML = '<br>';
+        const block = document.createElement('div');
+        block.classList.add('block');
+        block.appendChild(p);
+        content.appendChild(block);
+        wrapper.appendChild(content);
+
+        document.body.appendChild(wrapper);
+
+        clipboardEvent = createPasteEvent(html, '', h1) as unknown as ClipboardEvent;
+
+        Editor.handlePasteEvent(clipboardEvent, blockOperationsService);
+
+        expect(insertTextAtCursor).toHaveBeenCalledWith('First');
+        expect(p.textContent).toBe('Second');
+        expect(blockOperationsService.insertBlock).toHaveBeenCalledWith('block-p', 'Third', null);
     });
 
     //TODO: Add List test case
