@@ -223,8 +223,14 @@ export class TableOperationsService implements ITableOperationsService {
     private selectRange(toCell: HTMLTableCellElement) {
         if (!this.lastSelected) return;
         const table = toCell.closest('table') as HTMLTableElement;
-        const startRow = Math.min(this.lastSelected.parentElement!.rowIndex, toCell.parentElement!.rowIndex);
-        const endRow = Math.max(this.lastSelected.parentElement!.rowIndex, toCell.parentElement!.rowIndex);
+        const startRow = Math.min(
+            (this.lastSelected.parentElement as HTMLTableRowElement).rowIndex,
+            (toCell.parentElement as HTMLTableRowElement).rowIndex
+        );
+        const endRow = Math.max(
+            (this.lastSelected.parentElement as HTMLTableRowElement).rowIndex,
+            (toCell.parentElement as HTMLTableRowElement).rowIndex
+        );
         const startCol = Math.min(this.lastSelected.cellIndex, toCell.cellIndex);
         const endCol = Math.max(this.lastSelected.cellIndex, toCell.cellIndex);
         this.clearSelection();

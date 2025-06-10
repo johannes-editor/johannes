@@ -248,7 +248,7 @@ export class CommandDispatcher {
                 break;
 
             case Commands.insertTableColumnRight:
-                this.tableOperationsService.insertColumnRight(block || null);
+                this.tableOperationsService.insertColumnRight();
                 break;
 
             case Commands.insertTableRowAbove:
@@ -256,7 +256,7 @@ export class CommandDispatcher {
                 break;
 
             case Commands.insertTableRowBelow:
-                this.tableOperationsService.insertRowBelow(block || null);
+                this.tableOperationsService.insertRowBelow();
                 break;
 
 
