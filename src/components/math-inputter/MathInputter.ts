@@ -94,7 +94,7 @@ export class MathInputter extends BaseUIComponent {
         this.done?.addEventListener(DefaultJSEvents.Click, (e) => {
             e.preventDefault();
             this.updateFormula();
-            this.hide();
+            this.hide(true);
         });
 
         super.attachUIEvent();
@@ -127,7 +127,7 @@ export class MathInputter extends BaseUIComponent {
             if (!Utils.isEventFromContentWrapper(event)) return;
             if (this.canHide) {
                 event.stopImmediatePropagation();
-                this.hide();
+                this.hide(true);
             }
         }
     }
@@ -141,7 +141,7 @@ export class MathInputter extends BaseUIComponent {
         const mathInputter = DOMUtils.findClickedElementOrAncestorById(event, this.id);
         const clickedOnElement = DOMUtils.findClickedElementOrAncestorByClass(event, CommonClasses.ShowMathInputOnClick);
         if (!mathInputter && !clickedOnElement && this.isVisible) {
-            this.hide();
+            this.hide(false);
         }
     }
 
@@ -156,7 +156,7 @@ export class MathInputter extends BaseUIComponent {
                 const render = (container as any).renderPreview || (() => {});
                 this.setTarget(container, render);
                 if (this.isVisible && this.currentTarget === container) {
-                    this.hide();
+                    this.hide(true);
                 } else {
                     this.show();
                 }
@@ -185,11 +185,11 @@ export class MathInputter extends BaseUIComponent {
         setTimeout(() => this.input.focus(), 0);
     }
 
-    hide() {
+    hide(removeIfEmpty: boolean = true) {
         this.updateFormula();
         if (this.currentTarget) {
             const formula = this.currentTarget.dataset.formula || "";
-            if (!formula.trim()) {
+            if (removeIfEmpty && !formula.trim()) {
                 const container = this.currentTarget;
                 const parent = container.parentElement;
                 if (parent) {
