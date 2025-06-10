@@ -358,10 +358,17 @@ export class TextOperationsService implements ITextOperationsService {
         }
 
         const range = selection.getRangeAt(0);
+
+        let selectedText = '';
+        if (!selection.isCollapsed) {
+            selectedText = range.toString();
+            range.deleteContents();
+        }
+
         const container = document.createElement('span');
         container.classList.add('inline-math', CommonClasses.ShowMathInputOnClick, CommonClasses.ContentElement);
         container.setAttribute('data-content-type', ContentTypes.Math);
-        container.dataset.formula = '';
+        container.dataset.formula = selectedText;
 
         const renderPreview = () => {
             const formula = container.dataset.formula || '';
