@@ -55,9 +55,7 @@ export class MathInputter extends BaseUIComponent {
         const input = document.createElement("div");
         input.classList.add("math-input", "focusable", "editable");
         input.contentEditable = "true";
-        input.setAttribute("data-placeholder", "\\text{Formula}");
-        input.innerHTML = "<br>";
-        DOMUtils.updatePlaceholderVisibility(input);
+        input.innerHTML = "";
 
         const button = document.createElement("button");
         button.classList.add("blue-button");
@@ -89,6 +87,7 @@ export class MathInputter extends BaseUIComponent {
         this.ensureInputElements();
         document.addEventListener(DefaultJSEvents.Keydown, this.handleKeydown.bind(this), true);
         document.addEventListener(DefaultJSEvents.Click, this.handleClick.bind(this));
+        document.addEventListener(DefaultJSEvents.SelectionChange, this.handleSelectionChange.bind(this));
 
         this.input?.addEventListener("input", () => this.updateFormula());
         this.done?.addEventListener(DefaultJSEvents.Click, (e) => {
@@ -98,6 +97,28 @@ export class MathInputter extends BaseUIComponent {
         });
 
         super.attachUIEvent();
+    }
+
+    private handleSelectionChange() {
+        const sel = window.getSelection();
+        if (!sel || sel.rangeCount === 0 || !sel.isCollapsed) return;
+
+        let node: Node | null = sel.anchorNode;
+        if (!node) return;
+
+        if (node.nodeType === Node.TEXT_NODE) {
+            node = node.parentElement;
+        }
+
+        const container = (node as HTMLElement).closest('.inline-math');
+        if (container) {
+            const render = (container as any).renderPreview || (() => {});
+            if (this.currentTarget !== container || !this.isVisible) {
+                this.focusStack.push(container as HTMLElement);
+                this.setTarget(container as HTMLElement, render);
+                this.show();
+            }
+        }
     }
 
     private handleKeydown(event: KeyboardEvent) {

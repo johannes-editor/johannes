@@ -358,10 +358,17 @@ export class TextOperationsService implements ITextOperationsService {
         }
 
         const range = selection.getRangeAt(0);
+
+        let selectedText = '';
+        if (!selection.isCollapsed) {
+            selectedText = range.toString();
+            range.deleteContents();
+        }
+
         const container = document.createElement('span');
         container.classList.add('inline-math', CommonClasses.ShowMathInputOnClick, CommonClasses.ContentElement);
         container.setAttribute('data-content-type', ContentTypes.Math);
-        container.dataset.formula = '';
+        container.dataset.formula = selectedText;
 
         const renderPreview = () => {
             const formula = container.dataset.formula || '';
@@ -380,7 +387,13 @@ export class TextOperationsService implements ITextOperationsService {
         (container as any).renderPreview = renderPreview;
         renderPreview();
 
+        const startMarker = document.createTextNode('\u200B');
+        range.insertNode(startMarker);
+        range.setStartAfter(startMarker);
         range.insertNode(container);
+        range.setStartAfter(container);
+        const endMarker = document.createTextNode('\u200B');
+        range.insertNode(endMarker);
 
         const parent = container.closest('[contenteditable="true"]');
         if (parent) {
@@ -389,7 +402,7 @@ export class TextOperationsService implements ITextOperationsService {
             DOMUtils.mergeInlineElements(parent as HTMLElement);
         }
 
-        range.setStartAfter(container);
+        range.setStartAfter(endMarker);
         range.collapse(true);
         selection.removeAllRanges();
         selection.addRange(range);

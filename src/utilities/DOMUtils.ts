@@ -923,11 +923,20 @@ export class DOMUtils {
             if (children[i].nodeType === Node.ELEMENT_NODE) {
                 const childElement = children[i] as HTMLElement;
                 if (['SPAN', 'CODE', 'EM', 'STRONG', 'B', 'I'].includes(childElement.nodeName)) {
-                    while (i < children.length - 1 && childElement.nextSibling && childElement.nextSibling.nodeType === Node.ELEMENT_NODE && childElement.nodeName === (childElement.nextSibling as HTMLElement).nodeName) {
-                        while ((childElement.nextSibling as HTMLElement).childNodes.length > 0) {
-                            childElement.appendChild((childElement.nextSibling as HTMLElement).firstChild!);
+                    while (
+                        i < children.length - 1 &&
+                        childElement.nextSibling &&
+                        childElement.nextSibling.nodeType === Node.ELEMENT_NODE &&
+                        childElement.nodeName === (childElement.nextSibling as HTMLElement).nodeName
+                    ) {
+                        const nextElement = childElement.nextSibling as HTMLElement;
+                        if (childElement.classList.contains('inline-math') || nextElement.classList.contains('inline-math')) {
+                            break;
                         }
-                        element.removeChild(childElement.nextSibling);
+                        while (nextElement.childNodes.length > 0) {
+                            childElement.appendChild(nextElement.firstChild!);
+                        }
+                        element.removeChild(nextElement);
                     }
                     DOMUtils.mergeInlineElements(childElement);
                 }
