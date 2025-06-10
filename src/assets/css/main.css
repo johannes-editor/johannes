@@ -296,7 +296,12 @@ p.johannes-content-element {
     box-sizing: border-box;
 }
 
-.block:hover .drag-handler {
+.block:empty {
+    min-height: 1.5rem;
+}
+
+.block:hover .drag-handler,
+.block:focus-within .drag-handler {
     visibility: visible;
     vertical-align: top;
     justify-content: start;
