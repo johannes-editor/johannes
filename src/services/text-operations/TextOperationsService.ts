@@ -381,6 +381,14 @@ export class TextOperationsService implements ITextOperationsService {
         renderPreview();
 
         range.insertNode(container);
+
+        const parent = container.closest('[contenteditable="true"]');
+        if (parent) {
+            DOMUtils.trimEmptyTextAndBrElements(parent);
+            (parent as HTMLElement).normalize();
+            DOMUtils.mergeInlineElements(parent as HTMLElement);
+        }
+
         range.setStartAfter(container);
         range.collapse(true);
         selection.removeAllRanges();
@@ -389,7 +397,7 @@ export class TextOperationsService implements ITextOperationsService {
         const inputter = MathInputter.getInstance();
         inputter.setTarget(container, renderPreview);
         inputter.focusStack.push(container);
-        inputter.show();
+        setTimeout(() => inputter.show(), 0);
 
         EventEmitter.emitDocChangedEvent();
     }
