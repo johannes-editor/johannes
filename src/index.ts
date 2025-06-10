@@ -12,7 +12,6 @@ import { BlockOperationsService } from './services/block-operations/BlockOperati
 import { ElementFactoryService } from './services/element-factory/ElementFactoryService';
 import { TextOperationsService } from './services/text-operations/TextOperationsService';
 import { TableOperationsService } from './services/table-operations/TableOperationsService';
-import { Toolbar as TableContextFloatingToolbar } from './components/floating-toolbar/table-context/Toolbar';
 import { Memento } from './core/Memento';
 import { EditableNavigation } from './core/EditableNavigation';
 import { BlockToolbox } from './components/block-toolbox/BlockToolbox';
@@ -40,7 +39,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     //UserInterface
     DependencyContainer.Instance.register("IQuickMenu", () => QuickMenu.getInstance());
-    DependencyContainer.Instance.register("ITableContextFloatingToolbar", () => TableContextFloatingToolbar.getInstance());
     DependencyContainer.Instance.register("IEditableNavigation", () => EditableNavigation.getInstance());
 
     UIBuilder.build().start();

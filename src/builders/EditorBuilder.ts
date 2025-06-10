@@ -1,7 +1,6 @@
 import { Editor } from "@/components/editor/Editor";
 import { AddBlockBuilder } from "./AddBlockBuilder";
 import { Builder as TextContextFloatingToolbarBuilder } from "../components/floating-toolbar/text-context/Builder";
-import { Builder as TableContextFloatingToolbarBuilder } from "../components/floating-toolbar/table-context/Builder";
 import { QuickMenuBuilder } from "../components/quick-menu/QuickMenuBuilder";
 import { TitleBuilder } from "./TitleBuilder";
 import { ContentBuilder } from "./ContentBuilder";
@@ -18,7 +17,6 @@ export class EditorBuilder {
             AddBlockBuilder.build(),
             TextContextFloatingToolbarBuilder.build(),
             QuickMenuBuilder.build(),
-            TableContextFloatingToolbarBuilder.build(),
             MediaInputterBuilder.build(),
             MathInputterBuilder.build()
         );

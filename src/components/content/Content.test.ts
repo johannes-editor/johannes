@@ -20,18 +20,12 @@ class MockQuickMenu {
   register = jest.fn();
 }
 
-class MockTableContextFloatingToolbar {
-  show = jest.fn();
-  hide = jest.fn();
-  update = jest.fn();
-}
 
 describe("Content", () => {
   beforeEach(() => {
     DependencyContainer.Instance.register("IShortcutListeners", () => new MockShortcutListeners());
     DependencyContainer.Instance.register("ITableListeners", () => new MockTableListeners());
     DependencyContainer.Instance.register("IQuickMenu", () => new MockQuickMenu());
-    DependencyContainer.Instance.register("ITableContextFloatingToolbar", () => new MockTableContextFloatingToolbar());
   });
 
   test("Create element", () => {

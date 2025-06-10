@@ -1,5 +1,4 @@
 import { Directions } from "@/common/Directions";
-import { TableScopes } from "@/services/table-operations/TableScopes";
 import { DOMUtils } from "@/utilities/DOMUtils";
 
 export class TableUtils {
@@ -148,43 +147,6 @@ export class TableUtils {
         return null;
     }
 
-    static changeCellBorderColor(
-        table: HTMLTableElement,
-        scope: TableScopes,
-        color: string
-    ) {
-        let cellsToChange: NodeListOf<HTMLTableCellElement> | HTMLCollectionOf<HTMLTableCellElement> | null = null;
-
-        switch (scope) {
-            case TableScopes.Column:
-                const columnIndex = (table.querySelector("td.selected") as HTMLTableCellElement)?.cellIndex;
-                if (columnIndex !== undefined) {
-                    cellsToChange = table.querySelectorAll(`td:nth-child(${columnIndex + 1})`);
-                }
-                break;
-            case TableScopes.Row:
-                const selectedCell = table.querySelector("td.selected") as HTMLTableCellElement;
-                if (selectedCell) {
-                    const row = selectedCell.parentElement as HTMLTableRowElement;
-                    cellsToChange = row.cells;
-                }
-                break;
-            case TableScopes.Cell:
-                cellsToChange = table.querySelectorAll("td.selected") as NodeListOf<HTMLTableCellElement>;
-                break;
-            case TableScopes.SelectedCells:
-                cellsToChange = table.querySelectorAll("td.selected") as NodeListOf<HTMLTableCellElement>;
-                break;
-            default:
-                throw new Error("Invalid scope.");
-        }
-
-        if (cellsToChange) {
-            Array.from(cellsToChange).forEach((cell) => {
-                cell.style.border = `1px double ${color}`;
-            });
-        }
-    }
 
     static moveFocusToBelowCell(table: HTMLTableElement, cell: HTMLTableCellElement): boolean {
         const nextRow = cell.parentElement?.nextElementSibling as HTMLTableRowElement | null;

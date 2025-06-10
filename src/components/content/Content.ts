@@ -7,7 +7,6 @@ import { DependencyContainer } from "@/core/DependencyContainer";
 import { IQuickMenu } from "../quick-menu/IQuickMenu";
 import { IShortcutListeners } from "@/core/IShortcutListeners";
 import { ITableListeners } from "@/core/listeners/ITableListeners";
-import { ITableContextFloatingToolbar } from "../floating-toolbar/table-context/ITableContextFloatingToolbar";
 import { DOMUtils } from "@/utilities/DOMUtils";
 import { TableUtils } from "@/utilities/TableUtils";
 import { DefaultJSEvents } from "@/common/DefaultJSEvents";
@@ -17,7 +16,6 @@ import { Utils } from "@/utilities/Utils";
 export class Content extends BaseUIComponent {
 
     quickMenu: IQuickMenu;
-    tableToolbar: ITableContextFloatingToolbar;
     contentWrapper: HTMLElement | null = null;
 
     private contentEditableTimeout: number | null = null;
@@ -27,7 +25,6 @@ export class Content extends BaseUIComponent {
         super({});
 
         this.quickMenu = DependencyContainer.Instance.resolve<IQuickMenu>("IQuickMenu");
-        this.tableToolbar = DependencyContainer.Instance.resolve<ITableContextFloatingToolbar>("ITableContextFloatingToolbar");
 
         this.attachEvent();
     }
@@ -246,7 +243,7 @@ export class Content extends BaseUIComponent {
                 return;
             }
 
-            if (event.key === KeyboardKeys.Enter && !event.shiftKey && !this.quickMenu.isVisible && !this.tableToolbar.isVisible) {
+            if (event.key === KeyboardKeys.Enter && !event.shiftKey && !this.quickMenu.isVisible) {
 
                 event.preventDefault();
 

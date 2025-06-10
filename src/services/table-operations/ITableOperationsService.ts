@@ -1,19 +1,18 @@
-import { Colors } from "@/common/Colors";
-import { TableScopes } from "./TableScopes";
-
 export interface ITableOperationsService {
-    execCellBackgroundColor(value: string): void;
+    /** Creates a table wrapper with the given size */
+    createTable(rows: number, cols: number): HTMLElement;
+
+    /** Row operations */
     insertRowAbove(): void;
-    insertRowBelow(table: HTMLElement | null): void;
-    insertColumnLeft(): void;
-    insertColumnRight(block: HTMLElement | null): void;
-    showInsertLineElement(block: HTMLElement): void;
-    showInsertColumnElement(block: HTMLElement): void;
-    hideInsertRowElement(block: HTMLElement): void;
-    hideInsertColumnElement(block: HTMLElement): void;
-    removeColumn(): void;
+    insertRowBelow(): void;
     removeRow(): void;
-    changeTableBorderColor(scope: TableScopes, color: Colors): void;
-    queryStateCellBackgroundColor(value: string): boolean;
-    queryAllStateCellBackgroundColor(elements: HTMLTableCellElement[], color: Colors): boolean;
+
+    /** Column operations */
+    insertColumnLeft(): void;
+    insertColumnRight(): void;
+    removeColumn(): void;
+
+    /** Other utilities */
+    toggleHeader(): void;
+    alignSelectedCells(alignment: 'left' | 'center' | 'right'): void;
 }

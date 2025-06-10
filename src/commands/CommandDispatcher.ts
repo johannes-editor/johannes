@@ -6,8 +6,6 @@ import { DependencyContainer } from "@/core/DependencyContainer";
 import { IBlockOperationsService } from "@/services/block-operations/IBlockOperationsService";
 import { ITableOperationsService } from "@/services/table-operations/ITableOperationsService";
 import { ITextOperationsService } from "@/services/text-operations/ITextOperationsService";
-import { TableScopes } from "@/services/table-operations/TableScopes";
-import { Colors } from "@/common/Colors";
 import { DOMUtils } from "@/utilities/DOMUtils";
 
 /**
@@ -182,24 +180,36 @@ export class CommandDispatcher {
                 break;
 
             case Commands.JustifyLeft:
-                if (!block) {
-                    throw new Error(`${Commands.JustifyLeft} requires a block to justify.`);
+                if (DOMUtils.isSelectionInTableCell()) {
+                    this.tableOperationsService.alignSelectedCells('left');
+                } else {
+                    if (!block) {
+                        throw new Error(`${Commands.JustifyLeft} requires a block to justify.`);
+                    }
+                    this.blockOperationsService.justifyLeft(block);
                 }
-                this.blockOperationsService.justifyLeft(block);
                 break;
 
             case Commands.JustifyCenter:
-                if (!block) {
-                    throw new Error(`${Commands.JustifyCenter} requires a block to justify.`);
+                if (DOMUtils.isSelectionInTableCell()) {
+                    this.tableOperationsService.alignSelectedCells('center');
+                } else {
+                    if (!block) {
+                        throw new Error(`${Commands.JustifyCenter} requires a block to justify.`);
+                    }
+                    this.blockOperationsService.justifyCenter(block);
                 }
-                this.blockOperationsService.justifyCenter(block);
                 break;
 
             case Commands.JustifyRight:
-                if (!block) {
-                    throw new Error(`${Commands.JustifyRight} requires a block to justify.`);
+                if (DOMUtils.isSelectionInTableCell()) {
+                    this.tableOperationsService.alignSelectedCells('right');
+                } else {
+                    if (!block) {
+                        throw new Error(`${Commands.JustifyRight} requires a block to justify.`);
+                    }
+                    this.blockOperationsService.justifyRight(block);
                 }
-                this.blockOperationsService.justifyRight(block);
                 break;
 
             case Commands.changeCodeBlockLanguage:
@@ -238,7 +248,7 @@ export class CommandDispatcher {
                 break;
 
             case Commands.insertTableColumnRight:
-                this.tableOperationsService.insertColumnRight(block || null);
+                this.tableOperationsService.insertColumnRight();
                 break;
 
             case Commands.insertTableRowAbove:
@@ -246,15 +256,9 @@ export class CommandDispatcher {
                 break;
 
             case Commands.insertTableRowBelow:
-                this.tableOperationsService.insertRowBelow(block || null);
+                this.tableOperationsService.insertRowBelow();
                 break;
 
-            case Commands.toggleCellHiliteColor:
-                if (!value) {
-                    throw new Error(`${Commands.toggleCellHiliteColor} requires a value that represents the cell background color.`);
-                }
-                this.tableOperationsService.execCellBackgroundColor(value);
-                break;
 
             case Commands.changeCalloutBackgroundColor:
                 if (!block) {
@@ -282,13 +286,6 @@ export class CommandDispatcher {
                 this.tableOperationsService.removeRow();
                 break;
 
-            case Commands.removeRow:
-                this.tableOperationsService.removeRow();
-                break;
-
-            case Commands.changeTableBorderColor:
-                this.tableOperationsService.changeTableBorderColor(scope as TableScopes, value as Colors);
-                break;
 
 
             // case Commands.showInsertTableColumnElement:
