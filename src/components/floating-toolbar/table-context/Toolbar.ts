@@ -51,9 +51,21 @@ export class Toolbar extends FloatingToolbarBase implements ITableContextFloatin
     }
 
     attachEvents(): void {
-        document.addEventListener(DefaultJSEvents.Mousedown, this.handleMouseDown.bind(this));
-        document.addEventListener(DefaultJSEvents.Mousemove, this.handleMouseMove.bind(this));
-        document.addEventListener(DefaultJSEvents.Mouseup, this.handleMouseUp.bind(this));
+        document.addEventListener(
+            DefaultJSEvents.Mousedown,
+            this.handleMouseDown.bind(this),
+            true
+        );
+        document.addEventListener(
+            DefaultJSEvents.Mousemove,
+            this.handleMouseMove.bind(this),
+            true
+        );
+        document.addEventListener(
+            DefaultJSEvents.Mouseup,
+            this.handleMouseUp.bind(this),
+            true
+        );
 
         document.addEventListener(DefaultJSEvents.Keydown, this.handleStartSelectionInCellKeyDown.bind(this));
         document.addEventListener(DefaultJSEvents.Keydown, this.handleCellSelectionContinuationOnKeyDown.bind(this));
@@ -113,11 +125,6 @@ export class Toolbar extends FloatingToolbarBase implements ITableContextFloatin
 
     private handleMouseUp(event: MouseEvent) {
         if (this.selectedCells.length > 0 && this.selectionFlag) {
-
-            if (!Utils.isEventFromContentWrapper(event)) {
-                return;
-            }
-
             this.resetSelectionState();
             this.show();
         }
@@ -135,10 +142,18 @@ export class Toolbar extends FloatingToolbarBase implements ITableContextFloatin
 
         const target = event.target as HTMLElement;
         const currentCell = target.closest(DOMElements.TD) as HTMLTableCellElement;
+        const insideListItem = target.closest('.list-item');
 
         if (currentCell && !currentCell.matches('.gist td')) {
 
-            if (event.key == KeyboardKeys.Enter && !event.shiftKey && !event.ctrlKey && !event.metaKey && !event.altKey) {
+            if (
+                !insideListItem &&
+                event.key == KeyboardKeys.Enter &&
+                !event.shiftKey &&
+                !event.ctrlKey &&
+                !event.metaKey &&
+                !event.altKey
+            ) {
                 event.stopImmediatePropagation();
                 // alert("jump to next line");
             } else if (event.key == KeyboardKeys.Escape && this.canHide && !TextContextFloatingToolbar.getInstance().isVisible) {
@@ -303,6 +318,7 @@ export class Toolbar extends FloatingToolbarBase implements ITableContextFloatin
         if (this.selectedCells.length === 0) {
             this.selectedCells.push(cell);
             cell.classList.add('selected');
+            cell.tabIndex = 0;
             this.actualFocusedCell = cell;
             cell.focus();
             return;
@@ -316,6 +332,7 @@ export class Toolbar extends FloatingToolbarBase implements ITableContextFloatin
                 if (index === -1) {
                     this.selectedCells.push(cell);
                     cell.classList.add('selected');
+                    cell.tabIndex = 0;
                     this.actualFocusedCell = cell;
                     cell.focus();
                 } else {
