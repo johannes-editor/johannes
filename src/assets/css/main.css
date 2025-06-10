@@ -1493,7 +1493,7 @@ pre code {
 }
 
 .inline-math {
-    display: inline-block;
+    display: inline;
     min-height: 1.2em;
 }
 
