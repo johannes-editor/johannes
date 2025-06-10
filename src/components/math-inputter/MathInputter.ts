@@ -97,6 +97,19 @@ export class MathInputter extends BaseUIComponent {
             e.preventDefault();
             this.updateFormula();
             this.hide();
+            if (!this.currentTarget) return;
+            const next = this.currentTarget.nextSibling;
+            if (
+                next &&
+                ((next.nodeType === Node.TEXT_NODE && next.textContent === '\u200B') ||
+                    (next.nodeType === Node.ELEMENT_NODE &&
+                        (next as HTMLElement).classList.contains(CommonClasses.CaretPlaceholder)))
+            ) {
+                DOMUtils.placeCaretAfterNode(next);
+            } else {
+                DOMUtils.placeCaretAfterNode(this.currentTarget);
+            }
+            (this.currentTarget.closest('[contenteditable="true"]') as HTMLElement | null)?.focus();
         });
 
         super.attachUIEvent();
@@ -125,7 +138,12 @@ export class MathInputter extends BaseUIComponent {
             this.updateFormula();
             this.hide();
             const next = this.currentTarget.nextSibling;
-            if (next && next.nodeType === Node.TEXT_NODE && next.textContent === '\u200B') {
+            if (
+                next &&
+                ((next.nodeType === Node.TEXT_NODE && next.textContent === '\u200B') ||
+                    (next.nodeType === Node.ELEMENT_NODE &&
+                        (next as HTMLElement).classList.contains(CommonClasses.CaretPlaceholder)))
+            ) {
                 DOMUtils.placeCaretAfterNode(next);
             } else {
                 DOMUtils.placeCaretAfterNode(this.currentTarget);
@@ -136,7 +154,12 @@ export class MathInputter extends BaseUIComponent {
             this.updateFormula();
             this.hide();
             const next = this.currentTarget.nextSibling;
-            if (next && next.nodeType === Node.TEXT_NODE && next.textContent === '\u200B') {
+            if (
+                next &&
+                ((next.nodeType === Node.TEXT_NODE && next.textContent === '\u200B') ||
+                    (next.nodeType === Node.ELEMENT_NODE &&
+                        (next as HTMLElement).classList.contains(CommonClasses.CaretPlaceholder)))
+            ) {
                 DOMUtils.placeCaretAfterNode(next);
             } else {
                 DOMUtils.placeCaretAfterNode(this.currentTarget);
@@ -147,7 +170,12 @@ export class MathInputter extends BaseUIComponent {
             this.updateFormula();
             this.hide();
             const prev = this.currentTarget.previousSibling;
-            if (prev && prev.nodeType === Node.TEXT_NODE && prev.textContent === '\u200B') {
+            if (
+                prev &&
+                ((prev.nodeType === Node.TEXT_NODE && prev.textContent === '\u200B') ||
+                    (prev.nodeType === Node.ELEMENT_NODE &&
+                        (prev as HTMLElement).classList.contains(CommonClasses.CaretPlaceholder)))
+            ) {
                 DOMUtils.placeCaretBeforeNode(prev);
             } else {
                 DOMUtils.placeCaretBeforeNode(this.currentTarget);

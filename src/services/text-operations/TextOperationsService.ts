@@ -390,15 +390,37 @@ export class TextOperationsService implements ITextOperationsService {
 
         const parent = container.parentNode as HTMLElement | null;
         if (parent) {
-            if (!container.previousSibling ||
+            if (
+                !container.previousSibling ||
                 (container.previousSibling.nodeType === Node.ELEMENT_NODE &&
-                 (container.previousSibling as HTMLElement).tagName === 'BR')) {
-                parent.insertBefore(document.createTextNode('\u200B'), container);
+                    (container.previousSibling as HTMLElement).tagName === 'BR')
+            ) {
+                const ph = document.createElement('span');
+                ph.classList.add(CommonClasses.CaretPlaceholder);
+                ph.textContent = '\u200B';
+                Object.assign(ph.style, {
+                    display: 'inline-block',
+                    width: '1px',
+                    height: '1px',
+                    overflow: 'hidden',
+                });
+                parent.insertBefore(ph, container);
             }
-            if (!container.nextSibling ||
+            if (
+                !container.nextSibling ||
                 (container.nextSibling.nodeType === Node.ELEMENT_NODE &&
-                 (container.nextSibling as HTMLElement).tagName === 'BR')) {
-                DOMUtils.insertAfter(document.createTextNode('\u200B'), container);
+                    (container.nextSibling as HTMLElement).tagName === 'BR')
+            ) {
+                const ph = document.createElement('span');
+                ph.classList.add(CommonClasses.CaretPlaceholder);
+                ph.textContent = '\u200B';
+                Object.assign(ph.style, {
+                    display: 'inline-block',
+                    width: '1px',
+                    height: '1px',
+                    overflow: 'hidden',
+                });
+                DOMUtils.insertAfter(ph, container);
             }
         }
 

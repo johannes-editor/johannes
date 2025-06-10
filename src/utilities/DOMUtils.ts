@@ -949,14 +949,16 @@ export class DOMUtils {
                 const childElement = children[i] as HTMLElement;
                 if (
                     ['SPAN', 'CODE', 'EM', 'STRONG', 'B', 'I'].includes(childElement.nodeName) &&
-                    !childElement.classList.contains('inline-math')
+                    !childElement.classList.contains('inline-math') &&
+                    !childElement.classList.contains(CommonClasses.CaretPlaceholder)
                 ) {
                     while (
                         i < children.length - 1 &&
                         childElement.nextSibling &&
                         childElement.nextSibling.nodeType === Node.ELEMENT_NODE &&
                         childElement.nodeName === (childElement.nextSibling as HTMLElement).nodeName &&
-                        !(childElement.nextSibling as HTMLElement).classList.contains('inline-math')
+                        !(childElement.nextSibling as HTMLElement).classList.contains('inline-math') &&
+                        !(childElement.nextSibling as HTMLElement).classList.contains(CommonClasses.CaretPlaceholder)
                     ) {
                         while ((childElement.nextSibling as HTMLElement).childNodes.length > 0) {
                             childElement.appendChild((childElement.nextSibling as HTMLElement).firstChild!);
