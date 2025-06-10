@@ -183,13 +183,18 @@ describe('Editor.handlePasteEvent', () => {
     test('uses next empty paragraph when pasting into title', () => {
         const html = '<p>First</p><p>Second</p><p>Third</p>';
 
+        const wrapper = document.createElement('div');
+        wrapper.classList.add('content-wrapper');
+
         const h1 = document.createElement('h1');
         h1.setAttribute('contenteditable', 'true');
         const title = document.createElement('div');
         title.classList.add('title');
         title.appendChild(h1);
-        document.body.appendChild(title);
+        wrapper.appendChild(title);
 
+        const content = document.createElement('div');
+        content.classList.add('content');
         const p = document.createElement('p');
         p.setAttribute('contenteditable', 'true');
         p.classList.add('johannes-content-element');
@@ -197,7 +202,10 @@ describe('Editor.handlePasteEvent', () => {
         const block = document.createElement('div');
         block.classList.add('block');
         block.appendChild(p);
-        document.body.appendChild(block);
+        content.appendChild(block);
+        wrapper.appendChild(content);
+
+        document.body.appendChild(wrapper);
 
         clipboardEvent = createPasteEvent(html, '', h1) as unknown as ClipboardEvent;
 

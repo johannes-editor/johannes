@@ -293,9 +293,10 @@ export class Editor extends BaseUIComponent {
     
                     let nextEmptyBlock: HTMLElement | null = null;
                     if (target?.tagName.toLowerCase() === 'h1') {
-                        const title = target.closest('.title');
-                        const maybeNext = title?.nextElementSibling as HTMLElement | null;
-                        if (maybeNext && maybeNext.classList.contains('block')) {
+                        const wrapper = target.closest('.content-wrapper');
+                        const content = wrapper?.querySelector('.content');
+                        const maybeNext = content?.querySelector('.block') as HTMLElement | null;
+                        if (maybeNext) {
                             const contentEl = maybeNext.querySelector('.johannes-content-element') as HTMLElement | null;
                             if (contentEl && (contentEl.textContent || '').trim() === '') {
                                 nextEmptyBlock = maybeNext;
