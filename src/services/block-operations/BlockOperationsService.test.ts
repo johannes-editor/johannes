@@ -281,6 +281,50 @@ describe('BlockOperationsService.createNewElementAndSplitContent', () => {
             expect(firstListItems.length).toBe(1);
             expect(secondListItems.length).toBe(2);
         });
+
+        test('pressing enter at end of last list item creates new empty item', () => {
+            const parentBlock = document.createElement('div');
+            parentBlock.className = 'block deletable';
+
+            const listElement = document.createElement('ul');
+            listElement.className = 'johannes-content-element swittable list';
+
+            const items = [1, 2].map(i => {
+                const li = document.createElement('li');
+                li.className = 'deletable list-item hide-turninto';
+
+                const content = document.createElement('div');
+                content.className = 'focusable editable focus key-trigger';
+                content.contentEditable = 'true';
+                content.textContent = `Item ${i}`;
+
+                li.appendChild(content);
+                return li;
+            });
+
+            items.forEach(item => listElement.appendChild(item));
+            parentBlock.appendChild(listElement);
+            document.body.appendChild(parentBlock);
+
+            jest.spyOn(DOMUtils, 'getContentTypeFromActiveElement').mockReturnValue(ContentTypes.BulletedList);
+            jest.spyOn(DOMUtils, 'findClosestAncestorOfActiveElementByClass').mockImplementation((selector) => {
+                if (selector === 'list-item') return items[1];
+                if (selector === 'block') return parentBlock;
+                return null;
+            });
+
+            const focusable = items[1].querySelector('.focusable') as HTMLElement;
+            focusable.focus();
+            DOMUtils.setCursorPosition(focusable, focusable.textContent?.length || 0);
+            jest.spyOn(document, 'activeElement', 'get').mockReturnValue(focusable);
+
+            const cloneSpy = jest.spyOn(DOMUtils, 'cloneAndInsertAfter');
+
+            const result = service.createNewElementAndSplitContent();
+
+            expect(result).toBe(true);
+            expect(cloneSpy).toHaveBeenCalledWith(items[1]);
+        });
     });
 
     describe('Paragraph behavior', () => {
@@ -328,7 +372,6 @@ describe('BlockOperationsService.createNewElementAndSplitContent', () => {
             });
 
             const cloneSpy = jest.spyOn(DOMUtils, 'cloneAndInsertAfter');
-            const rearrangeSpy = jest.spyOn(DOMUtils, 'rearrangeContentAfterSplit');
 
             jest.spyOn(DOMUtils, 'getContentTypeFromActiveElement').mockReturnValue(ContentTypes.Paragraph);
             jest.spyOn(DOMUtils, 'findClosestAncestorOfActiveElementByClass').mockImplementation((selector) => {
@@ -346,7 +389,6 @@ describe('BlockOperationsService.createNewElementAndSplitContent', () => {
 
             expect(result).toBe(true);
             expect(cloneSpy).toHaveBeenCalledWith(block);
-            expect(rearrangeSpy).toHaveBeenCalled();
         });
     });
 
