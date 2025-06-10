@@ -87,10 +87,10 @@ export class MathInputter extends BaseUIComponent {
     attachEvents(): void {
         this.ensureInputElements();
         document.addEventListener(DefaultJSEvents.Keydown, this.handleKeydown.bind(this), true);
-        document.addEventListener(DefaultJSEvents.Click, this.handleClick.bind(this));
+        document.addEventListener(DefaultJSEvents.Mousedown, this.handleClick.bind(this));
         document.addEventListener(DefaultJSEvents.SelectionChange, this.handleSelectionChange.bind(this));
 
-        this.input?.addEventListener("input", () => this.updateFormula());
+        this.input?.addEventListener(DefaultJSEvents.Input, () => this.updateFormula());
         this.done?.addEventListener(DefaultJSEvents.Click, (e) => {
             e.preventDefault();
             this.updateFormula();
