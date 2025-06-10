@@ -405,7 +405,12 @@ export class TextOperationsService implements ITextOperationsService {
         const inputter = MathInputter.getInstance();
         inputter.setTarget(container, renderPreview);
         inputter.focusStack.push(container);
-        setTimeout(() => inputter.show(), 0);
+        setTimeout(() => {
+            inputter.show();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            (parent as HTMLElement | null)?.focus();
+        }, 0);
 
         EventEmitter.emitDocChangedEvent();
     }

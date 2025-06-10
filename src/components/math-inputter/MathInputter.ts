@@ -89,6 +89,7 @@ export class MathInputter extends BaseUIComponent {
         this.ensureInputElements();
         document.addEventListener(DefaultJSEvents.Keydown, this.handleKeydown.bind(this), true);
         document.addEventListener(DefaultJSEvents.Click, this.handleClick.bind(this));
+        document.addEventListener(DefaultJSEvents.SelectionChange, this.handleSelectionChange.bind(this));
 
         this.input?.addEventListener("input", () => this.updateFormula());
         this.done?.addEventListener(DefaultJSEvents.Click, (e) => {
@@ -139,6 +140,25 @@ export class MathInputter extends BaseUIComponent {
                     this.show();
                 }
             }
+        }
+    }
+
+    private handleSelectionChange() {
+        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0 || !selection.isCollapsed) return;
+
+        if (this.htmlElement.contains(selection.anchorNode)) return;
+
+        const container = DOMUtils.findClosestAncestorOfSelectionByClass('inline-math');
+        if (container) {
+            this.focusStack.push(container);
+            const render = (container as any).renderPreview || (() => {});
+            this.setTarget(container, render);
+            if (!this.isVisible || this.currentTarget !== container) {
+                this.show();
+            }
+        } else if (this.isVisible) {
+            this.hide();
         }
     }
 
