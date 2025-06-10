@@ -246,25 +246,28 @@ export class Content extends BaseUIComponent {
                 return;
             }
 
-            if (event.key === KeyboardKeys.Enter && !event.shiftKey && !this.quickMenu.isVisible && !this.tableToolbar.isVisible) {
-
-                event.preventDefault();
+            if (event.key === KeyboardKeys.Enter && !event.shiftKey && !this.quickMenu.isVisible) {
 
                 const tableController = (event.target as Element).closest(".table-controller");
                 const insideList = (event.target as Element).closest(".list");
+
+                event.preventDefault();
+
                 if (tableController && !insideList) {
-                    const activeCell = (event.target as Element).closest("td, th") as HTMLTableCellElement;
-                    const table = tableController.querySelector("table") as HTMLTableElement;
-                    if (activeCell) {
+                    if (!this.tableToolbar.isVisible) {
+                        const activeCell = (event.target as Element).closest("td, th") as HTMLTableCellElement;
+                        const table = tableController.querySelector("table") as HTMLTableElement;
+                        if (activeCell) {
 
-                        const focusedBelow = TableUtils.moveFocusToBelowCell(table, activeCell);
-                        if (!focusedBelow) {
+                            const focusedBelow = TableUtils.moveFocusToBelowCell(table, activeCell);
+                            if (!focusedBelow) {
 
-                            document.dispatchEvent(new CustomEvent<ICommandEventDetail>(CustomEvents.emittedCommand, {
-                                detail: {
-                                    command: Commands.focusOnNextBlock,
-                                }
-                            }));
+                                document.dispatchEvent(new CustomEvent<ICommandEventDetail>(CustomEvents.emittedCommand, {
+                                    detail: {
+                                        command: Commands.focusOnNextBlock,
+                                    }
+                                }));
+                            }
                         }
                     }
 
@@ -276,7 +279,6 @@ export class Content extends BaseUIComponent {
                 }
 
                 // Create a default block when press Enter
-                event.preventDefault();
                 event.stopImmediatePropagation();
 
                 document.dispatchEvent(new CustomEvent<ICommandEventDetail>(CustomEvents.emittedCommand, {
