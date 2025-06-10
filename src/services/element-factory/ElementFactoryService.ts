@@ -468,10 +468,16 @@ export class ElementFactoryService implements IElementFactoryService {
 
         pre.appendChild(code);
 
-        code.addEventListener("blur", () => {
+        const debouncedHighlight = Utils.debounce(() => {
             code.removeAttribute("data-highlighted");
             hljs.highlightElement(code);
+        }, 200);
+
+        code.addEventListener("blur", () => {
+            debouncedHighlight();
         });
+
+        code.addEventListener("input", debouncedHighlight);
 
         codeBlock.appendChild(pre);
         container.appendChild(codeBlock);
