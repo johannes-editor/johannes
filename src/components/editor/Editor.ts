@@ -6,7 +6,6 @@ import { Title } from "../title/Title";
 import { IBlockOperationsService } from "@/services/block-operations/IBlockOperationsService";
 import { AddBlockWrapper } from "../add-block/AddBlockWrapper";
 import { QuickMenu } from "../quick-menu/QuickMenu";
-import { Toolbar as TableContextFloatingToolbar } from "../floating-toolbar/table-context/Toolbar";
 import { Toolbar as TextContextFloatingToolbar } from "../floating-toolbar/text-context/Toolbar";
 import { IMemento } from "@/core/IMemento";
 import { DependencyContainer } from "@/core/DependencyContainer";
@@ -30,7 +29,6 @@ export class Editor extends BaseUIComponent {
     private addBlock: AddBlockWrapper;
     private textFloatingToolbar: TextContextFloatingToolbar;
     private quickMenu: QuickMenu;
-    private tableContextToolbar: TableContextFloatingToolbar;
     private mediaInputter: MediaInputter;
     private mathInputter: MathInputter;
     private inputLinkBoxWrapper: InputLinkBoxWrapper;
@@ -46,7 +44,6 @@ export class Editor extends BaseUIComponent {
         addBlock: AddBlockWrapper,
         floatingToolbar: TextContextFloatingToolbar,
         quickMenu: QuickMenu,
-        tableToolbar: TableContextFloatingToolbar,
         mediaInputter: MediaInputter,
         mathInputter: MathInputter,
         inputLinkBoxWrapper: InputLinkBoxWrapper
@@ -60,7 +57,6 @@ export class Editor extends BaseUIComponent {
             addBlock: addBlock,
             floatingToolbar: floatingToolbar,
             quickMenu: quickMenu,
-            tableToolbar: tableToolbar,
             mediaInputter: mediaInputter,
             mathInputter: mathInputter,
             inputLinkBoxWrapper: inputLinkBoxWrapper
@@ -77,7 +73,6 @@ export class Editor extends BaseUIComponent {
         this.addBlock = addBlock;
         this.textFloatingToolbar = floatingToolbar;
         this.quickMenu = quickMenu;
-        this.tableContextToolbar = tableToolbar;
         this.mediaInputter = mediaInputter;
         this.mathInputter = mathInputter;
 
@@ -118,7 +113,6 @@ export class Editor extends BaseUIComponent {
             htmlElement.appendChild(this.props.quickMenu.htmlElement);
         }
 
-        htmlElement.appendChild(this.props.tableToolbar.htmlElement);
         htmlElement.appendChild(this.props.mediaInputter.htmlElement);
         htmlElement.appendChild(this.props.mathInputter.htmlElement);
         htmlElement.appendChild(this.props.inputLinkBoxWrapper.htmlElement)
@@ -132,7 +126,6 @@ export class Editor extends BaseUIComponent {
         addBlock: AddBlockWrapper,
         textFloatingToolbar: TextContextFloatingToolbar,
         quickMenu: QuickMenu,
-        tableFloatingToolbar: TableContextFloatingToolbar,
         mediaInputter: MediaInputter,
         mathInputter: MathInputter) {
 
@@ -142,7 +135,7 @@ export class Editor extends BaseUIComponent {
         const inputLinkBoxWrapper = new InputLinkBoxWrapper();
 
         if (!Editor.instance) {
-            Editor.instance = new Editor(elementFactoryService, blockOperationsService, memento, title, content, addBlock, textFloatingToolbar, quickMenu, tableFloatingToolbar, mediaInputter, mathInputter, inputLinkBoxWrapper);
+            Editor.instance = new Editor(elementFactoryService, blockOperationsService, memento, title, content, addBlock, textFloatingToolbar, quickMenu, mediaInputter, mathInputter, inputLinkBoxWrapper);
         }
 
         return Editor.instance;

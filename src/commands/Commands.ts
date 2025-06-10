@@ -42,14 +42,8 @@ export enum Commands {
     insertTableRowBelow = "insertTableRowBelow",
     insertTableColumnLeft = "insertTableColumnLeft",
     insertTableColumnRight = "insertTableColumnRight",
-    showInsertTableColumnElement = "showInsertTableColumnElement",
-    showInsertTableRowElement = "showInsertTableRowElement",
-    hideInsertTableColumnElement = "hideInsertTableColumnElement",
-    hideInsertTableRowElement = "hideInsertTableRowElement",
-    toggleCellHiliteColor = "toggleCellHiliteColor",
     removeColumn = "removeColumn",
     removeRow = "removeRow",
-    changeTableBorderColor = "changeTableBorderColor",
 
 
 

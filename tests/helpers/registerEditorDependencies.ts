@@ -25,11 +25,6 @@ class MockQuickMenu {
     toggle = jest.fn();
 }
 
-class MockTableContextFloatingToolbar {
-    show = jest.fn();
-    hide = jest.fn();
-    update = jest.fn();
-}
 
 class MockMemento {
     get = jest.fn();
@@ -70,7 +65,6 @@ export function registerEditorDependenciesForTests() {
     DependencyContainer.Instance.register("IShortcutListeners", () => new MockShortcutListeners());
     DependencyContainer.Instance.register("ITableListeners", () => new MockTableListeners());
     DependencyContainer.Instance.register("IQuickMenu", () => new MockQuickMenu());
-    DependencyContainer.Instance.register("ITableContextFloatingToolbar", () => new MockTableContextFloatingToolbar());
     DependencyContainer.Instance.register("IMemento", () => new MockMemento());
     DependencyContainer.Instance.register("IBlockOperationsService", () => new MockBlockOperationsService());
     DependencyContainer.Instance.register("ITextOperationsService", () => new MockTextOperationsService());

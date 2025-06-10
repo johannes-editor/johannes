@@ -6,8 +6,6 @@ import { DependencyContainer } from "@/core/DependencyContainer";
 import { IBlockOperationsService } from "@/services/block-operations/IBlockOperationsService";
 import { ITableOperationsService } from "@/services/table-operations/ITableOperationsService";
 import { ITextOperationsService } from "@/services/text-operations/ITextOperationsService";
-import { TableScopes } from "@/services/table-operations/TableScopes";
-import { Colors } from "@/common/Colors";
 import { DOMUtils } from "@/utilities/DOMUtils";
 
 /**
@@ -249,12 +247,6 @@ export class CommandDispatcher {
                 this.tableOperationsService.insertRowBelow(block || null);
                 break;
 
-            case Commands.toggleCellHiliteColor:
-                if (!value) {
-                    throw new Error(`${Commands.toggleCellHiliteColor} requires a value that represents the cell background color.`);
-                }
-                this.tableOperationsService.execCellBackgroundColor(value);
-                break;
 
             case Commands.changeCalloutBackgroundColor:
                 if (!block) {
@@ -282,13 +274,6 @@ export class CommandDispatcher {
                 this.tableOperationsService.removeRow();
                 break;
 
-            case Commands.removeRow:
-                this.tableOperationsService.removeRow();
-                break;
-
-            case Commands.changeTableBorderColor:
-                this.tableOperationsService.changeTableBorderColor(scope as TableScopes, value as Colors);
-                break;
 
 
             // case Commands.showInsertTableColumnElement:

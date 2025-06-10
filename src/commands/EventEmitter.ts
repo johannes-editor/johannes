@@ -1,5 +1,4 @@
 import { Colors } from "@/common/Colors";
-import { TableScopes } from "@/services/table-operations/TableScopes";
 import { ICommandEventDetail } from "./ICommandEventDetail";
 import { CustomEvents } from "@/common/CustomEvents";
 import { Commands } from "./Commands";
@@ -123,16 +122,4 @@ export class EventEmitter {
         document.dispatchEvent(customEvent);
     }
 
-    static emitChangeTableBorderColorEvent(scope: TableScopes, color: Colors): void {
-
-        const customEvent = new CustomEvent<ICommandEventDetail>(CustomEvents.emittedCommand, {
-            detail: {
-                command: Commands.changeTableBorderColor,
-                value: color,
-                scope: scope
-            }
-        });
-
-        document.dispatchEvent(customEvent);
-    }
 }
