@@ -3,6 +3,7 @@ import { CommonClasses } from "@/common/CommonClasses";
 
 const START_MARKER_ID = 'caret-start-marker';
 const END_MARKER_ID = 'caret-end-marker';
+const ZWS = '\u200B';
 
 export class DOMUtils {
 
@@ -648,7 +649,7 @@ export class DOMUtils {
         if (!element.hasAttribute('data-placeholder')) {
             return;
         }
-        const content = element.innerHTML.replace(/\u200B/g, '').trim();
+        const content = element.innerHTML.replace(new RegExp(ZWS, 'g'), '').trim();
         const isEmpty = content === '' || content === '<br>';
         if (isEmpty) {
             element.setAttribute('data-empty', 'true');
@@ -661,7 +662,7 @@ export class DOMUtils {
         const contentElements = block.querySelectorAll(`.${CommonClasses.ContentElement}`);
         contentElements.forEach((el, index) => {
             if (index === 0) return;
-            const html = (el as HTMLElement).innerHTML.replace(/\u200B/g, '').trim();
+            const html = (el as HTMLElement).innerHTML.replace(new RegExp(ZWS, 'g'), '').trim();
             const text = (el as HTMLElement).textContent?.trim() || '';
             if (html === '' || html === '<br>' || text === '') {
                 el.remove();
@@ -1032,7 +1033,7 @@ export class DOMUtils {
         const range = sel.getRangeAt(0).cloneRange();
 
         const marker = document.createElement('span');
-        marker.textContent = '\u200B';
+        marker.textContent = ZWS;
         marker.style.display = 'inline-block';
         range.insertNode(marker);
 
@@ -1059,7 +1060,7 @@ export class DOMUtils {
         const range = sel.getRangeAt(0).cloneRange();
 
         const marker = document.createElement('span');
-        marker.textContent = '\u200B';
+        marker.textContent = ZWS;
         marker.style.display = 'inline-block';
         range.insertNode(marker);
 

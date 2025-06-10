@@ -388,13 +388,27 @@ export class TextOperationsService implements ITextOperationsService {
 
         range.insertNode(container);
 
+        const parent = container.parentNode as HTMLElement | null;
+        if (parent) {
+            if (!container.previousSibling ||
+                (container.previousSibling.nodeType === Node.ELEMENT_NODE &&
+                 (container.previousSibling as HTMLElement).tagName === 'BR')) {
+                parent.insertBefore(document.createTextNode('\u200B'), container);
+            }
+            if (!container.nextSibling ||
+                (container.nextSibling.nodeType === Node.ELEMENT_NODE &&
+                 (container.nextSibling as HTMLElement).tagName === 'BR')) {
+                DOMUtils.insertAfter(document.createTextNode('\u200B'), container);
+            }
+        }
+
         renderPreview();
 
-        const parent = container.closest('[contenteditable="true"]');
-        if (parent) {
-            DOMUtils.trimEmptyTextAndBrElements(parent);
-            (parent as HTMLElement).normalize();
-            DOMUtils.mergeInlineElements(parent as HTMLElement);
+        const editableParent = container.closest('[contenteditable="true"]');
+        if (editableParent) {
+            DOMUtils.trimEmptyTextAndBrElements(editableParent);
+            (editableParent as HTMLElement).normalize();
+            DOMUtils.mergeInlineElements(editableParent as HTMLElement);
         }
 
         range.setStartAfter(container);
@@ -409,7 +423,7 @@ export class TextOperationsService implements ITextOperationsService {
             inputter.show();
             selection.removeAllRanges();
             selection.addRange(range);
-            (parent as HTMLElement | null)?.focus();
+            (editableParent as HTMLElement | null)?.focus();
         }, 0);
 
         EventEmitter.emitDocChangedEvent();

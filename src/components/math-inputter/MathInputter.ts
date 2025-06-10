@@ -124,19 +124,34 @@ export class MathInputter extends BaseUIComponent {
             event.preventDefault();
             this.updateFormula();
             this.hide();
-            DOMUtils.placeCaretAfterNode(this.currentTarget);
+            const next = this.currentTarget.nextSibling;
+            if (next && next.nodeType === Node.TEXT_NODE && next.textContent === '\u200B') {
+                DOMUtils.placeCaretAfterNode(next);
+            } else {
+                DOMUtils.placeCaretAfterNode(this.currentTarget);
+            }
             (this.currentTarget.closest('[contenteditable="true"]') as HTMLElement | null)?.focus();
         } else if (event.key === KeyboardKeys.ArrowRight && DOMUtils.isCursorAtEnd(this.input)) {
             event.preventDefault();
             this.updateFormula();
             this.hide();
-            DOMUtils.placeCaretAfterNode(this.currentTarget);
+            const next = this.currentTarget.nextSibling;
+            if (next && next.nodeType === Node.TEXT_NODE && next.textContent === '\u200B') {
+                DOMUtils.placeCaretAfterNode(next);
+            } else {
+                DOMUtils.placeCaretAfterNode(this.currentTarget);
+            }
             (this.currentTarget.closest('[contenteditable="true"]') as HTMLElement | null)?.focus();
         } else if (event.key === KeyboardKeys.ArrowLeft && DOMUtils.isCursorAtStart(this.input)) {
             event.preventDefault();
             this.updateFormula();
             this.hide();
-            DOMUtils.placeCaretBeforeNode(this.currentTarget);
+            const prev = this.currentTarget.previousSibling;
+            if (prev && prev.nodeType === Node.TEXT_NODE && prev.textContent === '\u200B') {
+                DOMUtils.placeCaretBeforeNode(prev);
+            } else {
+                DOMUtils.placeCaretBeforeNode(this.currentTarget);
+            }
             (this.currentTarget.closest('[contenteditable="true"]') as HTMLElement | null)?.focus();
         }
     }
