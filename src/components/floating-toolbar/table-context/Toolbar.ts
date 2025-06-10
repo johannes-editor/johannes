@@ -136,21 +136,20 @@ export class Toolbar extends FloatingToolbarBase implements ITableContextFloatin
         const target = event.target as HTMLElement;
         const currentCell = target.closest(DOMElements.TD) as HTMLTableCellElement;
 
-        if (currentCell && !currentCell.matches('.gist td')) {
+        if (!currentCell || currentCell.matches('.gist td')) {
+            return;
+        }
 
-            if (event.key == KeyboardKeys.Enter && !event.shiftKey && !event.ctrlKey && !event.metaKey && !event.altKey) {
-                event.stopImmediatePropagation();
-                // alert("jump to next line");
-            } else if (event.key == KeyboardKeys.Escape && this.canHide && !TextContextFloatingToolbar.getInstance().isVisible) {
-
-                setTimeout(() => {
-                    if (this.canHide) {
-                        event.stopImmediatePropagation();
-                        this.clearAll();
-                        this.hide();
-                    }
-                }, 10);
-            }
+        if (event.key == KeyboardKeys.Enter && !event.shiftKey && !event.ctrlKey && !event.metaKey && !event.altKey) {
+            event.stopImmediatePropagation();
+        } else if (event.key == KeyboardKeys.Escape && this.canHide && !TextContextFloatingToolbar.getInstance().isVisible) {
+            setTimeout(() => {
+                if (this.canHide) {
+                    event.stopImmediatePropagation();
+                    this.clearAll();
+                    this.hide();
+                }
+            }, 10);
         }
     }
 
