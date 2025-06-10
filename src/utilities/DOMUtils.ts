@@ -3,6 +3,7 @@ import { CommonClasses } from "@/common/CommonClasses";
 
 const START_MARKER_ID = 'caret-start-marker';
 const END_MARKER_ID = 'caret-end-marker';
+const ZWS = '\u200B';
 
 export class DOMUtils {
 
@@ -402,6 +403,30 @@ export class DOMUtils {
         }
     }
 
+    static placeCaretAfterNode(node: Node) {
+        const sel = window.getSelection();
+        if (!sel) return;
+
+        const range = document.createRange();
+        range.setStartAfter(node);
+        range.collapse(true);
+
+        sel.removeAllRanges();
+        sel.addRange(range);
+    }
+
+    static placeCaretBeforeNode(node: Node) {
+        const sel = window.getSelection();
+        if (!sel) return;
+
+        const range = document.createRange();
+        range.setStartBefore(node);
+        range.collapse(true);
+
+        sel.removeAllRanges();
+        sel.addRange(range);
+    }
+
     static getCurrentActiveBlock(): Element | null {
 
         let container = document.activeElement;
@@ -624,7 +649,7 @@ export class DOMUtils {
         if (!element.hasAttribute('data-placeholder')) {
             return;
         }
-        const content = element.innerHTML.replace(/\u200B/g, '').trim();
+        const content = element.innerHTML.replace(new RegExp(ZWS, 'g'), '').trim();
         const isEmpty = content === '' || content === '<br>';
         if (isEmpty) {
             element.setAttribute('data-empty', 'true');
@@ -637,7 +662,7 @@ export class DOMUtils {
         const contentElements = block.querySelectorAll(`.${CommonClasses.ContentElement}`);
         contentElements.forEach((el, index) => {
             if (index === 0) return;
-            const html = (el as HTMLElement).innerHTML.replace(/\u200B/g, '').trim();
+            const html = (el as HTMLElement).innerHTML.replace(new RegExp(ZWS, 'g'), '').trim();
             const text = (el as HTMLElement).textContent?.trim() || '';
             if (html === '' || html === '<br>' || text === '') {
                 el.remove();
@@ -922,8 +947,19 @@ export class DOMUtils {
         for (let i = 0; i < children.length; i++) {
             if (children[i].nodeType === Node.ELEMENT_NODE) {
                 const childElement = children[i] as HTMLElement;
-                if (['SPAN', 'CODE', 'EM', 'STRONG', 'B', 'I'].includes(childElement.nodeName)) {
-                    while (i < children.length - 1 && childElement.nextSibling && childElement.nextSibling.nodeType === Node.ELEMENT_NODE && childElement.nodeName === (childElement.nextSibling as HTMLElement).nodeName) {
+                if (
+                    ['SPAN', 'CODE', 'EM', 'STRONG', 'B', 'I'].includes(childElement.nodeName) &&
+                    !childElement.classList.contains('inline-math') &&
+                    !childElement.classList.contains(CommonClasses.CaretPlaceholder)
+                ) {
+                    while (
+                        i < children.length - 1 &&
+                        childElement.nextSibling &&
+                        childElement.nextSibling.nodeType === Node.ELEMENT_NODE &&
+                        childElement.nodeName === (childElement.nextSibling as HTMLElement).nodeName &&
+                        !(childElement.nextSibling as HTMLElement).classList.contains('inline-math') &&
+                        !(childElement.nextSibling as HTMLElement).classList.contains(CommonClasses.CaretPlaceholder)
+                    ) {
                         while ((childElement.nextSibling as HTMLElement).childNodes.length > 0) {
                             childElement.appendChild((childElement.nextSibling as HTMLElement).firstChild!);
                         }
@@ -999,7 +1035,7 @@ export class DOMUtils {
         const range = sel.getRangeAt(0).cloneRange();
 
         const marker = document.createElement('span');
-        marker.textContent = '\u200B';
+        marker.textContent = ZWS;
         marker.style.display = 'inline-block';
         range.insertNode(marker);
 
@@ -1026,7 +1062,7 @@ export class DOMUtils {
         const range = sel.getRangeAt(0).cloneRange();
 
         const marker = document.createElement('span');
-        marker.textContent = '\u200B';
+        marker.textContent = ZWS;
         marker.style.display = 'inline-block';
         range.insertNode(marker);
 

@@ -89,12 +89,27 @@ export class MathInputter extends BaseUIComponent {
         this.ensureInputElements();
         document.addEventListener(DefaultJSEvents.Keydown, this.handleKeydown.bind(this), true);
         document.addEventListener(DefaultJSEvents.Click, this.handleClick.bind(this));
+        document.addEventListener(DefaultJSEvents.SelectionChange, this.handleSelectionChange.bind(this));
 
         this.input?.addEventListener("input", () => this.updateFormula());
+        this.input?.addEventListener(DefaultJSEvents.Keydown, this.handleInputNavigation.bind(this));
         this.done?.addEventListener(DefaultJSEvents.Click, (e) => {
             e.preventDefault();
             this.updateFormula();
             this.hide();
+            if (!this.currentTarget) return;
+            const next = this.currentTarget.nextSibling;
+            if (
+                next &&
+                ((next.nodeType === Node.TEXT_NODE && next.textContent === '\u200B') ||
+                    (next.nodeType === Node.ELEMENT_NODE &&
+                        (next as HTMLElement).classList.contains(CommonClasses.CaretPlaceholder)))
+            ) {
+                DOMUtils.placeCaretAfterNode(next);
+            } else {
+                DOMUtils.placeCaretAfterNode(this.currentTarget);
+            }
+            (this.currentTarget.closest('[contenteditable="true"]') as HTMLElement | null)?.focus();
         });
 
         super.attachUIEvent();
@@ -113,6 +128,60 @@ export class MathInputter extends BaseUIComponent {
     private handleClick(event: MouseEvent) {
         this.hideOnExternalClick(event);
         this.showOnTargetClick(event);
+    }
+
+    private handleInputNavigation(event: KeyboardEvent) {
+        if (!this.currentTarget) return;
+
+        if (event.key === KeyboardKeys.Enter) {
+            event.preventDefault();
+            this.updateFormula();
+            this.hide();
+            const next = this.currentTarget.nextSibling;
+            if (
+                next &&
+                ((next.nodeType === Node.TEXT_NODE && next.textContent === '\u200B') ||
+                    (next.nodeType === Node.ELEMENT_NODE &&
+                        (next as HTMLElement).classList.contains(CommonClasses.CaretPlaceholder)))
+            ) {
+                DOMUtils.placeCaretAfterNode(next);
+            } else {
+                DOMUtils.placeCaretAfterNode(this.currentTarget);
+            }
+            (this.currentTarget.closest('[contenteditable="true"]') as HTMLElement | null)?.focus();
+        } else if (event.key === KeyboardKeys.ArrowRight && DOMUtils.isCursorAtEnd(this.input)) {
+            event.preventDefault();
+            this.updateFormula();
+            this.hide();
+            const next = this.currentTarget.nextSibling;
+            if (
+                next &&
+                ((next.nodeType === Node.TEXT_NODE && next.textContent === '\u200B') ||
+                    (next.nodeType === Node.ELEMENT_NODE &&
+                        (next as HTMLElement).classList.contains(CommonClasses.CaretPlaceholder)))
+            ) {
+                DOMUtils.placeCaretAfterNode(next);
+            } else {
+                DOMUtils.placeCaretAfterNode(this.currentTarget);
+            }
+            (this.currentTarget.closest('[contenteditable="true"]') as HTMLElement | null)?.focus();
+        } else if (event.key === KeyboardKeys.ArrowLeft && DOMUtils.isCursorAtStart(this.input)) {
+            event.preventDefault();
+            this.updateFormula();
+            this.hide();
+            const prev = this.currentTarget.previousSibling;
+            if (
+                prev &&
+                ((prev.nodeType === Node.TEXT_NODE && prev.textContent === '\u200B') ||
+                    (prev.nodeType === Node.ELEMENT_NODE &&
+                        (prev as HTMLElement).classList.contains(CommonClasses.CaretPlaceholder)))
+            ) {
+                DOMUtils.placeCaretBeforeNode(prev);
+            } else {
+                DOMUtils.placeCaretBeforeNode(this.currentTarget);
+            }
+            (this.currentTarget.closest('[contenteditable="true"]') as HTMLElement | null)?.focus();
+        }
     }
 
     private hideOnExternalClick(event: MouseEvent) {
@@ -139,6 +208,25 @@ export class MathInputter extends BaseUIComponent {
                     this.show();
                 }
             }
+        }
+    }
+
+    private handleSelectionChange() {
+        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0 || !selection.isCollapsed) return;
+
+        if (this.htmlElement.contains(selection.anchorNode)) return;
+
+        const container = DOMUtils.findClosestAncestorOfSelectionByClass('inline-math');
+        if (container) {
+            this.focusStack.push(container);
+            const render = (container as any).renderPreview || (() => {});
+            this.setTarget(container, render);
+            if (!this.isVisible || this.currentTarget !== container) {
+                this.show();
+            }
+        } else if (this.isVisible) {
+            this.hide();
         }
     }
 

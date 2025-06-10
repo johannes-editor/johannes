@@ -1493,7 +1493,14 @@ pre code {
 }
 
 .inline-math {
+.caret-placeholder {
     display: inline-block;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+    display: inline;
     min-height: 1.2em;
 }
 

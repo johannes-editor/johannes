@@ -358,10 +358,17 @@ export class TextOperationsService implements ITextOperationsService {
         }
 
         const range = selection.getRangeAt(0);
+
+        let selectedText = '';
+        if (!selection.isCollapsed) {
+            selectedText = range.toString();
+            range.deleteContents();
+        }
+
         const container = document.createElement('span');
         container.classList.add('inline-math', CommonClasses.ShowMathInputOnClick, CommonClasses.ContentElement);
         container.setAttribute('data-content-type', ContentTypes.Math);
-        container.dataset.formula = '';
+        container.dataset.formula = selectedText;
 
         const renderPreview = () => {
             const formula = container.dataset.formula || '';
@@ -378,15 +385,52 @@ export class TextOperationsService implements ITextOperationsService {
         };
 
         (container as any).renderPreview = renderPreview;
-        renderPreview();
 
         range.insertNode(container);
 
-        const parent = container.closest('[contenteditable="true"]');
+        const parent = container.parentNode as HTMLElement | null;
         if (parent) {
-            DOMUtils.trimEmptyTextAndBrElements(parent);
-            (parent as HTMLElement).normalize();
-            DOMUtils.mergeInlineElements(parent as HTMLElement);
+            if (
+                !container.previousSibling ||
+                (container.previousSibling.nodeType === Node.ELEMENT_NODE &&
+                    (container.previousSibling as HTMLElement).tagName === 'BR')
+            ) {
+                const ph = document.createElement('span');
+                ph.classList.add(CommonClasses.CaretPlaceholder);
+                ph.textContent = '\u200B';
+                Object.assign(ph.style, {
+                    display: 'inline-block',
+                    width: '1px',
+                    height: '1px',
+                    overflow: 'hidden',
+                });
+                parent.insertBefore(ph, container);
+            }
+            if (
+                !container.nextSibling ||
+                (container.nextSibling.nodeType === Node.ELEMENT_NODE &&
+                    (container.nextSibling as HTMLElement).tagName === 'BR')
+            ) {
+                const ph = document.createElement('span');
+                ph.classList.add(CommonClasses.CaretPlaceholder);
+                ph.textContent = '\u200B';
+                Object.assign(ph.style, {
+                    display: 'inline-block',
+                    width: '1px',
+                    height: '1px',
+                    overflow: 'hidden',
+                });
+                DOMUtils.insertAfter(ph, container);
+            }
+        }
+
+        renderPreview();
+
+        const editableParent = container.closest('[contenteditable="true"]');
+        if (editableParent) {
+            DOMUtils.trimEmptyTextAndBrElements(editableParent);
+            (editableParent as HTMLElement).normalize();
+            DOMUtils.mergeInlineElements(editableParent as HTMLElement);
         }
 
         range.setStartAfter(container);
@@ -397,7 +441,12 @@ export class TextOperationsService implements ITextOperationsService {
         const inputter = MathInputter.getInstance();
         inputter.setTarget(container, renderPreview);
         inputter.focusStack.push(container);
-        setTimeout(() => inputter.show(), 0);
+        setTimeout(() => {
+            inputter.show();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            (editableParent as HTMLElement | null)?.focus();
+        }, 0);
 
         EventEmitter.emitDocChangedEvent();
     }
