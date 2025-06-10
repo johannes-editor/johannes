@@ -91,7 +91,7 @@ export class MathInputter extends BaseUIComponent {
 
         this.input?.addEventListener("input", () => this.updateFormula());
         this.input?.addEventListener(DefaultJSEvents.Paste, () => {
-            setTimeout(() => this.updateFormula(), 0);
+            requestAnimationFrame(() => this.updateFormula());
         });
         this.input?.addEventListener(DefaultJSEvents.Keydown, (event: KeyboardEvent) => {
             if (event.key === KeyboardKeys.Escape && this.canHide) {
