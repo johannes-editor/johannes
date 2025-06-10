@@ -402,6 +402,30 @@ export class DOMUtils {
         }
     }
 
+    static placeCaretAfterNode(node: Node) {
+        const sel = window.getSelection();
+        if (!sel) return;
+
+        const range = document.createRange();
+        range.setStartAfter(node);
+        range.collapse(true);
+
+        sel.removeAllRanges();
+        sel.addRange(range);
+    }
+
+    static placeCaretBeforeNode(node: Node) {
+        const sel = window.getSelection();
+        if (!sel) return;
+
+        const range = document.createRange();
+        range.setStartBefore(node);
+        range.collapse(true);
+
+        sel.removeAllRanges();
+        sel.addRange(range);
+    }
+
     static getCurrentActiveBlock(): Element | null {
 
         let container = document.activeElement;

@@ -92,6 +92,7 @@ export class MathInputter extends BaseUIComponent {
         document.addEventListener(DefaultJSEvents.SelectionChange, this.handleSelectionChange.bind(this));
 
         this.input?.addEventListener("input", () => this.updateFormula());
+        this.input?.addEventListener(DefaultJSEvents.Keydown, this.handleInputNavigation.bind(this));
         this.done?.addEventListener(DefaultJSEvents.Click, (e) => {
             e.preventDefault();
             this.updateFormula();
@@ -114,6 +115,30 @@ export class MathInputter extends BaseUIComponent {
     private handleClick(event: MouseEvent) {
         this.hideOnExternalClick(event);
         this.showOnTargetClick(event);
+    }
+
+    private handleInputNavigation(event: KeyboardEvent) {
+        if (!this.currentTarget) return;
+
+        if (event.key === KeyboardKeys.Enter) {
+            event.preventDefault();
+            this.updateFormula();
+            this.hide();
+            DOMUtils.placeCaretAfterNode(this.currentTarget);
+            (this.currentTarget.closest('[contenteditable="true"]') as HTMLElement | null)?.focus();
+        } else if (event.key === KeyboardKeys.ArrowRight && DOMUtils.isCursorAtEnd(this.input)) {
+            event.preventDefault();
+            this.updateFormula();
+            this.hide();
+            DOMUtils.placeCaretAfterNode(this.currentTarget);
+            (this.currentTarget.closest('[contenteditable="true"]') as HTMLElement | null)?.focus();
+        } else if (event.key === KeyboardKeys.ArrowLeft && DOMUtils.isCursorAtStart(this.input)) {
+            event.preventDefault();
+            this.updateFormula();
+            this.hide();
+            DOMUtils.placeCaretBeforeNode(this.currentTarget);
+            (this.currentTarget.closest('[contenteditable="true"]') as HTMLElement | null)?.focus();
+        }
     }
 
     private hideOnExternalClick(event: MouseEvent) {
