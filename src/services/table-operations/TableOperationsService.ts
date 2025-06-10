@@ -1,4 +1,6 @@
 import { ITableOperationsService } from "./ITableOperationsService";
+import { ElementFactoryService } from "../element-factory/ElementFactoryService";
+import { DOMUtils } from "@/utilities/DOMUtils";
 
 export class TableOperationsService implements ITableOperationsService {
     private static instance: TableOperationsService;
@@ -15,6 +17,23 @@ export class TableOperationsService implements ITableOperationsService {
             this.instance = new TableOperationsService();
         }
         return this.instance;
+    }
+
+    createTable(rows: number, cols: number): HTMLElement {
+        const wrapper = ElementFactoryService.getInstance().create(ElementFactoryService.ELEMENT_TYPES.TABLE);
+        const table = wrapper.querySelector('table') as HTMLTableElement;
+        const tbody = table.querySelector('tbody') as HTMLTableSectionElement;
+        tbody.innerHTML = '';
+        for (let i = 0; i < rows; i++) {
+            const row = document.createElement('tr');
+            for (let j = 0; j < cols; j++) {
+                const cell = document.createElement('td');
+                this.prepareCell(cell);
+                row.appendChild(cell);
+            }
+            tbody.appendChild(row);
+        }
+        return wrapper;
     }
 
     insertRowAbove(): void {
@@ -76,6 +95,45 @@ export class TableOperationsService implements ITableOperationsService {
         });
     }
 
+    toggleHeader(): void {
+        const cell = this.getActiveCell();
+        if (!cell) return;
+        const table = cell.closest('table') as HTMLTableElement;
+        const tbody = table.querySelector('tbody') as HTMLTableSectionElement;
+        let thead = table.querySelector('thead');
+        if (thead) {
+            const headerRow = thead.rows[0];
+            const newRow = document.createElement('tr');
+            Array.from(headerRow.cells).forEach(th => {
+                const td = document.createElement('td');
+                td.innerHTML = (th as HTMLElement).innerHTML;
+                this.prepareCell(td);
+                newRow.appendChild(td);
+            });
+            thead.remove();
+            tbody.insertBefore(newRow, tbody.firstChild);
+        } else {
+            const firstRow = tbody.rows[0];
+            if (!firstRow) return;
+            thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            Array.from(firstRow.cells).forEach(td => {
+                const th = document.createElement('th');
+                th.innerHTML = (td as HTMLElement).innerHTML;
+                this.prepareCell(th);
+                headerRow.appendChild(th);
+            });
+            tbody.removeChild(firstRow);
+            thead.appendChild(headerRow);
+            table.insertBefore(thead, tbody);
+        }
+    }
+
+    alignSelectedCells(alignment: 'left' | 'center' | 'right'): void {
+        const targets = this.selectedCells.length ? this.selectedCells : [this.getActiveCell()].filter((c): c is HTMLTableCellElement => !!c);
+        targets.forEach(c => (c.style.textAlign = alignment));
+    }
+
     /* selection logic */
     private handleMouseDown(event: MouseEvent) {
         const cell = (event.target as HTMLElement).closest('td,th') as HTMLTableCellElement | null;
@@ -99,31 +157,65 @@ export class TableOperationsService implements ITableOperationsService {
         if (!cell) return;
         const table = cell.closest('table') as HTMLTableElement;
         const row = cell.parentElement as HTMLTableRowElement;
-        if (event.key === 'ArrowDown') {
-            const nextRow = table.rows[row.rowIndex + 1];
-            if (nextRow && nextRow.cells[cell.cellIndex]) {
-                (nextRow.cells[cell.cellIndex] as HTMLElement).focus();
+
+        const moveFocus = (targetCell: HTMLTableCellElement | null, fallbackBlock: HTMLElement | null, placeStart: boolean) => {
+            if (targetCell) {
+                targetCell.focus();
                 event.preventDefault();
-            } else {
-                const nextBlock = (table.closest('.block') as HTMLElement)?.nextElementSibling as HTMLElement | null;
-                const target = nextBlock?.querySelector('[contenteditable]') as HTMLElement | null;
-                if (target) {
-                    target.focus();
+            } else if (fallbackBlock) {
+                const editable = fallbackBlock.querySelector('[contenteditable]') as HTMLElement | null;
+                if (editable) {
+                    editable.focus();
+                    placeStart ? DOMUtils.placeCursorAtStartOfEditableElement(editable) : DOMUtils.placeCursorAtEndOfEditableElement(editable);
                     event.preventDefault();
                 }
             }
-        } else if (event.key === 'ArrowUp') {
-            const prevRow = table.rows[row.rowIndex - 1];
-            if (prevRow && prevRow.cells[cell.cellIndex]) {
-                (prevRow.cells[cell.cellIndex] as HTMLElement).focus();
-                event.preventDefault();
-            } else {
+        };
+
+        switch (event.key) {
+            case 'ArrowDown': {
+                const nextRow = table.rows[row.rowIndex + 1];
+                const nextCell = nextRow ? nextRow.cells[cell.cellIndex] as HTMLTableCellElement | undefined : undefined;
+                const nextBlock = (table.closest('.block') as HTMLElement)?.nextElementSibling as HTMLElement | null;
+                moveFocus(nextCell || null, nextBlock, true);
+                break;
+            }
+            case 'ArrowUp': {
+                const prevRow = table.rows[row.rowIndex - 1];
+                const prevCell = prevRow ? prevRow.cells[cell.cellIndex] as HTMLTableCellElement | undefined : undefined;
                 const prevBlock = (table.closest('.block') as HTMLElement)?.previousElementSibling as HTMLElement | null;
-                const target = prevBlock?.querySelector('[contenteditable]') as HTMLElement | null;
-                if (target) {
-                    target.focus();
-                    event.preventDefault();
+                moveFocus(prevCell || null, prevBlock, false);
+                break;
+            }
+            case 'ArrowRight': {
+                const info = DOMUtils.getSelectionTextInfo(cell);
+                if (!info.atEnd) return;
+                const nextCell = row.cells[cell.cellIndex + 1] as HTMLTableCellElement | undefined;
+                let targetCell: HTMLTableCellElement | null = null;
+                if (nextCell) {
+                    targetCell = nextCell;
+                } else {
+                    const nextRow = table.rows[row.rowIndex + 1];
+                    targetCell = nextRow ? nextRow.cells[0] as HTMLTableCellElement | undefined || null : null;
                 }
+                const nextBlock = !targetCell ? (table.closest('.block') as HTMLElement)?.nextElementSibling as HTMLElement | null : null;
+                moveFocus(targetCell, nextBlock, true);
+                break;
+            }
+            case 'ArrowLeft': {
+                const info = DOMUtils.getSelectionTextInfo(cell);
+                if (!info.atStart) return;
+                const prevCell = row.cells[cell.cellIndex - 1] as HTMLTableCellElement | undefined;
+                let targetCell: HTMLTableCellElement | null = null;
+                if (prevCell) {
+                    targetCell = prevCell;
+                } else {
+                    const prevRow = table.rows[row.rowIndex - 1];
+                    targetCell = prevRow ? prevRow.cells[prevRow.cells.length - 1] as HTMLTableCellElement | undefined || null : null;
+                }
+                const prevBlock = !targetCell ? (table.closest('.block') as HTMLElement)?.previousElementSibling as HTMLElement | null : null;
+                moveFocus(targetCell, prevBlock, false);
+                break;
             }
         }
     }

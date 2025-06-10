@@ -180,24 +180,36 @@ export class CommandDispatcher {
                 break;
 
             case Commands.JustifyLeft:
-                if (!block) {
-                    throw new Error(`${Commands.JustifyLeft} requires a block to justify.`);
+                if (DOMUtils.isSelectionInTableCell()) {
+                    this.tableOperationsService.alignSelectedCells('left');
+                } else {
+                    if (!block) {
+                        throw new Error(`${Commands.JustifyLeft} requires a block to justify.`);
+                    }
+                    this.blockOperationsService.justifyLeft(block);
                 }
-                this.blockOperationsService.justifyLeft(block);
                 break;
 
             case Commands.JustifyCenter:
-                if (!block) {
-                    throw new Error(`${Commands.JustifyCenter} requires a block to justify.`);
+                if (DOMUtils.isSelectionInTableCell()) {
+                    this.tableOperationsService.alignSelectedCells('center');
+                } else {
+                    if (!block) {
+                        throw new Error(`${Commands.JustifyCenter} requires a block to justify.`);
+                    }
+                    this.blockOperationsService.justifyCenter(block);
                 }
-                this.blockOperationsService.justifyCenter(block);
                 break;
 
             case Commands.JustifyRight:
-                if (!block) {
-                    throw new Error(`${Commands.JustifyRight} requires a block to justify.`);
+                if (DOMUtils.isSelectionInTableCell()) {
+                    this.tableOperationsService.alignSelectedCells('right');
+                } else {
+                    if (!block) {
+                        throw new Error(`${Commands.JustifyRight} requires a block to justify.`);
+                    }
+                    this.blockOperationsService.justifyRight(block);
                 }
-                this.blockOperationsService.justifyRight(block);
                 break;
 
             case Commands.changeCodeBlockLanguage:
