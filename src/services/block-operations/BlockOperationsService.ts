@@ -743,40 +743,28 @@ export class BlockOperationsService implements IBlockOperationsService {
             }
         }
 
-        const contentType = DOMUtils.getContentTypeFromActiveElement();
+        const listItem = DOMUtils.findClosestAncestorOfActiveElementByClass("list-item");
 
-        if (contentType == ContentTypes.Image) {
-
-            const block = DOMUtils.findClosestAncestorOfActiveElementByClass("block");
-            this.createDefaultBlock(block, "");
-            return false;
-        } else if (contentType == ContentTypes.Table) {
-            return false;
-        } else if (
-            contentType == ContentTypes.CheckList ||
-            contentType == ContentTypes.BulletedList ||
-            contentType == ContentTypes.NumberedList) {
-        
-            const currentItem = DOMUtils.findClosestAncestorOfActiveElementByClass("list-item");
-            const parentBlock = currentItem?.closest(".block");
+        if (listItem) {
+            const parentBlock = listItem.closest(".block");
             const listElement = parentBlock?.querySelector("ul, ol");
             const allListItems = listElement?.querySelectorAll(".list-item");
 
-            if (!currentItem || !parentBlock || !listElement || !allListItems) return false;
+            if (!parentBlock || !listElement || !allListItems) return false;
 
-            const focusable = currentItem.querySelector(".focusable") as HTMLElement | null;
+            const focusable = listItem.querySelector(".focusable") as HTMLElement | null;
             const { atEnd } = focusable ? DOMUtils.getSelectionTextInfo(focusable) : { atEnd: false };
 
-            if (DOMUtils.hasTextContent(currentItem)) {
+            if (DOMUtils.hasTextContent(listItem)) {
                 if (atEnd) {
                     const newItem = this.elementFactoryService.create(ElementFactoryService.ELEMENT_TYPES.LIST_ITEM, "");
-                    DOMUtils.insertAfter(newItem, currentItem);
+                    DOMUtils.insertAfter(newItem, listItem);
                     const newFocusable = newItem.querySelector('.focusable') as HTMLElement;
                     DOMUtils.placeCursorAtStartOfEditableElement(newFocusable);
                 } else {
-                    const clone = DOMUtils.cloneAndInsertAfter(currentItem);
+                    const clone = DOMUtils.cloneAndInsertAfter(listItem);
                     if (clone) {
-                        const contentCurrent = currentItem.querySelector(".focusable") as Node;
+                        const contentCurrent = listItem.querySelector(".focusable") as Node;
                         const contentClone = clone.querySelector(".focusable") as Node;
 
                         DOMUtils.rearrangeContentAfterSplit(contentCurrent, contentClone);
@@ -788,16 +776,30 @@ export class BlockOperationsService implements IBlockOperationsService {
                 }
             } else {
                 const newParagraph = ElementFactoryService.blockParagraph();
-                DOMUtils.insertAfter(newParagraph, parentBlock);
+                DOMUtils.insertAfter(newParagraph, parentBlock!);
 
-                currentItem.remove();
+                listItem.remove();
                 if (allListItems.length === 1) {
-                    parentBlock.remove();
+                    parentBlock!.remove();
                 }
 
                 const p = newParagraph.querySelector('p') as HTMLElement;
                 DOMUtils.placeCursorAtStartOfEditableElement(p);
             }
+
+            EventEmitter.emitDocChangedEvent();
+            return true;
+        }
+
+        const contentType = DOMUtils.getContentTypeFromActiveElement();
+
+        if (contentType == ContentTypes.Image) {
+
+            const block = DOMUtils.findClosestAncestorOfActiveElementByClass("block");
+            this.createDefaultBlock(block, "");
+            return false;
+        } else if (contentType == ContentTypes.Table) {
+            return false;
         } else {
             const currentBlock = DOMUtils.findClosestAncestorOfActiveElementByClass("block");
 

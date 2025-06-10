@@ -274,6 +274,90 @@ describe('BlockOperationsService.createNewElementAndSplitContent', () => {
         });
     });
 
+    describe('Table behavior', () => {
+        test('pressing enter in table cell returns false', () => {
+            const block = document.createElement('div');
+            block.className = 'block deletable';
+
+            const table = document.createElement('table');
+            table.className = 'johannes-content-element swittable table';
+            table.setAttribute('data-content-type', ContentTypes.Table);
+
+            const tbody = document.createElement('tbody');
+            table.appendChild(tbody);
+
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.className = 'focusable editable';
+            cell.contentEditable = 'true';
+            row.appendChild(cell);
+            tbody.appendChild(row);
+
+            block.appendChild(table);
+            document.body.appendChild(block);
+
+            jest.spyOn(DOMUtils, 'getContentTypeFromActiveElement').mockReturnValue(ContentTypes.Table);
+            jest.spyOn(DOMUtils, 'findClosestAncestorOfActiveElementByClass').mockImplementation((selector) => {
+                if (selector === 'block') return block;
+                return null;
+            });
+
+            const result = service.createNewElementAndSplitContent();
+
+            expect(result).toBe(false);
+            expect(block.querySelectorAll('table').length).toBe(1);
+        });
+
+        test('list operations inside table are not blocked', () => {
+            const block = document.createElement('div');
+            block.className = 'block deletable';
+
+            const table = document.createElement('table');
+            table.className = 'johannes-content-element swittable table';
+            table.setAttribute('data-content-type', ContentTypes.Table);
+
+            const tbody = document.createElement('tbody');
+            table.appendChild(tbody);
+
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.className = 'focusable editable';
+            cell.contentEditable = 'true';
+            row.appendChild(cell);
+            tbody.appendChild(row);
+
+            const listElement = document.createElement('ul');
+            listElement.className = 'list';
+
+            const li = document.createElement('li');
+            li.className = 'deletable list-item hide-turninto';
+            const content = document.createElement('div');
+            content.className = 'focusable editable focus key-trigger';
+            content.contentEditable = 'true';
+            content.textContent = 'Item 1';
+
+            li.appendChild(content);
+            listElement.appendChild(li);
+            cell.appendChild(listElement);
+            block.appendChild(table);
+            document.body.appendChild(block);
+
+            jest.spyOn(DOMUtils, 'getContentTypeFromActiveElement').mockReturnValue(ContentTypes.Table);
+            jest.spyOn(DOMUtils, 'findClosestAncestorOfActiveElementByClass').mockImplementation((selector) => {
+                if (selector === 'list-item') return li;
+                if (selector === 'block') return block;
+                return null;
+            });
+            jest.spyOn(DOMUtils, 'getSelectionTextInfo').mockReturnValue({ atStart: false, atEnd: true });
+
+            const result = service.createNewElementAndSplitContent();
+
+            expect(result).toBe(true);
+            const items = listElement.querySelectorAll('.list-item');
+            expect(items.length).toBe(2);
+        });
+    });
+
     describe('Paragraph behavior', () => {
         test('pressing enter at end of paragraph creates new paragraph', () => {
             const block = ElementFactoryService.blockParagraph('Hello');
