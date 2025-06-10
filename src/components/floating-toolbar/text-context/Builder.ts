@@ -106,6 +106,10 @@ export class Builder {
         const inlineCode = ButtonGroupItem.create(Commands.toggleInlineCode, "Code", SVGIcon.create(Icons.InlineCode, Sizes.large));
         inlineCode.setId(ButtonIDs.InlineCode);
         inlineCode.appendTo(groupButton);
+
+        const inlineFormula = ButtonGroupItem.create(Commands.insertInlineFormula, "Formula", SVGIcon.create(Icons.Formula, Sizes.large));
+        inlineFormula.setId(ButtonIDs.InlineFormula);
+        inlineFormula.appendTo(groupButton);
         
         const strikethrough = ButtonGroupItem.create(Commands.toggleStrikeThrough, "Strike-through", SVGIcon.create(Icons.StrikeThrough, Sizes.large));
         strikethrough.setId(ButtonIDs.Strikethrough);

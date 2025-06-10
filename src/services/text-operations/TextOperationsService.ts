@@ -6,6 +6,10 @@ import { DependencyContainer } from "@/core/DependencyContainer";
 import { EventEmitter } from "@/commands/EventEmitter";
 import { ButtonIDs } from "@/core/ButtonIDs";
 import { DOMUtils } from "@/utilities/DOMUtils";
+import { MathInputter } from "@/components/math-inputter/MathInputter";
+import { CommonClasses } from "@/common/CommonClasses";
+import { ContentTypes } from "@/common/ContentTypes";
+import katex from 'katex';
 
 import rangy from 'rangy';
 import 'rangy/lib/rangy-classapplier';
@@ -342,6 +346,52 @@ export class TextOperationsService implements ITextOperationsService {
             console.error("Error applying inline code:", error);
             return false;
         }
+    }
+
+    execInlineFormula(): void {
+        this.memento.saveState();
+
+        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0) {
+            console.warn("No valid cursor position for inline formula.");
+            return;
+        }
+
+        const range = selection.getRangeAt(0);
+        const container = document.createElement('span');
+        container.classList.add('inline-math', CommonClasses.ShowMathInputOnClick, CommonClasses.ContentElement);
+        container.setAttribute('data-content-type', ContentTypes.Math);
+        container.dataset.formula = '';
+
+        const renderPreview = () => {
+            const formula = container.dataset.formula || '';
+            container.innerHTML = '';
+            if (formula) {
+                try {
+                    katex.render(formula, container, { throwOnError: false });
+                } catch (e) {
+                    container.textContent = formula;
+                }
+            } else {
+                container.textContent = 'f(x)';
+            }
+        };
+
+        (container as any).renderPreview = renderPreview;
+        renderPreview();
+
+        range.insertNode(container);
+        range.setStartAfter(container);
+        range.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(range);
+
+        const inputter = MathInputter.getInstance();
+        inputter.setTarget(container, renderPreview);
+        inputter.focusStack.push(container);
+        inputter.show();
+
+        EventEmitter.emitDocChangedEvent();
     }
 
     execItalic(): void {

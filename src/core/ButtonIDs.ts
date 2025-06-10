@@ -4,6 +4,7 @@ export enum ButtonIDs {
     Italic = "italicButton",
     Underline = "underlineButton",
     InlineCode = "inlineCodeButton",
+    InlineFormula = "inlineFormulaButton",
     Strikethrough = "strikethroughButton",
     AlignLeft = "alignLeft",
     AlignCenter = "alignCenter",

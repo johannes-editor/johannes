@@ -10,6 +10,7 @@ export interface ITextOperationsService {
     execItalic(): void;
     execStrikeThrough(): void;
     execInlineCode(): void;
+    execInlineFormula(): void;
     execUnderline(): void
     execHiliteColor(value: string): void;
     execForeColor(value: string): void;

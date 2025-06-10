@@ -6,6 +6,7 @@ export enum Commands {
     changeCalloutBackgroundColor = "changeCalloutBackgroundColor",
     toggleForeColor = "foreColor",
     toggleInlineCode = "inlineCode",
+    insertInlineFormula = "inlineFormula",
     toggleLink = "createLink",
     linkReadyToInsert = "linkReadyToInsert",
     toggleUnderline = "underline",

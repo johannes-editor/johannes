@@ -33,6 +33,7 @@ export class Toolbar extends FloatingToolbarBase {
     private turnIntoOptions: HTMLElement | null = null;
     private turnIntoSeparator: HTMLElement | null = null;
     private inlineCodeButton: HTMLElement | null = null;
+    private inlineFormulaButton: HTMLElement | null = null;
     private linkButton: HTMLElement | null = null;
     private textOperationsSeparator: HTMLElement | null = null;
 
@@ -148,6 +149,10 @@ export class Toolbar extends FloatingToolbarBase {
             this.inlineCodeButton = document.querySelector("#inlineCodeButton");
         }
 
+        if (!this.inlineFormulaButton) {
+            this.inlineFormulaButton = document.querySelector("#inlineFormulaButton");
+        }
+
         if (!this.linkButton) {
             this.linkButton = document.querySelector("#linkButton");
         }        
@@ -167,6 +172,7 @@ export class Toolbar extends FloatingToolbarBase {
             this.turnIntoOptions!.style.display = "none";
             this.turnIntoSeparator!.style.display = "none";
             this.inlineCodeButton!.style.display = "none";
+            this.inlineFormulaButton!.style.display = "none";
             this.textOperationsSeparator!.style.display = "none";
 
         } else {
@@ -175,6 +181,7 @@ export class Toolbar extends FloatingToolbarBase {
             this.turnIntoOptions!.style.display = "flex";
             this.turnIntoSeparator!.style.display = "flex";
             this.inlineCodeButton!.style.display = "flex";
+            this.inlineFormulaButton!.style.display = "flex";
             this.textOperationsSeparator!.style.display = "flex";
         }
     }
