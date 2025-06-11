@@ -6,6 +6,7 @@ import { DOMElements } from "@/common/DOMElements";
 import { CommonClasses } from "@/common/CommonClasses";
 import { DOMUtils } from "@/utilities/DOMUtils";
 import { Utils } from "@/utilities/Utils";
+import { ContentTypes } from "@/common/ContentTypes";
 
 export class BlockToolbox implements IBlockToolbox {
 
@@ -162,6 +163,7 @@ export class BlockToolbox implements IBlockToolbox {
 
             if (block) {
                 block.appendChild(toolboxWrapper);
+                BlockToolbox.updateCaptionOptionVisibility(block as HTMLElement);
                 block.addEventListener(DefaultJSEvents.Mouseenter, (event) => this.resetToolbox(event, block as HTMLElement));
 
                 block.addEventListener(DefaultJSEvents.Mousemove, (event: Event) => {
@@ -248,6 +250,21 @@ export class BlockToolbox implements IBlockToolbox {
         return false;
     }
 
+    static updateCaptionOptionVisibility(block: HTMLElement): void {
+        const captionItem = block.querySelector('.caption-option-item') as HTMLElement | null;
+        if (!captionItem) return;
+
+        const contentElement = block.querySelector('.johannes-content-element') as HTMLElement | null;
+        const contentType = contentElement?.getAttribute('data-content-type');
+        const hasImage = !!block.querySelector('img');
+
+        if (contentType === ContentTypes.Image && hasImage) {
+            captionItem.style.display = 'flex';
+        } else {
+            captionItem.style.display = 'none';
+        }
+    }
+
     resetToolbox(event: Event, block: HTMLElement) {
         const blockToolbar = block.querySelector(".block-toolbar");
 
@@ -267,6 +284,7 @@ export class BlockToolbox implements IBlockToolbox {
         }
 
         this.changeToolbarColor(block);
+        BlockToolbox.updateCaptionOptionVisibility(block);
     }
 
     static createToolbox(includeLanguageSelectionTool = false, includeAlignTool = false, includeColorTool = false, includeExtraOptions = false): HTMLElement {

@@ -1294,6 +1294,13 @@ export class BlockOperationsService implements IBlockOperationsService {
 
     toggleCaption(block: HTMLElement): void {
 
+        const contentElement = block.querySelector('.johannes-content-element') as HTMLElement | null;
+        const contentType = contentElement?.getAttribute('data-content-type');
+
+        if (contentType !== ContentTypes.Image) {
+            return;
+        }
+
         this.memento.saveState();
 
         const moreOptionsList = block.querySelector('.media-more-option-select') as HTMLElement | null;
