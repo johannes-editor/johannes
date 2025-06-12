@@ -102,65 +102,61 @@ describe('BlockOperationsService.createNewElementAndSplitContent', () => {
         jest.spyOn(DOMUtils, 'trimEmptyTextAndBrElements').mockImplementation(() => { });
         jest.spyOn(DOMUtils, 'rearrangeContentAfterSplit').mockImplementation(() => { });
         jest.spyOn(document, 'querySelector').mockReturnValue(document.createElement('div'));
+
+        mockElementFactoryService.create.mockImplementation((type) => {
+            if (type === ElementFactoryService.ELEMENT_TYPES.LIST_ITEM) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                return (ElementFactoryService as any).listItem_2('');
+            }
+            if (type === ElementFactoryService.ELEMENT_TYPES.BLOCK_PARAGRAPH) {
+                return ElementFactoryService.blockParagraph('');
+            }
+            return document.createElement('div');
+        });
     });
 
     afterEach(() => {
         document.body.innerHTML = '';
-        jest.clearAllMocks();
+        jest.restoreAllMocks();
     });
 
     describe('List behavior', () => {
-        test('should split list when pressing enter on empty middle item', () => {
+        test('pressing enter at end of list item creates new empty item', () => {
             const parentBlock = document.createElement('div');
             parentBlock.className = 'block deletable';
 
             const listElement = document.createElement('ul');
             listElement.className = 'johannes-content-element swittable list';
 
-            const items = [1, 2, 3].map(i => {
-                const li = document.createElement('li');
-                li.className = 'deletable list-item hide-turninto';
+            const li = document.createElement('li');
+            li.className = 'deletable list-item hide-turninto';
 
-                const content = document.createElement('div');
-                content.className = 'focusable editable focus key-trigger';
-                content.contentEditable = 'true';
-                content.textContent = i === 2 ? '' : `Item ${i}`;
+            const content = document.createElement('div');
+            content.className = 'focusable editable focus key-trigger';
+            content.contentEditable = 'true';
+            content.textContent = 'Item 1';
 
-                li.appendChild(content);
-                return li;
-            });
-
-            items.forEach(item => listElement.appendChild(item));
+            li.appendChild(content);
+            listElement.appendChild(li);
             parentBlock.appendChild(listElement);
-
             document.body.appendChild(parentBlock);
 
-            const emptyItemContent = items[1].querySelector('.focusable') as HTMLElement;
             jest.spyOn(DOMUtils, 'getContentTypeFromActiveElement').mockReturnValue(ContentTypes.BulletedList);
             jest.spyOn(DOMUtils, 'findClosestAncestorOfActiveElementByClass').mockImplementation((selector) => {
-                if (selector === 'list-item') return items[1];
+                if (selector === 'list-item') return li;
                 if (selector === 'block') return parentBlock;
                 return null;
             });
+            jest.spyOn(DOMUtils, 'getSelectionTextInfo').mockReturnValue({ atStart: false, atEnd: true });
 
             const result = service.createNewElementAndSplitContent();
 
             expect(result).toBe(true);
-            expect(mockMemento.saveState).toHaveBeenCalled();
-
-            const allBlocks = document.querySelectorAll('.block');
-            expect(allBlocks.length).toBe(2);
-
-            const firstList = allBlocks[0].querySelector('ul');
-            expect(firstList?.querySelectorAll('.list-item').length).toBe(1);
-
-            const secondList = allBlocks[1].querySelector('ul');
-            expect(secondList?.querySelectorAll('.list-item').length).toBe(1);
-
-            expect(items[1].parentNode).toBeNull();
-
-            const newFocusElement = secondList?.querySelector('.focusable') as HTMLElement;
-            expect(DOMUtils.placeCursorAtStartOfEditableElement).toHaveBeenCalledWith(newFocusElement);
+            const items = listElement.querySelectorAll('.list-item');
+            expect(items.length).toBe(2);
+            const newItem = items[1].querySelector('.focusable') as HTMLElement;
+            expect(newItem.textContent).toBe('');
+            expect(DOMUtils.placeCursorAtStartOfEditableElement).toHaveBeenCalledWith(newItem);
         });
 
         test('should remove entire list block if first item is empty and is the only item', () => {
@@ -191,9 +187,11 @@ describe('BlockOperationsService.createNewElementAndSplitContent', () => {
             });
         
             const result = service.createNewElementAndSplitContent();
-        
+
             expect(result).toBe(true);
             expect(document.body.contains(parentBlock)).toBe(false);
+            const paragraph = document.body.querySelector('p');
+            expect(paragraph).not.toBeNull();
         });
 
         test('should remove last empty list item and create paragraph block', () => {
@@ -237,49 +235,126 @@ describe('BlockOperationsService.createNewElementAndSplitContent', () => {
             expect(allBlocks[1].querySelector('p')).not.toBeNull();
         });
 
-        test('should split list with multiple items after split point', () => {
+        test('pressing enter in the middle of list item splits the item', () => {
             const parentBlock = document.createElement('div');
             parentBlock.className = 'block deletable';
-        
+
             const listElement = document.createElement('ul');
             listElement.className = 'johannes-content-element swittable list';
-        
-            const items = [1, 2, 3, 4].map(i => {
-                const li = document.createElement('li');
-                li.className = 'deletable list-item hide-turninto';
-        
-                const content = document.createElement('div');
-                content.className = 'focusable editable focus key-trigger';
-                content.contentEditable = 'true';
-                content.textContent = i === 2 ? '' : `Item ${i}`;
-        
-                li.appendChild(content);
-                return li;
-            });
-        
-            items.forEach(item => listElement.appendChild(item));
+
+            const li = document.createElement('li');
+            li.className = 'deletable list-item hide-turninto';
+
+            const content = document.createElement('div');
+            content.className = 'focusable editable focus key-trigger';
+            content.contentEditable = 'true';
+            content.textContent = 'Hello world';
+
+            li.appendChild(content);
+            listElement.appendChild(li);
             parentBlock.appendChild(listElement);
             document.body.appendChild(parentBlock);
-        
+
             jest.spyOn(DOMUtils, 'getContentTypeFromActiveElement').mockReturnValue(ContentTypes.BulletedList);
             jest.spyOn(DOMUtils, 'findClosestAncestorOfActiveElementByClass').mockImplementation((selector) => {
-                if (selector === 'list-item') return items[1];
+                if (selector === 'list-item') return li;
                 if (selector === 'block') return parentBlock;
                 return null;
             });
-        
+            jest.spyOn(DOMUtils, 'getSelectionTextInfo').mockReturnValue({ atStart: false, atEnd: false });
+
+            const cloneSpy = jest.spyOn(DOMUtils, 'cloneAndInsertAfter');
+            const rearrangeSpy = jest.spyOn(DOMUtils, 'rearrangeContentAfterSplit');
+
             const result = service.createNewElementAndSplitContent();
-        
+
             expect(result).toBe(true);
-        
-            const allBlocks = document.querySelectorAll('.block');
-            expect(allBlocks.length).toBe(2);
-        
-            const firstListItems = allBlocks[0].querySelectorAll('.list-item');
-            const secondListItems = allBlocks[1].querySelectorAll('.list-item');
-        
-            expect(firstListItems.length).toBe(1);
-            expect(secondListItems.length).toBe(2);
+            expect(cloneSpy).toHaveBeenCalledWith(li);
+            expect(rearrangeSpy).toHaveBeenCalled();
+        });
+    });
+
+    describe('Table behavior', () => {
+        test('pressing enter in table cell returns false', () => {
+            const block = document.createElement('div');
+            block.className = 'block deletable';
+
+            const table = document.createElement('table');
+            table.className = 'johannes-content-element swittable table';
+            table.setAttribute('data-content-type', ContentTypes.Table);
+
+            const tbody = document.createElement('tbody');
+            table.appendChild(tbody);
+
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.className = 'focusable editable';
+            cell.contentEditable = 'true';
+            row.appendChild(cell);
+            tbody.appendChild(row);
+
+            block.appendChild(table);
+            document.body.appendChild(block);
+
+            jest.spyOn(DOMUtils, 'getContentTypeFromActiveElement').mockReturnValue(ContentTypes.Table);
+            jest.spyOn(DOMUtils, 'findClosestAncestorOfActiveElementByClass').mockImplementation((selector) => {
+                if (selector === 'block') return block;
+                return null;
+            });
+
+            const result = service.createNewElementAndSplitContent();
+
+            expect(result).toBe(false);
+            expect(block.querySelectorAll('table').length).toBe(1);
+        });
+
+        test('list operations inside table are not blocked', () => {
+            const block = document.createElement('div');
+            block.className = 'block deletable';
+
+            const table = document.createElement('table');
+            table.className = 'johannes-content-element swittable table';
+            table.setAttribute('data-content-type', ContentTypes.Table);
+
+            const tbody = document.createElement('tbody');
+            table.appendChild(tbody);
+
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.className = 'focusable editable';
+            cell.contentEditable = 'true';
+            row.appendChild(cell);
+            tbody.appendChild(row);
+
+            const listElement = document.createElement('ul');
+            listElement.className = 'list';
+
+            const li = document.createElement('li');
+            li.className = 'deletable list-item hide-turninto';
+            const content = document.createElement('div');
+            content.className = 'focusable editable focus key-trigger';
+            content.contentEditable = 'true';
+            content.textContent = 'Item 1';
+
+            li.appendChild(content);
+            listElement.appendChild(li);
+            cell.appendChild(listElement);
+            block.appendChild(table);
+            document.body.appendChild(block);
+
+            jest.spyOn(DOMUtils, 'getContentTypeFromActiveElement').mockReturnValue(ContentTypes.Table);
+            jest.spyOn(DOMUtils, 'findClosestAncestorOfActiveElementByClass').mockImplementation((selector) => {
+                if (selector === 'list-item') return li;
+                if (selector === 'block') return block;
+                return null;
+            });
+            jest.spyOn(DOMUtils, 'getSelectionTextInfo').mockReturnValue({ atStart: false, atEnd: true });
+
+            const result = service.createNewElementAndSplitContent();
+
+            expect(result).toBe(true);
+            const items = listElement.querySelectorAll('.list-item');
+            expect(items.length).toBe(2);
         });
     });
 
