@@ -1,4 +1,19 @@
-# Johannes Editor
+# Johannes Editor (Archived)
+
+This repository has been discontinued and archived.
+
+New Project
+
+The work previously developed here has been moved to a new repository:
+
+https://github.com/soguten/guten-editor
+https://demo-editor.guten.so
+
+## What's changed?
+
+The new project is a complete rewrite, with improvements in architecture, maintainability, and future development.
+
+---
 
 Johannes is a lightweight block based text editor written in TypeScript. It ships without any
 front end framework dependencies and focuses on providing an easy to embed editing experience.
