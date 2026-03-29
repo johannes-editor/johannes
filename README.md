@@ -7,6 +7,7 @@ This repository has been discontinued and archived.
 The work previously developed here has been moved to a new repository:
 
 https://github.com/soguten/guten-editor
+
 https://demo-editor.guten.so
 
 ## What's changed?
