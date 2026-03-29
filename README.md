@@ -2,7 +2,7 @@
 
 This repository has been discontinued and archived.
 
-New Project
+## New Project
 
 The work previously developed here has been moved to a new repository:
 
