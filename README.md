@@ -6,9 +6,9 @@ This repository has been discontinued and archived.
 
 The work previously developed here has been moved to a new repository:
 
-https://github.com/soguten/guten-editor
+https://github.com/soguten/guten-editor - Repo
 
-https://demo-editor.guten.so
+https://demo-editor.guten.so - Demo
 
 ## What's changed?
 
